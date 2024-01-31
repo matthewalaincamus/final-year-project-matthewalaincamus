@@ -1,3 +1,4 @@
 *.exe
 /proof-of-concept/words_data
 /corpus/Texts
+/corpus/*.txt
