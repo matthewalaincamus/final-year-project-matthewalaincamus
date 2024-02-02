@@ -253,7 +253,10 @@ int LWD_Dataset()
                             strcpy(FinalDirectoryName, innnerDirectoryName);
                             strcat(FinalDirectoryName, "/");
                             strcat(FinalDirectoryName, innerdp->d_name);
-                            printf("%s\n", FinalDirectoryName);
+                            //printf("%s\n", FinalDirectoryName);
+
+                            int ReaderCheck =  wordReader(FinalDirectoryName, Wfp);
+                            if (ReaderCheck == -1) return -1;
                         }
                     }
                     closedir(innerdir);
@@ -352,5 +355,7 @@ int wordReader(char fileLocation[128], FILE* Wfp)
 
     //cleanup
     fclose(fp);
+
+    return 0;
 
 }
