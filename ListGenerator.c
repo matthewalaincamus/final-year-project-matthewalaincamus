@@ -1,13 +1,14 @@
 #include "ListGenerator.h"
 
 //function for making list of words with no checks for duplicates
-int LWD_Dataset()
+int LWD_Dataset(int sortCheck)
 {
     //clear the screen so that only relevant system text is shown
     system("cls");
 
     //show user options for the corpus
     printf("Please type a letter from A to K as two which text you would like (has to be capitals):\n");
+    printf("Type Z, if you wish to return to the previous screen\n");
 
     int letterCheck = 0;
     char ActionChoice1[128];
@@ -24,6 +25,10 @@ int LWD_Dataset()
             {
                 break;
             }
+            else if(!strcmp(ActionChoice1, "Z") || !strcmp(ActionChoice1, "z"))
+            {
+                return 0;
+            }
             else
             {
                 printf("please input a letter inside the required range and is capitalised\n");
@@ -36,11 +41,18 @@ int LWD_Dataset()
     }
 
     printf("***Generating list***\n");
+    printf("LOADING...\n");
 
     FILE* Wfp;
 
     //this is the file where all the words are deposited
-    Wfp = fopen("./corpus/words.txt", "w");
+    if (sortCheck == 0)Wfp = fopen("./corpus/LWD.txt", "w");
+    else if (sortCheck == 1)Wfp = fopen("./corpus/LWDS.txt", "w");
+    else
+    {
+        printf("Error: invalid sortCheck value given\n");
+        return -1;
+    }
 
     if (Wfp == NULL)
     {
@@ -88,7 +100,9 @@ int LWD_Dataset()
                             strcpy(FinalDirectoryName, innnerDirectoryName);
                             strcat(FinalDirectoryName, "/");
                             strcat(FinalDirectoryName, innerdp->d_name);
-                            //printf("%s\n", FinalDirectoryName);
+
+                            //print the files as they load
+                            printf("%s\n", FinalDirectoryName);
 
                             int ReaderCheck =  wordReader(FinalDirectoryName, Wfp);
                             if (ReaderCheck == -1) return -1;
@@ -101,8 +115,16 @@ int LWD_Dataset()
         closedir(dir);
     }
 
-    
+    //cleanup
     fclose(Wfp);
+
+    //***sorting functionality
+    if (sortCheck == 1)
+    {
+        int sortErrorCheck = sortingAlphabeticallyFunction("./corpus/LWDS.txt");
+
+        if (sortCheck == -1)return -1;
+    }
 
     //confirm that the file was generated successfully
     printf("***File generated sucessfully***\n");
@@ -169,9 +191,26 @@ int wordReader(char fileLocation[128], FILE* Wfp)
                                 breakCheck++;
                                 break;
                             }
-                            nextString[charCount] = nextChar;
-                            nextChar = fgetc(fp);
-                            charCount++;
+                            else if (nextChar == '/')
+                            {
+                                nextString[charCount] = '\0';
+                                //word shouldn't have numbers or start on anything other than a letter
+                                //if a word is valid, it is added to the final file of words
+                                if (breakCheck == 0 && isalpha(nextString[0]))
+                                {
+                                    fprintf(Wfp, "%s\n", nextString);
+                                    //printf("%d: %s\n", lineCount, nextString);
+                                }
+                                charCount = 0;
+                                breakCheck = 0;
+                                nextChar = fgetc(fp);
+                            }
+                            else
+                            {
+                                nextString[charCount] = nextChar;
+                                nextChar = fgetc(fp);
+                                charCount++;
+                            }
                         }
                         nextString[charCount] = '\0';
                         //word shouldn't have numbers or start on anything other than a letter
@@ -196,13 +235,14 @@ int wordReader(char fileLocation[128], FILE* Wfp)
 }
 
 //function for making list of words with no checks for duplicates
-int LWND_Dataset()
+int LWND_Dataset(int sortCheck)
 {
     //clear the screen so that only relevant system text is shown
     system("cls");
 
     //show user options for the corpus
     printf("Please type a letter from A to K as two which text you would like (has to be capitals):\n");
+    printf("Type Z, if you wish to return to the previous screen\n");
 
     int letterCheck = 0;
     char ActionChoice1[128];
@@ -219,6 +259,10 @@ int LWND_Dataset()
             {
                 break;
             }
+            else if(!strcmp(ActionChoice1, "Z") || !strcmp(ActionChoice1, "z"))
+            {
+                return 0;
+            }
             else
             {
                 printf("please input a letter inside the required range and is capitalised\n");
@@ -231,8 +275,9 @@ int LWND_Dataset()
     }
 
     printf("***Generating list***\n");
+    printf("LOADING...\n");
 
-     //make a string array to store the words for duplicate checking
+    //make a string array to store the words for duplicate checking
     char **WordArray;
     WordArray = malloc(1000000 * sizeof(char*));
     int WordCount = 0;
@@ -240,7 +285,14 @@ int LWND_Dataset()
     FILE* Wfp;
 
     //this is the file where all the words are deposited
-    Wfp = fopen("./corpus/words.txt", "w");
+    //this is the file where all the words are deposited
+    if (sortCheck == 0)Wfp = fopen("./corpus/LWND.txt", "w");
+    else if (sortCheck == 1)Wfp = fopen("./corpus/LWNDS.txt", "w");
+    else
+    {
+        printf("Error: invalid sortCheck value given\n");
+        return -1;
+    }
 
     if (Wfp == NULL)
     {
@@ -288,10 +340,12 @@ int LWND_Dataset()
                             strcpy(FinalDirectoryName, innnerDirectoryName);
                             strcat(FinalDirectoryName, "/");
                             strcat(FinalDirectoryName, innerdp->d_name);
-                            //printf("%s\n", FinalDirectoryName);
+
+                            //print the files as they load
+                            printf("%s\n", FinalDirectoryName);
 
                             FILE* fp;
-                            char nextChar;
+                            char nextChar = ' ';
 
                             fp = fopen(FinalDirectoryName, "r");
 
@@ -342,9 +396,44 @@ int LWND_Dataset()
                                                         breakCheck++;
                                                         break;
                                                     }
-                                                    nextString[charCount] = nextChar;
-                                                    nextChar = fgetc(fp);
-                                                    charCount++;
+                                                    else if (nextChar == '/')
+                                                    {
+                                                        nextString[charCount] = '\0';
+                                                        //word shouldn't have numbers or start on anything other than a letter
+                                                        //if a word is valid, it is added to the final file of words
+                                                        if (breakCheck == 0 && isalpha(nextString[0]))
+                                                        {
+                                                            int duplicateCheck = 0;
+
+                                                            for (int i = 0; i < WordCount; i++)
+                                                            {
+                                                                if (!strcmp(WordArray[i], nextString))
+                                                                {
+                                                                    duplicateCheck = 1;
+                                                                    break;
+                                                                }
+                                                            }
+                                                            if(duplicateCheck == 0)
+                                                            {
+                                                                WordArray[WordCount] = malloc(128 * sizeof(char));
+                                                                strcpy(WordArray[WordCount], nextString);
+                                                                WordCount++;
+
+                                                                fprintf(Wfp, "%s\n", nextString);
+                                                                //printf("%d: %s\n", lineCount, nextString);
+                                                            }
+                                                        }
+
+                                                        charCount = 0;
+                                                        breakCheck = 0;
+                                                        nextChar = fgetc(fp);
+                                                    }
+                                                    else
+                                                    {
+                                                        nextString[charCount] = nextChar;
+                                                        nextChar = fgetc(fp);
+                                                        charCount++;
+                                                    }
                                                 }
                                                 nextString[charCount] = '\0';
                                                 //word shouldn't have numbers or start on anything other than a letter
@@ -379,10 +468,6 @@ int LWND_Dataset()
                             }
                             //cleanup
                             fclose(fp);
-
-                            //for testing
-                            break;
-
                         }
                     }
                     closedir(innerdir);
@@ -400,6 +485,7 @@ int LWND_Dataset()
     }
     */
     
+    //cleanup
     fclose(Wfp);
     free(WordArray);
 
@@ -410,6 +496,28 @@ int LWND_Dataset()
     char ActionChoice2[128];
     printf("Type anything to return: ");
     scanf("%s", &ActionChoice2);
+
+    return 0;
+}
+
+//function used to sort a list of words in aplphabetical order
+int sortingAlphabeticallyFunction(char fileName[128])
+{
+    //look into using malloc word array from previous functions to sort.
+
+
+    FILE* Wfp;
+
+    Wfp = fopen(fileName, "r");
+
+    if (Wfp == NULL)
+    {
+        printf("Error: issue loading sorting file\n");
+        return -1;
+    }
+    
+    //cleanup
+    fclose(Wfp);
 
     return 0;
 }

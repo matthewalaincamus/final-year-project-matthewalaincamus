@@ -112,6 +112,7 @@ int GenerateDataset()
         printf("options for corpus (indicate which option by typing its asscociated letter):\n");
         printf("(A) text into single list with duplicates\n");
         printf("(B) text into single list without duplicates\n");
+        printf("(C) text into single list with duplicates and sorted\n");
         printf("(Z) return to main menu\n");
 
         //check to see if the user wishes to close the system or not
@@ -126,7 +127,7 @@ int GenerateDataset()
 
             if(!strcmp(ActionChoice, "A") || !strcmp(ActionChoice, "a"))
             {
-                int errorCheck = LWD_Dataset();
+                int errorCheck = LWD_Dataset(0);
 
                 //if -1, an error occured.
                 //if 0, then reload the page again
@@ -141,7 +142,7 @@ int GenerateDataset()
             }
             else if(!strcmp(ActionChoice, "B") || !strcmp(ActionChoice, "b"))
             {
-                int errorCheck = LWND_Dataset();
+                int errorCheck = LWND_Dataset(0);
 
                 //if -1, an error occured.
                 //if 0, then reload the page again
@@ -153,6 +154,22 @@ int GenerateDataset()
                 {
                     inputCheck = -1;
                 }
+            }
+            else if(!strcmp(ActionChoice, "C") || !strcmp(ActionChoice, "c"))
+            {
+                int errorCheck = LWD_Dataset(1);
+
+                //if -1, an error occured.
+                //if 0, then reload the page again
+                if (errorCheck == 0)
+                {
+                    inputCheck = 2;
+                }
+                else if (errorCheck == -1)
+                {
+                    inputCheck = -1;
+                }
+
             }
             else if(!strcmp(ActionChoice, "Z") || !strcmp(ActionChoice, "z"))
             {
