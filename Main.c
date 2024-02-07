@@ -69,6 +69,14 @@ int mainMenu()
             else if(!strcmp(ActionChoice, "Z") || !strcmp(ActionChoice, "z"))
             {
                 inputCheck = 0;
+                
+                //remove all files to save storage space
+                remove("./corpus/LWD.txt");
+                remove("./corpus/LWDS.txt");
+                remove("./corpus/LWND.txt");
+                remove("./corpus/LWNDS.txt");
+                remove("./corpus/LWDS_tmp.txt");
+                remove("./corpus/LWNDS_tmp.txt");
             }
             //if the user types an invalid answer
             else
@@ -127,7 +135,7 @@ int GenerateDataset()
 
             if(!strcmp(ActionChoice, "A") || !strcmp(ActionChoice, "a"))
             {
-                int errorCheck = LWD_Dataset(0);
+                int errorCheck = DataReader(1, 0);
 
                 //if -1, an error occured.
                 //if 0, then reload the page again
@@ -142,7 +150,7 @@ int GenerateDataset()
             }
             else if(!strcmp(ActionChoice, "B") || !strcmp(ActionChoice, "b"))
             {
-                int errorCheck = LWND_Dataset(0);
+                int errorCheck = DataReader(0, 0);
 
                 //if -1, an error occured.
                 //if 0, then reload the page again
@@ -157,7 +165,7 @@ int GenerateDataset()
             }
             else if(!strcmp(ActionChoice, "C") || !strcmp(ActionChoice, "c"))
             {
-                int errorCheck = LWD_Dataset(1);
+                int errorCheck = DataReader(1, 1);
 
                 //if -1, an error occured.
                 //if 0, then reload the page again

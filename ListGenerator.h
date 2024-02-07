@@ -5,9 +5,8 @@
 #include <dirent.h>
 
 //list generation functions
-int LWD_Dataset(int sortCheck);
-int wordReader(char fileLocation[128], FILE* Wfp);
+int DataReader(int duplicateFlag, int sortFlag);
 
-int LWND_Dataset(int sortCheck);
-
-int sortingAlphabeticallyFunction(char fileName[128]);
+//sorting algorithms
+char** sortingAlphabeticallyFunction(FILE* Wfp, int StartValue, int MidValue, int EndValue);
+int AfterSort(char** WordArray, int WordCount, FILE* Wfp);
