@@ -1,4 +1,5 @@
 #include "ListGenerator.h"
+#include <time.h>
 
 //**function for making list of words from corpus
 //if duplicateFlag == 0 (no duplicates), if duplicateFlag == 1 (duplicates)
@@ -18,7 +19,7 @@ int DataReader(int duplicateFlag, int sortFlag)
     {
         //user input (just to confirm that the user can return back to the previous menu)
         printf(": ");
-        scanf("%s", &ActionChoice1);
+        scanf("%s", ActionChoice1);
 
         if(strlen(ActionChoice1) == 1)
         {
@@ -42,6 +43,9 @@ int DataReader(int duplicateFlag, int sortFlag)
         }
     }
 
+    //start timer
+    clock_t Start = clock();
+
     printf("***Generating list***\n");
     printf("LOADING...\n");
 
@@ -54,27 +58,23 @@ int DataReader(int duplicateFlag, int sortFlag)
 
     //this is the file where all the words are deposited
     if (sortFlag == 0 && duplicateFlag == 1)Wfp = fopen("./corpus/LWD.txt", "w");
-    else if (sortFlag == 1 && duplicateFlag == 1)Wfp = fopen("./corpus/LWDS_tmp.txt", "w");
+    else if (sortFlag == 1 && duplicateFlag == 1)Wfp = fopen("./corpus/LWDS.txt", "w");
     else if (sortFlag == 0 && duplicateFlag == 0)Wfp = fopen("./corpus/LWND.txt", "w");
-    else if (sortFlag == 1 && duplicateFlag == 0)Wfp = fopen("./corpus/LWNDS_tmp.txt", "w");
+    else if (sortFlag == 1 && duplicateFlag == 0)Wfp = fopen("./corpus/LWNDS.txt", "w");
     else
     {
         printf("Error: invalid sortCheck or duplicateCheck value given\n");
-        free(WordArray);
-        fclose(Wfp);
         return -1;
     }
 
     if (Wfp == NULL)
     {
         printf("Error: unable to open word file\n");
-        free(WordArray);
-        fclose(Wfp);
         return -1;
     }
 
     struct dirent *dp;
-    char directoryName[128] = "./corpus/Texts/";
+    char directoryName[50] = "./corpus/Texts/";
     strcat(directoryName, ActionChoice1);
     //printf("%s\n", directoryName);
 
@@ -90,7 +90,7 @@ int DataReader(int duplicateFlag, int sortFlag)
         {
             if (!(!strcmp(dp->d_name,"..") || !strcmp(dp->d_name, ".")))
             {
-                char innnerDirectoryName[128];
+                char innnerDirectoryName[50];
                 strcpy(innnerDirectoryName, directoryName);
                 strcat(innnerDirectoryName, "/");
                 strcat(innnerDirectoryName, dp->d_name);
@@ -109,7 +109,7 @@ int DataReader(int duplicateFlag, int sortFlag)
                     {
                         if (!(!strcmp(innerdp->d_name,"..") || !strcmp(innerdp->d_name, ".")))
                         {
-                            char FinalDirectoryName[128];
+                            char FinalDirectoryName[50];
                             strcpy(FinalDirectoryName, innnerDirectoryName);
                             strcat(FinalDirectoryName, "/");
                             strcat(FinalDirectoryName, innerdp->d_name);
@@ -125,8 +125,6 @@ int DataReader(int duplicateFlag, int sortFlag)
                             if (fp == NULL)
                             {
                                 printf("Error: unknown xml file\n");
-                                free(WordArray);
-                                fclose(Wfp);
                                 return -1;
                             }
                             else
@@ -193,7 +191,7 @@ int DataReader(int duplicateFlag, int sortFlag)
                                                                 }
                                                             }
 
-                                                            if(duplicateCheck == 0 & duplicateFlag == 0)
+                                                            if((duplicateCheck == 0 && duplicateFlag == 0) || (duplicateFlag == 1))
                                                             {
                                                                 WordArray[WordCount] = malloc(25 * sizeof(char));
                                                                 strcpy(WordArray[WordCount], nextString);
@@ -205,12 +203,14 @@ int DataReader(int duplicateFlag, int sortFlag)
                                                                     //printf("%d: %s\n", lineCount, nextString);
                                                                 }
                                                             }
+                                                            /*
                                                             else if (duplicateFlag == 1)
                                                             {
                                                                 fprintf(Wfp, "%s\n", nextString);
                                                                 //printf("%d: %s\n", lineCount, nextString);
                                                                 WordCount++;
                                                             }
+                                                            */
                                                         }
 
                                                         charCount = 0;
@@ -243,7 +243,7 @@ int DataReader(int duplicateFlag, int sortFlag)
                                                         }
                                                     }
 
-                                                    if(duplicateCheck == 0 & duplicateFlag == 0)
+                                                    if((duplicateCheck == 0 && duplicateFlag == 0) || (duplicateFlag == 1))
                                                     {
                                                         WordArray[WordCount] = malloc(25 * sizeof(char));
                                                         strcpy(WordArray[WordCount], nextString);
@@ -255,12 +255,14 @@ int DataReader(int duplicateFlag, int sortFlag)
                                                             //printf("%d: %s\n", lineCount, nextString);
                                                         }
                                                     }
+                                                    /*
                                                     else if (duplicateFlag == 1)
                                                     {
                                                         fprintf(Wfp, "%s\n", nextString);
                                                         //printf("%d: %s\n", lineCount, nextString);
                                                         WordCount++;
                                                     }
+                                                    */
                                                 }
                                             }
                                         }
@@ -278,6 +280,8 @@ int DataReader(int duplicateFlag, int sortFlag)
         closedir(dir);
     }
 
+    printf("WordCount: %d\n", WordCount);
+
     printf("**Loading Complete\n");
 
     //for testing
@@ -288,47 +292,16 @@ int DataReader(int duplicateFlag, int sortFlag)
     }
     */
 
-    //cleanup
-    fclose(Wfp);
-    free(WordArray);
-
     //sorting if necessary
     if (sortFlag == 1)
     {
         printf("Sorting...\n");
 
-        FILE *fp, *Wfp;
+        //shell sort
+        char **SortedWordArray = sortingAlphabeticallyFunction(WordArray, WordCount);
 
-        if (duplicateFlag == 1)
-        {
-            fp = fopen("./corpus/LWDS_tmp.txt", "r");
-            Wfp = fopen("./corpus/LWDS.txt", "w");
-        }
-        else if (duplicateFlag == 0)
-        {
-            fp = fopen("./corpus/LWNDS_tmp.txt", "r");
-            Wfp = fopen("./corpus/LWNDS.txt", "w");
-        }
-
-        if (fp == NULL)
-        {
-            printf("Error: unable to open sorting temporary word file\n");
-            fclose(fp);
-            return -1;
-        }
-
-        if (Wfp == NULL)
-        {
-            printf("Error: unable to open final sorted word file\n");
-            fclose(Wfp);
-            return -1;
-        }
-
-        //merge sort
-        //char **SortedWordArray = sortingAlphabeticallyFunction(Wfp, 0, WordCount/2, WordCount);
-
-        /*
-        int sortingCheck = AfterSort(WordArray, WordCount, Wfp);
+        
+        int sortingCheck = AfterSort(SortedWordArray, WordCount, Wfp);
 
         if (sortingCheck == -1)
         {
@@ -337,79 +310,119 @@ int DataReader(int duplicateFlag, int sortFlag)
             fclose(Wfp);
             return -1;
         }
-        */
-
-        printf("Sorting Completed\n");
-
-        //cleanup
-        fclose(Wfp);
-        fclose(fp);
+        
+        printf("**Sorting Completed\n");
     }
+
+    //cleanup
+    fclose(Wfp);
+    for (int i = 0; i < WordCount - 1 ;i++)
+    {
+        free(WordArray[i]);
+        WordArray[i] = NULL;
+    }
+    free(WordArray);
+    WordArray = NULL;
 
     //confirm that the file was generated successfully
     printf("***File generated sucessfully***\n");
 
+    clock_t TimeDif = clock() - Start;
+    double TimeTaken = (double)TimeDif / CLOCKS_PER_SEC;
+
+    printf("Operation took: %f Seconds to complete\n\n", TimeTaken);
+
     //user input (just to confirm that the user can return back to the previous menu)
     char ActionChoice2[128];
     printf("Type anything to return: ");
-    scanf("%s", &ActionChoice2);
+    scanf("%s", ActionChoice2);
 
     return 0;
 }
 
 //function used to sort a list of words in aplphabetical order
-//using a merge sort since I am dealing with numbers of words in the order of millions
-char** sortingAlphabeticallyFunction(FILE* Wfp, int StartValue, int MidValue, int EndValue)
+//using a shell sort
+char** sortingAlphabeticallyFunction(char **WordArray, int WordCount)
 {
-    int i, j, k;
+    printf("%d: words to sort\n", WordCount);
 
-    int LeftNumber = MidValue - StartValue + 1;
-    int RightNumber = EndValue - MidValue;
+    MergeSort(WordArray, 0, WordCount - 1, WordCount);
 
-    char** LeftArray = malloc((LeftNumber) * sizeof(char*));
-    char** RightArray = malloc((RightNumber) * sizeof(char*));
+    return WordArray;
+}
 
-    /*
-    for (i = 0; i < LeftNumber; i++)
+void MergeSort(char**WordArray, int LeftValue, int RightValue, int WordCount)
+{
+    if (LeftValue < RightValue)
     {
-        LeftArray[i] = malloc(25 * sizeof(char));
-        strcpy(LeftArray[i], WordArray[i]);
+        int MiddleValue = (LeftValue + (RightValue - 1)) / 2;
+
+        MergeSort(WordArray, LeftValue, MiddleValue, WordCount);
+        MergeSort(WordArray, MiddleValue + 1, RightValue, WordCount);
+        Merge(WordArray, LeftValue, MiddleValue, RightValue, WordCount);
     }
-    for (j = 0; j < RightNumber; j++)
-    {
-        RightArray[j] = malloc(25 * sizeof(char));
-        strcpy(RightArray[j], WordArray[j + MidValue + 1]);
-    }
-    */
+}
 
-    /*
-    //this is the loop to sort a string list in alphabetical order
-    for (int i = 0; i < WordCount; i++)
+void Merge(char**WordArray, int LeftValue, int MiddleValue, int RightValue, int WordCount)
+{
+    int LeftArrayRange = MiddleValue - LeftValue + 1;
+    int RightArrayRange = RightValue - MiddleValue;
+
+    char**LeftArray = malloc(LeftArrayRange * sizeof(char*));
+    char**RightArray = malloc(RightArrayRange * sizeof(char*));
+
+    for (int i = 0; i < LeftArrayRange; i++)
     {
-        for (int j = i + 1; j < WordCount; j++)
+        //printf("IValue: %d, LeftValue + i: %d, WordCount: %d\n", i, LeftValue+i, WordCount);
+        LeftArray[i] = malloc(25*sizeof(char));
+        strcpy(LeftArray[i], WordArray[LeftValue + i]);
+    }
+    for (int j = 0; j < RightArrayRange; j++)
+    {
+        //printf("JValue: %d, MiddleValue + 1 + j: %d, WordCount: %d\n", j, MiddleValue + 1 + j, WordCount);
+        RightArray[j] = malloc(25*sizeof(char));
+        strcpy(RightArray[j], WordArray[MiddleValue + 1 + j]);
+    }
+
+    int i = 0, j = 0, k = LeftValue;
+
+    while( i < LeftArrayRange && j < RightArrayRange)
+    {
+        //printf("IValue: %d, JValue: %d, KValue: %d, WordCount: %d\n", i, j, k, WordCount);
+        if( strcmp(LeftArray[i], RightArray[j]) < 0)
         {
-            if(strcmp(WordArray[i],WordArray[j]) > 0)
-            {
-                char *tmp = malloc(50 * sizeof(char));
-                strcpy(tmp,WordArray[i]);
-                strcpy(WordArray[i], WordArray[j]);
-                strcpy(WordArray[j], tmp);
-                
-                free(tmp);
-            }
+            strcpy(WordArray[k], LeftArray[i]);
+            i++;
         }
+        else
+        {
+            strcpy(WordArray[k], RightArray[j]);
+            j++;
+        }
+        k++;
     }
-    */
-   free(LeftArray);
-   free(RightArray);
 
-    return 0;
+    while (i < LeftArrayRange)
+    {
+        //printf("IValue: %d, KValue: %d, WordCount: %d\n", i, k, WordCount);
+        strcpy(WordArray[k], LeftArray[i]);
+        i++;
+        k++;
+    }
+
+    while (j < RightArrayRange)
+    {
+        //printf("JValue: %d, KValue: %d, WordCount: %d\n", j, k, WordCount);
+        strcpy(WordArray[k], RightArray[j]);
+        j++;
+        k++;
+    }
 }
 
 int AfterSort(char** WordArray, int WordCount, FILE* Wfp)
 {
     //loop to add sorted list to final file
-    for (int i = 0; i < WordCount; i++)
+    for (int i = 0; i < WordCount - 1; i++)
     {
         fprintf(Wfp, "%s\n", WordArray[i]);
         //printf("%d: %s\n", i, WordArray[i]);

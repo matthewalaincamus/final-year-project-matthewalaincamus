@@ -8,5 +8,7 @@
 int DataReader(int duplicateFlag, int sortFlag);
 
 //sorting algorithms
-char** sortingAlphabeticallyFunction(FILE* Wfp, int StartValue, int MidValue, int EndValue);
+char** sortingAlphabeticallyFunction(char **WordArray, int WordCount);
+void MergeSort(char**WordArray, int LeftValue, int RightValue, int WordCount);
+void Merge(char**WordArray, int LeftValue, int MiddleValue, int RightValue, int WordCount);
 int AfterSort(char** WordArray, int WordCount, FILE* Wfp);
