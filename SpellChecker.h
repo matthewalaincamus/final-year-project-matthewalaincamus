@@ -3,5 +3,14 @@
 #include <string.h>
 #include <ctype.h>
 #include <dirent.h>
+#include <time.h>
 
-int simpleCheck(int FileType);
+struct WordsListing 
+{
+    char** WordArray;
+    int WordCount;
+};
+
+int simpleCheckLinear(int FileType);
+int simpleCheckBinary(int FileType);
+struct WordsListing WordFetcher(int FileType);

@@ -1,5 +1,4 @@
 #include "ListGenerator.h"
-#include <time.h>
 
 //**function for making list of words from corpus
 //if duplicateFlag == 0 (no duplicates), if duplicateFlag == 1 (duplicates)

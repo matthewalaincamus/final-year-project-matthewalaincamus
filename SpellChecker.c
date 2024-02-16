@@ -1,6 +1,286 @@
 #include "SpellChecker.h"
 
-int simpleCheck(int FileType)
+struct WordsListing WordFetcher(int FileType);
+
+int simpleCheckLinear(int FileType)
 {
+    //check to see if the user wants to return to the main menu
+    int returnCheck = 1;
+
+    //will loop till the user exits via typing z or Z on the keyboard in the main menu
+    while (returnCheck == 1)
+    {
+        system("cls");
+
+        printf("Simple Check Spell Check:\n");
+        printf("**Current Filetype selected: ");
+
+        if (FileType == 0)
+        {
+            printf("text with duplicate\n\n");
+        }
+        else if (FileType == 1)
+        {
+            printf("text without duplicates\n\n");
+        }
+        else if (FileType== 2)
+        {
+            printf("text with duplicates sorted in alphabetical order\n\n");
+        }
+        else if (FileType == 3)
+        {
+            printf("text without duplicates sorted in alphabetical order\n\n");
+        }
+
+        printf("Please enter the word you wish to spell check\n");
+        printf("RULES:\n");
+        printf("- no numbers or non alphabet characters\n");
+        printf("- maximum length string of 25 characters\n");
+        printf("- all characters must be in lowercase\n\n");
+        printf("If you wish to return to the previous screen, please type '?' and then press enter\n");
+
+        int inputCheck = 1;
+
+        char ActionChoice[128];
+
+        while(inputCheck == 1)
+        {
+            //user input
+            printf(": ");
+            scanf("%s", ActionChoice);
+
+            if(!strcmp(ActionChoice, "?"))
+            {
+                return 0;
+            }
+
+            int WordCheck = 0;
+
+            for (int i = 0; i < 128; i++)
+            {
+                if (i > 24) WordCheck++;
+
+                int charToInt = (int)ActionChoice[i];
+
+                if (ActionChoice[i] == '\0') break;
+                else if (isdigit(ActionChoice[i])) WordCheck++;
+                else if (charToInt < 97 || charToInt > 122) WordCheck++;
+            }
+
+            if (WordCheck > 0) printf("Please enter a valid word\n");
+            else inputCheck = 0;
+        }
+
+        //start timer
+        clock_t Start = clock();
+
+        struct WordsListing WordArray = WordFetcher(FileType);
+        if (WordArray.WordCount == -1) return -1;
+
+        int WordFlag = 0;
+        int lineCount = 0;
+
+        for (int i = 0; i < WordArray.WordCount; i++)
+        {
+            if(!strcmp(WordArray.WordArray[i], ActionChoice))
+            {
+                printf("Your word exists in the word list\n");
+                WordFlag++;
+
+                clock_t TimeDif = clock() - Start;
+                double TimeTaken = (double)TimeDif / CLOCKS_PER_SEC;
+
+                printf("Operation took: %f Seconds to complete\n\n", TimeTaken);
+                break;
+            }
+            lineCount++;
+        }
+
+        if (WordFlag == 0)
+        {
+            printf("Your word doesn't exist in the word list\n");
+            clock_t TimeDif = clock() - Start;
+            double TimeTaken = (double)TimeDif / CLOCKS_PER_SEC;
+
+            printf("Operation took: %f Seconds to complete\n\n", TimeTaken);
+        }
+
+        printf("\n");
+
+        //user input (just to confirm that the user can return back to the previous menu)
+        char ActionChoice2[128];
+        printf("Type anything to enter another word: ");
+        scanf("%s", ActionChoice2);
+
+        //cleanup
+        free(WordArray.WordArray);
+        WordArray.WordArray = NULL;
+    }
+
     return 0;
+}
+
+int simpleCheckBinary(int FileType)
+{
+    //check to see if the user wants to return to the main menu
+    int returnCheck = 1;
+
+    //will loop till the user exits via typing z or Z on the keyboard in the main menu
+    while (returnCheck == 1)
+    {
+        system("cls");
+
+        printf("Simple Check Spell Check:\n");
+        printf("**Current Filetype selected: ");
+
+        if (FileType== 2)
+        {
+            printf("text with duplicates sorted in alphabetical order\n\n");
+        }
+        else if (FileType == 3)
+        {
+            printf("text without duplicates sorted in alphabetical order\n\n");
+        }
+
+        printf("Please enter the word you wish to spell check\n");
+        printf("RULES:\n");
+        printf("- no numbers or non alphabet characters\n");
+        printf("- maximum length string of 25 characters\n");
+        printf("- all characters must be in lowercase\n\n");
+        printf("If you wish to return to the previous screen, please type '?' and then press enter\n");
+
+        int inputCheck = 1;
+
+        char ActionChoice[128];
+
+        while(inputCheck == 1)
+        {
+            //user input
+            printf(": ");
+            scanf("%s", ActionChoice);
+
+            if(!strcmp(ActionChoice, "?"))
+            {
+                return 0;
+            }
+
+            int WordCheck = 0;
+
+            for (int i = 0; i < 128; i++)
+            {
+                if (i > 24) WordCheck++;
+
+                int charToInt = (int)ActionChoice[i];
+
+                if (ActionChoice[i] == '\0') break;
+                else if (isdigit(ActionChoice[i])) WordCheck++;
+                else if (charToInt < 97 || charToInt > 122) WordCheck++;
+            }
+
+            if (WordCheck > 0) printf("Please enter a valid word\n");
+            else inputCheck = 0;
+        }
+
+        //start timer
+        clock_t Start = clock();
+
+        struct WordsListing WordArray = WordFetcher(FileType);
+        if (WordArray.WordCount == -1) return -1;
+
+        clock_t TimeDif = clock() - Start;
+        double TimeTaken = (double)TimeDif / CLOCKS_PER_SEC;
+
+        printf("Operation took: %f Seconds to complete\n\n", TimeTaken);
+
+        //cleanup
+        free(WordArray.WordArray);
+        WordArray.WordArray = NULL;
+
+        //user input (just to confirm that the user can return back to the previous menu)
+        char ActionChoice2[128];
+        printf("Type anything to enter another word: ");
+        scanf("%s", ActionChoice2);
+    }
+
+    return 0;
+}
+
+struct WordsListing WordFetcher(int FileType)
+{
+    struct WordsListing returnStruct;
+
+    FILE* fp;
+
+    if (FileType == 0)
+    {
+        fp = fopen("./corpus/LWD.txt", "r");
+    }
+    else if(FileType == 1)
+    {
+        fp = fopen("./corpus/LWND.txt", "r");
+    }
+    else if(FileType == 2)
+    {
+        fp = fopen("./corpus/LWDS.txt", "r");
+    }
+    else if(FileType == 3)
+    {
+        fp = fopen("./corpus/LWNDS.txt", "r");
+    }
+    else
+    {
+        printf("Error: bad fileflag found\n");
+        returnStruct.WordCount = -1;
+        return returnStruct;
+    }
+
+    if (fp == NULL)
+    {
+        printf("Error: unable to open word file\n");
+        returnStruct.WordCount = -1;
+        return returnStruct;
+    }
+
+    //word array for storing all the words
+    char **WordArray;
+    WordArray = malloc(20000000 * sizeof(char*));
+    int WordCount = 0;
+
+    char nextChar = ' ';
+    char nextString[25];
+
+    //for testing
+    int lineCount = 0;
+    
+    int charCount = 0;
+
+    while (nextChar != EOF)
+    {
+        nextChar = fgetc(fp);
+
+        if (isalpha(nextChar))
+        {
+            nextString[charCount] = nextChar;
+            charCount++;
+        }
+        else if (nextChar == '\n')
+        {
+            nextString[charCount] = '\0';
+            //printf("%s\n", nextString);
+
+            WordArray[WordCount] = malloc(25 * sizeof(char));
+            strcpy(WordArray[WordCount], nextString);
+            WordCount++;
+            
+            lineCount++;
+            charCount = 0;
+        }
+    }
+
+    fclose(fp);
+
+    returnStruct.WordArray = WordArray;
+    returnStruct.WordCount = WordCount;
+
+    return returnStruct;
 }

@@ -3,6 +3,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <dirent.h>
+#include <time.h>
 
 //list generation functions
 int DataReader(int duplicateFlag, int sortFlag);

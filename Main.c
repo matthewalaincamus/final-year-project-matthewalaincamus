@@ -367,7 +367,7 @@ int SpellCheck(int FileType)
         //clear the screen so that only relevant system text is shown
         system("cls");
 
-        printf("**Current Filetype selected:\n");
+        printf("**Current Filetype selected: ");
 
         if (FileType == 0)
         {
@@ -388,7 +388,8 @@ int SpellCheck(int FileType)
 
         //show user options for the corpus
         printf("options for spell checking (indicate which option by typing its asscociated letter):\n");
-        printf("(A) simple check to see if the word is in the file generated\n");
+        printf("(A) simple check to see if the word is in the file generated using linear search\n");
+        printf("(B) simple check to see if the word is in the file generated using binary search (sorted word list only)\n");
         printf("(Z) return to main menu\n");
 
         
@@ -404,7 +405,7 @@ int SpellCheck(int FileType)
             if(!strcmp(ActionChoice, "A") || !strcmp(ActionChoice, "a"))
             {
                 
-                int errorCheck = simpleCheck(FileType);
+                int errorCheck = simpleCheckLinear(FileType);
 
                 //if -1, an error occured.
                 //if 0, then reload the page again
@@ -417,6 +418,27 @@ int SpellCheck(int FileType)
                     inputCheck = -1;
                 }
                 
+            }
+            else if((!strcmp(ActionChoice, "B") || !strcmp(ActionChoice, "b")) && ((FileType == 2) || (FileType == 3)))
+            {
+                
+                int errorCheck = simpleCheckBinary(FileType);
+
+                //if -1, an error occured.
+                //if 0, then reload the page again
+                if (errorCheck == 0)
+                {
+                    inputCheck = 2;
+                }
+                else if (errorCheck == -1)
+                {
+                    inputCheck = -1;
+                }
+                
+            }
+            else if((!strcmp(ActionChoice, "B") || !strcmp(ActionChoice, "b")) && ((FileType == 0) || (FileType == 1)))
+            {
+                printf("the selected file type needs to be sorted to perform this action\n");
             }
             else if(!strcmp(ActionChoice, "Z") || !strcmp(ActionChoice, "z"))
             {
