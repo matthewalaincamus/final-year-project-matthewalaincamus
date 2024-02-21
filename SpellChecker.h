@@ -11,6 +11,7 @@ struct WordsListing
     int WordCount;
 };
 
-int simpleCheckLinear(int FileType);
+int simpleCheckLinear(int FileType, int LevCheck);
 int simpleCheckBinary(int FileType);
 struct WordsListing WordFetcher(int FileType);
+int binarySearch(char** WordArray, int leftValue, int rightValue, char wordString[25]);

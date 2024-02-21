@@ -1,8 +1,9 @@
 #include "SpellChecker.h"
 
 struct WordsListing WordFetcher(int FileType);
+int binarySearch(char** WordArray, int leftValue, int rightValue, char wordString[25]);
 
-int simpleCheckLinear(int FileType)
+int simpleCheckLinear(int FileType, int LevCheck)
 {
     //check to see if the user wants to return to the main menu
     int returnCheck = 1;
@@ -12,7 +13,13 @@ int simpleCheckLinear(int FileType)
     {
         system("cls");
 
-        printf("Simple Check Spell Check:\n");
+        if (LevCheck == 0) printf("Simple Check Spell Check:\n");
+        else if (LevCheck == 1) printf("Simple Check Spell Check with levenshtein distance based suggestions:\n");
+        else
+        {
+            printf("Error: LevCheck value wrong\n");
+            return -1;
+        }
         printf("**Current Filetype selected: ");
 
         if (FileType == 0)
@@ -187,6 +194,14 @@ int simpleCheckBinary(int FileType)
         struct WordsListing WordArray = WordFetcher(FileType);
         if (WordArray.WordCount == -1) return -1;
 
+        int binaryCheck = binarySearch(WordArray.WordArray, 0, WordArray.WordCount - 1, ActionChoice);
+        if (binaryCheck == 0) printf("Your word doesn't exist in the word list\n");
+        else if (binaryCheck == 1) printf("Your word exists in the word list\n");
+        else
+        {
+            printf("Error: problem with binary search\n");
+        }
+
         clock_t TimeDif = clock() - Start;
         double TimeTaken = (double)TimeDif / CLOCKS_PER_SEC;
 
@@ -283,4 +298,32 @@ struct WordsListing WordFetcher(int FileType)
     returnStruct.WordCount = WordCount;
 
     return returnStruct;
+}
+
+int binarySearch(char** WordArray, int leftValue, int rightValue, char wordString[25])
+{
+    if (rightValue >= leftValue)
+    {
+        int middleValue = leftValue + (rightValue - leftValue) / 2;
+        //printf("LeftValue: %i, MiddleValue: %i, RightValue: %i\n", leftValue, middleValue, rightValue);
+        //printf("WordArray: %s, Word to find: %s\n", WordArray[middleValue], wordString);
+
+        if (strcmp(wordString, WordArray[middleValue]) == 0)
+        return 1;
+
+        else if (strcmp(wordString, WordArray[middleValue]) < 0)
+        {
+            return binarySearch(WordArray, leftValue, middleValue - 1, wordString);
+        }
+        else
+        {
+            return binarySearch(WordArray, middleValue + 1, rightValue, wordString);
+        }
+    }
+    return 0;
+}
+
+int LevenshteinChecker(int FileType)
+{
+    return 0;
 }
