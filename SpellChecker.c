@@ -2,6 +2,8 @@
 
 struct WordsListing WordFetcher(int FileType);
 int binarySearch(char** WordArray, int leftValue, int rightValue, char wordString[25]);
+int LevenshteinChecker(char string1[], char string2[], int len1, int len2);
+int Min(int a, int b);
 
 int simpleCheckLinear(int FileType, int LevCheck)
 {
@@ -76,6 +78,16 @@ int simpleCheckLinear(int FileType, int LevCheck)
 
             if (WordCheck > 0) printf("Please enter a valid word\n");
             else inputCheck = 0;
+        }
+
+        //testing
+        if (LevCheck == 1)
+        {
+            char testString[] = "apples";
+            printf("String1: %s, String2: %s, value: %d", 
+            ActionChoice, 
+            testString, 
+            LevenshteinChecker(ActionChoice, testString, strlen(ActionChoice), strlen(testString)));
         }
 
         //start timer
@@ -323,7 +335,32 @@ int binarySearch(char** WordArray, int leftValue, int rightValue, char wordStrin
     return 0;
 }
 
-int LevenshteinChecker(int FileType)
+int LevenshteinChecker(char string1[], char string2[], int len1, int len2)
 {
-    return 0;
+    //empty string1
+    if (len1 == 0) return len2;
+
+    //empty string2
+    if (len2 == 0) return len1;
+
+    if(string1[len1 - 1] == string2[len2 - 1])
+    {
+        return LevenshteinChecker(string1, string2, len1 - 1, len2 - 1);
+    }
+    
+    return 1 + Min( 
+        //insert
+        LevenshteinChecker(string1, string2, len1, len2 -1),
+        Min(
+            //Remove
+            LevenshteinChecker(string1, string2, len1 - 1, len2),
+            //Replace
+            LevenshteinChecker(string1, string2, len1 - 1, len2 - 1)
+        ));
+}
+
+int Min(int a, int b)
+{
+    if (a < b) return a;
+    else return b;
 }

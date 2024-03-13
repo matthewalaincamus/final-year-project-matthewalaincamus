@@ -1,5 +1,11 @@
 #include "ListGenerator.h"
 
+//**function used to get a valid word from a given file pointer
+const char* GetWord(FILE fp, char** WordArray)
+{
+    return "hi";
+}
+
 //**function for making list of words from corpus
 //if duplicateFlag == 0 (no duplicates), if duplicateFlag == 1 (duplicates)
 //if sortFlag = 0 (no sort), if sortFlag = 1 (sort alphabetically), if sortFlag == 2 (sort by frequency)
@@ -174,7 +180,8 @@ int DataReader(int duplicateFlag, int sortFlag)
                                                         nextString[charCount] = '\0';
                                                         //word shouldn't have numbers or start on anything other than a letter
                                                         //if a word is valid, it is added to the final file of words
-                                                        if (breakCheck == 0 && isalpha(nextString[0]))
+                                                        //exclude one letter words
+                                                        if (breakCheck == 0 && isalpha(nextString[0]) && charCount > 1)
                                                         {
                                                             int duplicateCheck = 0;
 
@@ -226,7 +233,8 @@ int DataReader(int duplicateFlag, int sortFlag)
                                                 nextString[charCount] = '\0';
                                                 //word shouldn't have numbers or start on anything other than a letter
                                                 //if a word is valid, it is added to the final file of words
-                                                if (breakCheck == 0 && isalpha(nextString[0]))
+                                                //exclude 1 letter words
+                                                if (breakCheck == 0 && isalpha(nextString[0]) && charCount > 1)
                                                 {
                                                     int duplicateCheck = 0;
 
@@ -279,9 +287,9 @@ int DataReader(int duplicateFlag, int sortFlag)
         closedir(dir);
     }
 
-    printf("WordCount: %d\n", WordCount);
-
     printf("**Loading Complete\n");
+
+    printf("WordCount: %d\n", WordCount);
 
     //for testing
     /*
@@ -296,10 +304,9 @@ int DataReader(int duplicateFlag, int sortFlag)
     {
         printf("Sorting...\n");
 
-        //shell sort
+        //merge sort
         char **SortedWordArray = sortingAlphabeticallyFunction(WordArray, WordCount);
 
-        
         int sortingCheck = AfterSort(SortedWordArray, WordCount, Wfp);
 
         if (sortingCheck == -1)
