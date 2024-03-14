@@ -137,6 +137,12 @@ int DataReader(int duplicateFlag, int sortFlag)
                                 //line count just used for testing purposes
                                 int lineCount = 1;
 
+                                //for if a word ends with a ': needs work
+                                /*
+                                int apostropheCheck = 0;
+                                char apostropheWord [25] = "";
+                                */
+
                                 while(nextChar != EOF)
                                 {
                                     nextChar = fgetc(fp);

@@ -84,7 +84,7 @@ int simpleCheckLinear(int FileType, int LevCheck)
         if (LevCheck == 1)
         {
             char testString[] = "apples";
-            printf("String1: %s, String2: %s, value: %d", 
+            printf("String1: %s, String2: %s, value: %d\n", 
             ActionChoice, 
             testString, 
             LevenshteinChecker(ActionChoice, testString, strlen(ActionChoice), strlen(testString)));
@@ -99,25 +99,65 @@ int simpleCheckLinear(int FileType, int LevCheck)
         int WordFlag = 0;
         int lineCount = 0;
 
-        for (int i = 0; i < WordArray.WordCount; i++)
+        //for lev calculations
+        int LevArray [WordArray.WordCount];
+
+        //if the word is a single letter, no need to do any further checks as they are always valid
+        if (strlen(ActionChoice) == 1)
         {
-            if(!strcmp(WordArray.WordArray[i], ActionChoice))
+            printf("Your word exists in the word list\n");
+            WordFlag++;
+        }
+        else
+        {
+            for (int i = 0; i < WordArray.WordCount; i++)
             {
-                printf("Your word exists in the word list\n");
-                WordFlag++;
+                if(!strcmp(WordArray.WordArray[i], ActionChoice))
+                {
+                    printf("Your word exists in the word list\n");
+                    WordFlag++;
 
-                clock_t TimeDif = clock() - Start;
-                double TimeTaken = (double)TimeDif / CLOCKS_PER_SEC;
+                    clock_t TimeDif = clock() - Start;
+                    double TimeTaken = (double)TimeDif / CLOCKS_PER_SEC;
 
-                printf("Operation took: %f Seconds to complete\n\n", TimeTaken);
-                break;
+                    printf("Operation took: %f Seconds to complete\n\n", TimeTaken);
+                    break;
+                }
+                lineCount++;
+                
+                //if lev is active
+                if (LevCheck == 1)
+                {
+                    LevArray[i] = LevenshteinChecker(ActionChoice, WordArray.WordArray[i], strlen(ActionChoice), strlen(WordArray.WordArray[i]));
+                }
+
             }
-            lineCount++;
         }
 
         if (WordFlag == 0)
         {
             printf("Your word doesn't exist in the word list\n");
+
+            //beginning of levenstien distance calculations
+            for (int i = 0; i < 10; i++)
+            {
+                int CurrentMin = 50;
+                int CurrentMinIndex = 0;
+
+                for(int j = 0; j < WordArray.WordCount; j++)
+                {
+                    if (LevArray[j] < CurrentMin)
+                    {
+                        CurrentMin = LevArray[j];
+                        CurrentMinIndex = j;
+                    }
+                }
+
+                LevArray[CurrentMinIndex] = 50;
+
+                printf("Suggestion %i: %s\n", i+1, WordArray.WordArray[CurrentMinIndex]);
+            }
+
             clock_t TimeDif = clock() - Start;
             double TimeTaken = (double)TimeDif / CLOCKS_PER_SEC;
 
