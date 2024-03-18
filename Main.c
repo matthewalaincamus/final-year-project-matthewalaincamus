@@ -138,8 +138,10 @@ int GenerateDataset()
         printf("options for corpus (indicate which option by typing its asscociated letter):\n");
         printf("(A) text into single list with duplicates\n");
         printf("(B) text into single list without duplicates\n");
-        printf("(C) text into single list with duplicates and sorted\n");
-        printf("(D) text into single list without duplicates and sorted\n");
+        printf("(C) text into single list with duplicates and sorted alphabeticaly\n");
+        printf("(D) text into single list without duplicates and sorted alphabeticaly (merge sort)\n");
+        printf("(E) text into single list without duplicates and sorted alphabetically (parallel binary sort)\n");
+        printf("(F) text into single list without duplicate and sorted by frequency\n");
         printf("(Z) return to main menu\n");
 
         //check to see if the user wishes to close the system or not

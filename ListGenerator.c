@@ -356,7 +356,7 @@ int DataReader(int duplicateFlag, int sortFlag)
 //using a shell sort
 char** sortingAlphabeticallyFunction(char **WordArray, int WordCount)
 {
-    printf("%d: words to sort\n", WordCount);
+    //printf("%d: words to sort\n", WordCount);
 
     MergeSort(WordArray, 0, WordCount - 1, WordCount);
 
@@ -429,6 +429,11 @@ void Merge(char**WordArray, int LeftValue, int MiddleValue, int RightValue, int 
         j++;
         k++;
     }
+}
+
+void ParallelSort(char**WordArray)
+{
+    return;
 }
 
 int AfterSort(char** WordArray, int WordCount, FILE* Wfp)
