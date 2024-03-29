@@ -1,0 +1,10 @@
+notes:
+*use mispelled corpus to test / use in algorithms to better check for similarities
+*maybe test against a similar system in python
+*look for similaritiy algorithms other than Levenshtien distance
+  - Hamming Distance
+  - Smith-Waterman
+  - Sørensen–Dice Coefficient
+  - Damerau Levenshtein distance
+  - Simon White Similarity
+*fine tune the current algorithms
