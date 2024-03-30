@@ -140,8 +140,6 @@ int GenerateDataset()
         printf("(B) text into single list without duplicates\n");
         printf("(C) text into single list with duplicates and sorted alphabeticaly\n");
         printf("(D) text into single list without duplicates and sorted alphabeticaly (merge sort)\n");
-        printf("(E) text into single list without duplicates and sorted alphabetically (parallel binary sort)\n");
-        printf("(F) text into single list without duplicate and sorted by frequency\n");
         printf("(Z) return to main menu\n");
 
         //check to see if the user wishes to close the system or not
@@ -392,7 +390,10 @@ int SpellCheck(int FileType)
         printf("options for spell checking (indicate which option by typing its asscociated letter):\n");
         printf("(A) simple check using linear search\n");
         printf("(B) simple check binary search (sorted word list only)\n");
-        printf("(C) simple check using linear search, followed by suggestions if wrong using Levenshtein distance\n");
+        printf("(C) simple check using linear search, followed by suggestions if wrong using Levenshtein Distance\n");
+        printf("(D) simple check using binary search (sorted word list only), followed by suggestions if wrong using Levenshtien Distance\n");
+        printf("(E) simple check using linear search, followed by suggestions if wrong using Hamming Distance\n");
+        printf("(F) simple check using binary search (sorted word list only), followed by suggestions if wrong using Hamming Distance\n");
         printf("(Z) return to main menu\n");
 
         
@@ -408,7 +409,7 @@ int SpellCheck(int FileType)
             if(!strcmp(ActionChoice, "A") || !strcmp(ActionChoice, "a"))
             {
                 
-                int errorCheck = simpleCheckLinear(FileType, 0);
+                int errorCheck = SpellChecker(FileType, 0, 0);
 
                 //if -1, an error occured.
                 //if 0, then reload the page again
@@ -425,7 +426,7 @@ int SpellCheck(int FileType)
             else if((!strcmp(ActionChoice, "B") || !strcmp(ActionChoice, "b")) && ((FileType == 2) || (FileType == 3)))
             {
                 
-                int errorCheck = simpleCheckBinary(FileType);
+                int errorCheck = SpellChecker(FileType, 1, 0);
 
                 //if -1, an error occured.
                 //if 0, then reload the page again
@@ -446,7 +447,7 @@ int SpellCheck(int FileType)
             else if(!strcmp(ActionChoice, "C") || !strcmp(ActionChoice, "c"))
             {
                 
-                int errorCheck = simpleCheckLinear(FileType, 1);
+                int errorCheck = SpellChecker(FileType, 0, 1);
 
                 //if -1, an error occured.
                 //if 0, then reload the page again
@@ -459,6 +460,65 @@ int SpellCheck(int FileType)
                     inputCheck = -1;
                 }
                 
+            }
+            else if((!strcmp(ActionChoice, "D") || !strcmp(ActionChoice, "d")) && ((FileType == 2) || (FileType == 3)))
+            {
+                
+                int errorCheck = SpellChecker(FileType, 1, 1);
+
+                //if -1, an error occured.
+                //if 0, then reload the page again
+                if (errorCheck == 0)
+                {
+                    inputCheck = 2;
+                }
+                else if (errorCheck == -1)
+                {
+                    inputCheck = -1;
+                }
+                
+            }
+            else if((!strcmp(ActionChoice, "D") || !strcmp(ActionChoice, "d")) && ((FileType == 0) || (FileType == 1)))
+            {
+                printf("the selected file type needs to be sorted to perform this action\n");
+            }
+            else if(!strcmp(ActionChoice, "E") || !strcmp(ActionChoice, "e"))
+            {
+                
+                int errorCheck = SpellChecker(FileType, 0, 2);
+
+                //if -1, an error occured.
+                //if 0, then reload the page again
+                if (errorCheck == 0)
+                {
+                    inputCheck = 2;
+                }
+                else if (errorCheck == -1)
+                {
+                    inputCheck = -1;
+                }
+                
+            }
+            else if((!strcmp(ActionChoice, "F") || !strcmp(ActionChoice, "f")) && ((FileType == 2) || (FileType == 3)))
+            {
+                
+                int errorCheck = SpellChecker(FileType, 1, 2);
+
+                //if -1, an error occured.
+                //if 0, then reload the page again
+                if (errorCheck == 0)
+                {
+                    inputCheck = 2;
+                }
+                else if (errorCheck == -1)
+                {
+                    inputCheck = -1;
+                }
+                
+            }
+            else if((!strcmp(ActionChoice, "F") || !strcmp(ActionChoice, "f")) && ((FileType == 0) || (FileType == 1)))
+            {
+                printf("the selected file type needs to be sorted to perform this action\n");
             }
             else if(!strcmp(ActionChoice, "Z") || !strcmp(ActionChoice, "z"))
             {

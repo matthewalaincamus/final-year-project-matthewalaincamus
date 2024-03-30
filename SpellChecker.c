@@ -1,11 +1,14 @@
 #include "SpellChecker.h"
 
 struct WordsListing WordFetcher(int FileType);
+int linearCheck(char ** WordArray, int WordCount, char wordString[], int AlgorithmCheck, clock_t Start);
+int binaryCheck(char ** WordArray, int WordCount, char wordString[], int AlgorithmCheck, clock_t Start);
 int binarySearch(char** WordArray, int leftValue, int rightValue, char wordString[25]);
 int LevenshteinChecker(char string1[], char string2[], int len1, int len2);
+int HammingChecker(char string1[], char string2[], int len1, int len2);
 int Min(int a, int b);
 
-int simpleCheckLinear(int FileType, int LevCheck)
+int SpellChecker(int FileType, int CheckType, int AlgorithmCheck)
 {
     //check to see if the user wants to return to the main menu
     int returnCheck = 1;
@@ -15,8 +18,9 @@ int simpleCheckLinear(int FileType, int LevCheck)
     {
         system("cls");
 
-        if (LevCheck == 0) printf("Simple Check Spell Check:\n");
-        else if (LevCheck == 1) printf("Simple Check Spell Check with levenshtein distance based suggestions:\n");
+        if (AlgorithmCheck == 0) printf("Simple Check Spell Check:\n");
+        else if (AlgorithmCheck == 1) printf("Simple Check Spell Check with levenshtein distance based suggestions:\n");
+        else if (AlgorithmCheck == 2) printf("Simple Check Spell Check with hamming distance based suggestions:\n");
         else
         {
             printf("Error: LevCheck value wrong\n");
@@ -80,89 +84,17 @@ int simpleCheckLinear(int FileType, int LevCheck)
             else inputCheck = 0;
         }
 
-        //testing
-        if (LevCheck == 1)
-        {
-            char testString[] = "apples";
-            printf("String1: %s, String2: %s, value: %d\n", 
-            ActionChoice, 
-            testString, 
-            LevenshteinChecker(ActionChoice, testString, strlen(ActionChoice), strlen(testString)));
-        }
+        struct WordsListing WordArray = WordFetcher(FileType);
+        if (WordArray.WordCount == -1) return -1;
 
         //start timer
         clock_t Start = clock();
 
-        struct WordsListing WordArray = WordFetcher(FileType);
-        if (WordArray.WordCount == -1) return -1;
+        //linear searching = 0
+        if (CheckType == 0) linearCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, AlgorithmCheck, Start);
 
-        int WordFlag = 0;
-        int lineCount = 0;
-
-        //for lev calculations
-        int LevArray [WordArray.WordCount];
-
-        //if the word is a single letter, no need to do any further checks as they are always valid
-        if (strlen(ActionChoice) == 1)
-        {
-            printf("Your word exists in the word list\n");
-            WordFlag++;
-        }
-        else
-        {
-            for (int i = 0; i < WordArray.WordCount; i++)
-            {
-                if(!strcmp(WordArray.WordArray[i], ActionChoice))
-                {
-                    printf("Your word exists in the word list\n");
-                    WordFlag++;
-
-                    clock_t TimeDif = clock() - Start;
-                    double TimeTaken = (double)TimeDif / CLOCKS_PER_SEC;
-
-                    printf("Operation took: %f Seconds to complete\n\n", TimeTaken);
-                    break;
-                }
-                lineCount++;
-                
-                //if lev is active
-                if (LevCheck == 1)
-                {
-                    LevArray[i] = LevenshteinChecker(ActionChoice, WordArray.WordArray[i], strlen(ActionChoice), strlen(WordArray.WordArray[i]));
-                }
-
-            }
-        }
-
-        if (WordFlag == 0)
-        {
-            printf("Your word doesn't exist in the word list\n");
-
-            //beginning of levenstien distance calculations
-            for (int i = 0; i < 10; i++)
-            {
-                int CurrentMin = 50;
-                int CurrentMinIndex = 0;
-
-                for(int j = 0; j < WordArray.WordCount; j++)
-                {
-                    if (LevArray[j] < CurrentMin)
-                    {
-                        CurrentMin = LevArray[j];
-                        CurrentMinIndex = j;
-                    }
-                }
-
-                LevArray[CurrentMinIndex] = 50;
-
-                printf("Suggestion %i: %s\n", i+1, WordArray.WordArray[CurrentMinIndex]);
-            }
-
-            clock_t TimeDif = clock() - Start;
-            double TimeTaken = (double)TimeDif / CLOCKS_PER_SEC;
-
-            printf("Operation took: %f Seconds to complete\n\n", TimeTaken);
-        }
+        //binary searching = 1
+        else if (CheckType == 1) binaryCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, AlgorithmCheck, Start); 
 
         printf("\n");
 
@@ -174,99 +106,6 @@ int simpleCheckLinear(int FileType, int LevCheck)
         //cleanup
         free(WordArray.WordArray);
         WordArray.WordArray = NULL;
-    }
-
-    return 0;
-}
-
-int simpleCheckBinary(int FileType)
-{
-    //check to see if the user wants to return to the main menu
-    int returnCheck = 1;
-
-    //will loop till the user exits via typing z or Z on the keyboard in the main menu
-    while (returnCheck == 1)
-    {
-        system("cls");
-
-        printf("Simple Check Spell Check:\n");
-        printf("**Current Filetype selected: ");
-
-        if (FileType== 2)
-        {
-            printf("text with duplicates sorted in alphabetical order\n\n");
-        }
-        else if (FileType == 3)
-        {
-            printf("text without duplicates sorted in alphabetical order\n\n");
-        }
-
-        printf("Please enter the word you wish to spell check\n");
-        printf("RULES:\n");
-        printf("- no numbers or non alphabet characters\n");
-        printf("- maximum length string of 25 characters\n");
-        printf("- all characters must be in lowercase\n\n");
-        printf("If you wish to return to the previous screen, please type '?' and then press enter\n");
-
-        int inputCheck = 1;
-
-        char ActionChoice[128];
-
-        while(inputCheck == 1)
-        {
-            //user input
-            printf(": ");
-            scanf("%s", ActionChoice);
-
-            if(!strcmp(ActionChoice, "?"))
-            {
-                return 0;
-            }
-
-            int WordCheck = 0;
-
-            for (int i = 0; i < 128; i++)
-            {
-                if (i > 24) WordCheck++;
-
-                int charToInt = (int)ActionChoice[i];
-
-                if (ActionChoice[i] == '\0') break;
-                else if (isdigit(ActionChoice[i])) WordCheck++;
-                else if (charToInt < 97 || charToInt > 122) WordCheck++;
-            }
-
-            if (WordCheck > 0) printf("Please enter a valid word\n");
-            else inputCheck = 0;
-        }
-
-        //start timer
-        clock_t Start = clock();
-
-        struct WordsListing WordArray = WordFetcher(FileType);
-        if (WordArray.WordCount == -1) return -1;
-
-        int binaryCheck = binarySearch(WordArray.WordArray, 0, WordArray.WordCount - 1, ActionChoice);
-        if (binaryCheck == 0) printf("Your word doesn't exist in the word list\n");
-        else if (binaryCheck == 1) printf("Your word exists in the word list\n");
-        else
-        {
-            printf("Error: problem with binary search\n");
-        }
-
-        clock_t TimeDif = clock() - Start;
-        double TimeTaken = (double)TimeDif / CLOCKS_PER_SEC;
-
-        printf("Operation took: %f Seconds to complete\n\n", TimeTaken);
-
-        //cleanup
-        free(WordArray.WordArray);
-        WordArray.WordArray = NULL;
-
-        //user input (just to confirm that the user can return back to the previous menu)
-        char ActionChoice2[128];
-        printf("Type anything to enter another word: ");
-        scanf("%s", ActionChoice2);
     }
 
     return 0;
@@ -352,13 +191,148 @@ struct WordsListing WordFetcher(int FileType)
     return returnStruct;
 }
 
+int linearCheck(char ** WordArray, int WordCount, char wordString[], int AlgorithmCheck, clock_t Start)
+{
+    int WordFlag = 0;
+    int lineCount = 0;
+
+    //for suggestion calculations
+    int AlgorithmArray [WordCount];
+
+    //if the word is a single letter, no need to do any further checks as they are always valid
+    if (strlen(wordString) == 1)
+    {
+        printf("Your word exists in the word list\n");
+        WordFlag++;
+    }
+    else
+    {
+        for (int i = 0; i < WordCount; i++)
+        {
+            if(!strcmp(WordArray[i], wordString))
+            {
+                printf("Your word exists in the word list\n");
+                WordFlag++;
+
+                clock_t TimeDif = clock() - Start;
+                double TimeTaken = (double)TimeDif / CLOCKS_PER_SEC;
+
+                printf("Operation took: %f Seconds to complete\n\n", TimeTaken);
+                break;
+            }
+            lineCount++;
+            
+            //if lev is active
+            if (AlgorithmCheck == 1)
+            {
+                AlgorithmArray[i] = LevenshteinChecker(wordString, WordArray[i], strlen(wordString), strlen(WordArray[i]));
+            }
+            else if (AlgorithmCheck == 2)
+            {
+                AlgorithmArray[i] = HammingChecker(wordString, WordArray[i], strlen(wordString), strlen(WordArray[i]));
+            }
+        }
+    }
+
+    if (WordFlag == 0)
+    {
+        printf("Your word doesn't exist in the word list\n");
+
+        //get top 10 suggestions
+        for (int i = 0; i < 10; i++)
+        {
+            int CurrentMin = 50;
+            int CurrentMinIndex = 0;
+
+            for(int j = 0; j < WordCount; j++)
+            {
+                if (AlgorithmArray[j] < CurrentMin)
+                {
+                    CurrentMin = AlgorithmArray[j];
+                    CurrentMinIndex = j;
+                }
+            }
+
+            AlgorithmArray[CurrentMinIndex] = 50;
+
+            printf("Suggestion %i: %s\n", i+1, WordArray[CurrentMinIndex]);
+        }
+
+        clock_t TimeDif = clock() - Start;
+        double TimeTaken = (double)TimeDif / CLOCKS_PER_SEC;
+
+        printf("Operation took: %f Seconds to complete\n\n", TimeTaken);
+    }
+    return 0;
+}
+
+int binaryCheck(char ** WordArray, int WordCount, char wordString[], int AlgorithmCheck, clock_t Start)
+{
+    //perform the binary search
+    int binaryCheck = binarySearch(WordArray, 0, WordCount - 1, wordString);
+    if (binaryCheck == 0) 
+    {
+        printf("Your word doesn't exist in the word list\n");
+
+        if (AlgorithmCheck != 0)
+        {
+            //for suggestion calculations
+            int AlgorithmArray [WordCount];
+
+            //get all the levenshtein distances from string linearly
+            for (int i = 0; i < WordCount; i++)
+            {   
+                //if lev is active
+                if (AlgorithmCheck == 1)
+                {
+                    AlgorithmArray[i] = LevenshteinChecker(wordString, WordArray[i], strlen(wordString), strlen(WordArray[i]));
+                }
+                else if(AlgorithmCheck == 2)
+                {
+                    AlgorithmArray[i] = HammingChecker(wordString, WordArray[i], strlen(wordString), strlen(WordArray[i]));
+                }
+            }
+
+            //get top 10 suggestions
+            for (int i = 0; i < 10; i++)
+            {
+                int CurrentMin = 50;
+                int CurrentMinIndex = 0;
+
+                for(int j = 0; j < WordCount; j++)
+                {
+                    if (AlgorithmArray[j] < CurrentMin)
+                    {
+                        CurrentMin = AlgorithmArray[j];
+                        CurrentMinIndex = j;
+                    }
+                }
+
+                AlgorithmArray[CurrentMinIndex] = 50;
+
+                printf("Suggestion %i: %s\n", i+1, WordArray[CurrentMinIndex]);
+            }
+        }
+    }
+    else if (binaryCheck == 1) printf("Your word exists in the word list\n");
+    else
+    {
+        printf("Error: problem with binary search\n");
+    }
+
+    //get the time taken
+    clock_t TimeDif = clock() - Start;
+    double TimeTaken = (double)TimeDif / CLOCKS_PER_SEC;
+
+    printf("Operation took: %f Seconds to complete\n\n", TimeTaken);
+    return 0;
+}
+
 int binarySearch(char** WordArray, int leftValue, int rightValue, char wordString[25])
 {
     if (rightValue >= leftValue)
     {
         int middleValue = leftValue + (rightValue - leftValue) / 2;
-        //printf("LeftValue: %i, MiddleValue: %i, RightValue: %i\n", leftValue, middleValue, rightValue);
-        //printf("WordArray: %s, Word to find: %s\n", WordArray[middleValue], wordString);
 
         if (strcmp(wordString, WordArray[middleValue]) == 0)
         return 1;
@@ -397,6 +371,23 @@ int LevenshteinChecker(char string1[], char string2[], int len1, int len2)
             //Replace
             LevenshteinChecker(string1, string2, len1 - 1, len2 - 1)
         ));
+}
+
+//hamming distance calculator
+int HammingChecker(char string1[], char string2[], int len1, int len2)
+{
+    //strings need to be same length
+    if (len1 != len2) return 50; 
+
+    int HammingScore = 0;
+
+    //if a char is different, add 1 to the score
+    for (int i = 0; i < len1; i++)
+    {
+        if (string1[i] != string2[i]) HammingScore++;
+    }
+
+    return HammingScore;
 }
 
 int Min(int a, int b)

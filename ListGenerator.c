@@ -212,17 +212,8 @@ int DataReader(int duplicateFlag, int sortFlag)
                                                                 if (sortFlag == 0)
                                                                 {
                                                                     fprintf(Wfp, "%s\n", nextString);
-                                                                    //printf("%d: %s\n", lineCount, nextString);
                                                                 }
                                                             }
-                                                            /*
-                                                            else if (duplicateFlag == 1)
-                                                            {
-                                                                fprintf(Wfp, "%s\n", nextString);
-                                                                //printf("%d: %s\n", lineCount, nextString);
-                                                                WordCount++;
-                                                            }
-                                                            */
                                                         }
 
                                                         charCount = 0;
@@ -265,17 +256,8 @@ int DataReader(int duplicateFlag, int sortFlag)
                                                         if (sortFlag == 0)
                                                         {
                                                             fprintf(Wfp, "%s\n", nextString);
-                                                            //printf("%d: %s\n", lineCount, nextString);
                                                         }
                                                     }
-                                                    /*
-                                                    else if (duplicateFlag == 1)
-                                                    {
-                                                        fprintf(Wfp, "%s\n", nextString);
-                                                        //printf("%d: %s\n", lineCount, nextString);
-                                                        WordCount++;
-                                                    }
-                                                    */
                                                 }
                                             }
                                         }
@@ -385,13 +367,11 @@ void Merge(char**WordArray, int LeftValue, int MiddleValue, int RightValue, int 
 
     for (int i = 0; i < LeftArrayRange; i++)
     {
-        //printf("IValue: %d, LeftValue + i: %d, WordCount: %d\n", i, LeftValue+i, WordCount);
         LeftArray[i] = malloc(25*sizeof(char));
         strcpy(LeftArray[i], WordArray[LeftValue + i]);
     }
     for (int j = 0; j < RightArrayRange; j++)
     {
-        //printf("JValue: %d, MiddleValue + 1 + j: %d, WordCount: %d\n", j, MiddleValue + 1 + j, WordCount);
         RightArray[j] = malloc(25*sizeof(char));
         strcpy(RightArray[j], WordArray[MiddleValue + 1 + j]);
     }
@@ -400,7 +380,6 @@ void Merge(char**WordArray, int LeftValue, int MiddleValue, int RightValue, int 
 
     while( i < LeftArrayRange && j < RightArrayRange)
     {
-        //printf("IValue: %d, JValue: %d, KValue: %d, WordCount: %d\n", i, j, k, WordCount);
         if( strcmp(LeftArray[i], RightArray[j]) < 0)
         {
             strcpy(WordArray[k], LeftArray[i]);
@@ -416,7 +395,6 @@ void Merge(char**WordArray, int LeftValue, int MiddleValue, int RightValue, int 
 
     while (i < LeftArrayRange)
     {
-        //printf("IValue: %d, KValue: %d, WordCount: %d\n", i, k, WordCount);
         strcpy(WordArray[k], LeftArray[i]);
         i++;
         k++;
@@ -424,16 +402,10 @@ void Merge(char**WordArray, int LeftValue, int MiddleValue, int RightValue, int 
 
     while (j < RightArrayRange)
     {
-        //printf("JValue: %d, KValue: %d, WordCount: %d\n", j, k, WordCount);
         strcpy(WordArray[k], RightArray[j]);
         j++;
         k++;
     }
-}
-
-void ParallelSort(char**WordArray)
-{
-    return;
 }
 
 int AfterSort(char** WordArray, int WordCount, FILE* Wfp)
@@ -442,7 +414,6 @@ int AfterSort(char** WordArray, int WordCount, FILE* Wfp)
     for (int i = 0; i < WordCount - 1; i++)
     {
         fprintf(Wfp, "%s\n", WordArray[i]);
-        //printf("%d: %s\n", i, WordArray[i]);
     }
 
     return 0;
