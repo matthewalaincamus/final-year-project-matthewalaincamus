@@ -394,6 +394,10 @@ int SpellCheck(int FileType)
         printf("(D) simple check using binary search (sorted word list only), followed by suggestions if wrong using Levenshtien Distance\n");
         printf("(E) simple check using linear search, followed by suggestions if wrong using Hamming Distance\n");
         printf("(F) simple check using binary search (sorted word list only), followed by suggestions if wrong using Hamming Distance\n");
+        printf("(G) simple check using linear search, followed by suggestions if wrong using Sorensen-Dice Coefficient\n");
+        printf("(H) simple check using binary search (sorted word list only), followed by suggestions if wrong using Sorensen-Dice Coefficient\n");
+        printf("(I) simple check using linear search, followed by suggestions if wrong using Optimal String Alignment Distance\n");
+        printf("(J) simple check using binary search (sorted word list only), followed by suggestions if wrong using Optimal String Alignment Distance\n");
         printf("(Z) return to main menu\n");
 
         
@@ -440,10 +444,6 @@ int SpellCheck(int FileType)
                 }
                 
             }
-            else if((!strcmp(ActionChoice, "B") || !strcmp(ActionChoice, "b")) && ((FileType == 0) || (FileType == 1)))
-            {
-                printf("the selected file type needs to be sorted to perform this action\n");
-            }
             else if(!strcmp(ActionChoice, "C") || !strcmp(ActionChoice, "c"))
             {
                 
@@ -477,10 +477,6 @@ int SpellCheck(int FileType)
                     inputCheck = -1;
                 }
                 
-            }
-            else if((!strcmp(ActionChoice, "D") || !strcmp(ActionChoice, "d")) && ((FileType == 0) || (FileType == 1)))
-            {
-                printf("the selected file type needs to be sorted to perform this action\n");
             }
             else if(!strcmp(ActionChoice, "E") || !strcmp(ActionChoice, "e"))
             {
@@ -516,14 +512,94 @@ int SpellCheck(int FileType)
                 }
                 
             }
-            else if((!strcmp(ActionChoice, "F") || !strcmp(ActionChoice, "f")) && ((FileType == 0) || (FileType == 1)))
+            else if(!strcmp(ActionChoice, "G") || !strcmp(ActionChoice, "g"))
             {
-                printf("the selected file type needs to be sorted to perform this action\n");
+                
+                int errorCheck = SpellChecker(FileType, 0, 3);
+
+                //if -1, an error occured.
+                //if 0, then reload the page again
+                if (errorCheck == 0)
+                {
+                    inputCheck = 2;
+                }
+                else if (errorCheck == -1)
+                {
+                    inputCheck = -1;
+                }
+                
+            }
+            else if((!strcmp(ActionChoice, "H") || !strcmp(ActionChoice, "h")) && ((FileType == 2) || (FileType == 3)))
+            {
+                
+                int errorCheck = SpellChecker(FileType, 1, 3);
+
+                //if -1, an error occured.
+                //if 0, then reload the page again
+                if (errorCheck == 0)
+                {
+                    inputCheck = 2;
+                }
+                else if (errorCheck == -1)
+                {
+                    inputCheck = -1;
+                }
+                
+            }
+            else if(!strcmp(ActionChoice, "I") || !strcmp(ActionChoice, "i"))
+            {
+                
+                int errorCheck = SpellChecker(FileType, 0, 4);
+
+                //if -1, an error occured.
+                //if 0, then reload the page again
+                if (errorCheck == 0)
+                {
+                    inputCheck = 2;
+                }
+                else if (errorCheck == -1)
+                {
+                    inputCheck = -1;
+                }
+                
+            }
+            else if((!strcmp(ActionChoice, "J") || !strcmp(ActionChoice, "j")) && ((FileType == 2) || (FileType == 3)))
+            {
+                
+                int errorCheck = SpellChecker(FileType, 1, 4);
+
+                //if -1, an error occured.
+                //if 0, then reload the page again
+                if (errorCheck == 0)
+                {
+                    inputCheck = 2;
+                }
+                else if (errorCheck == -1)
+                {
+                    inputCheck = -1;
+                }
+                
             }
             else if(!strcmp(ActionChoice, "Z") || !strcmp(ActionChoice, "z"))
             {
                 inputCheck = 0;
             }
+            //if user attempts to use a binary search with a non sorted file type, reject the request
+            else if((!strcmp(ActionChoice, "B") ||
+                !strcmp(ActionChoice, "b") ||
+                !strcmp(ActionChoice, "D") || 
+                !strcmp(ActionChoice, "d") ||
+                !strcmp(ActionChoice, "F") || 
+                !strcmp(ActionChoice, "f") ||
+                !strcmp(ActionChoice, "H") || 
+                !strcmp(ActionChoice, "h") ||
+                !strcmp(ActionChoice, "J") || 
+                !strcmp(ActionChoice, "j")) && 
+                ((FileType == 0) || (FileType == 1)))
+            {
+                printf("the selected file type needs to be sorted to perform this action\n");
+            }
+
             //if the user types an invalid answer
             else
             {

@@ -27,10 +27,19 @@ struct WordsListing WordFetcher(int FileType);
 int binarySearch(char** WordArray, int leftValue, int rightValue, char wordString[25]);
 
 //levenshtein algorithm
-int LevenshteinChecker(char string1[], char string2[], int len1, int len2);
+int LevenshteinDistance(char string1[], char string2[], int len1, int len2);
 
 //hamming algorithm
-int HammingChecker(char string1[], char string2[], int len1, int len2);
+int HammingDistance(char string1[], char string2[], int len1, int len2);
+
+//Sørensen-Dice Coefficient algorithm
+int SorensenDiceCoefficient(char string1[], char string2[], int len1, int len2);
+
+//Optimal String Alignment Distance algorithm
+int OptimalStringAlignmentDistance(char string1[], char string2[], int len1, int len2);
 
 //min function used in levenshtein checker
 int Min(int a, int b);
+
+//min for 3 number function used in Optimal String Alignment Distance algorithm
+int Min3(int a, int b, int c);

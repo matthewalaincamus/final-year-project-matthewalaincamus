@@ -1,6 +1,4 @@
 *.exe
 /proof-of-concept/words_data
-/corpus/Texts
-/corpus/Words-Misspelled
 /corpus/*.txt
 /.vscode
