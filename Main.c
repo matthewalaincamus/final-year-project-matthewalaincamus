@@ -398,6 +398,12 @@ int SpellCheck(int FileType)
         printf("(H) simple check using binary search (sorted word list only), followed by suggestions if wrong using Sorensen-Dice Coefficient\n");
         printf("(I) simple check using linear search, followed by suggestions if wrong using Optimal String Alignment Distance\n");
         printf("(J) simple check using binary search (sorted word list only), followed by suggestions if wrong using Optimal String Alignment Distance\n");
+        printf("(K) simple check using linear search, followed by suggestions if wrong using Damerau-Levenshtein Distance\n");
+        printf("(L) simple check using binary search (sorted word list only), followed by suggestions if wrong using Damerau-Levenshtein Distance\n");
+        printf("(M) simple check using linear search, followed by suggestions if wrong using Jaro Similarity\n");
+        printf("(N) simple check using binary search (sorted word list only), followed by suggestions if wrong using Jaro Similarity\n");
+        printf("(O) simple check using linear search, followed by suggestions if wrong using Jaro-Winkler Similarity\n");
+        printf("(P) simple check using binary search (sorted word list only), followed by suggestions if wrong using Jaro-Winkler Similarity\n");
         printf("(Z) return to main menu\n");
 
         
@@ -580,6 +586,108 @@ int SpellCheck(int FileType)
                 }
                 
             }
+            else if(!strcmp(ActionChoice, "K") || !strcmp(ActionChoice, "k"))
+            {
+                
+                int errorCheck = SpellChecker(FileType, 0, 5);
+
+                //if -1, an error occured.
+                //if 0, then reload the page again
+                if (errorCheck == 0)
+                {
+                    inputCheck = 2;
+                }
+                else if (errorCheck == -1)
+                {
+                    inputCheck = -1;
+                }
+                
+            }
+            else if((!strcmp(ActionChoice, "L") || !strcmp(ActionChoice, "l")) && ((FileType == 2) || (FileType == 3)))
+            {
+                
+                int errorCheck = SpellChecker(FileType, 1, 5);
+
+                //if -1, an error occured.
+                //if 0, then reload the page again
+                if (errorCheck == 0)
+                {
+                    inputCheck = 2;
+                }
+                else if (errorCheck == -1)
+                {
+                    inputCheck = -1;
+                }
+                
+            }
+            else if(!strcmp(ActionChoice, "M") || !strcmp(ActionChoice, "m"))
+            {
+                
+                int errorCheck = SpellChecker(FileType, 0, 6);
+
+                //if -1, an error occured.
+                //if 0, then reload the page again
+                if (errorCheck == 0)
+                {
+                    inputCheck = 2;
+                }
+                else if (errorCheck == -1)
+                {
+                    inputCheck = -1;
+                }
+                
+            }
+            else if((!strcmp(ActionChoice, "N") || !strcmp(ActionChoice, "n")) && ((FileType == 2) || (FileType == 3)))
+            {
+                
+                int errorCheck = SpellChecker(FileType, 1, 6);
+
+                //if -1, an error occured.
+                //if 0, then reload the page again
+                if (errorCheck == 0)
+                {
+                    inputCheck = 2;
+                }
+                else if (errorCheck == -1)
+                {
+                    inputCheck = -1;
+                }
+                
+            }
+            else if(!strcmp(ActionChoice, "O") || !strcmp(ActionChoice, "o"))
+            {
+                
+                int errorCheck = SpellChecker(FileType, 0, 7);
+
+                //if -1, an error occured.
+                //if 0, then reload the page again
+                if (errorCheck == 0)
+                {
+                    inputCheck = 2;
+                }
+                else if (errorCheck == -1)
+                {
+                    inputCheck = -1;
+                }
+                
+            }
+            else if((!strcmp(ActionChoice, "P") || !strcmp(ActionChoice, "p")) && ((FileType == 2) || (FileType == 3)))
+            {
+                
+                int errorCheck = SpellChecker(FileType, 1, 7);
+
+                //if -1, an error occured.
+                //if 0, then reload the page again
+                if (errorCheck == 0)
+                {
+                    inputCheck = 2;
+                }
+                else if (errorCheck == -1)
+                {
+                    inputCheck = -1;
+                }
+                
+            }
             else if(!strcmp(ActionChoice, "Z") || !strcmp(ActionChoice, "z"))
             {
                 inputCheck = 0;
@@ -594,7 +702,13 @@ int SpellCheck(int FileType)
                 !strcmp(ActionChoice, "H") || 
                 !strcmp(ActionChoice, "h") ||
                 !strcmp(ActionChoice, "J") || 
-                !strcmp(ActionChoice, "j")) && 
+                !strcmp(ActionChoice, "j") ||
+                !strcmp(ActionChoice, "L") || 
+                !strcmp(ActionChoice, "l") ||
+                !strcmp(ActionChoice, "N") || 
+                !strcmp(ActionChoice, "n") ||
+                !strcmp(ActionChoice, "P") || 
+                !strcmp(ActionChoice, "p")) && 
                 ((FileType == 0) || (FileType == 1)))
             {
                 printf("the selected file type needs to be sorted to perform this action\n");

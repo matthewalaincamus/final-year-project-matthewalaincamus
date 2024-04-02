@@ -3,9 +3,9 @@ notes:
 *maybe test against a similar system in python
 *look for similaritiy algorithms other than Levenshtien Distance
   - Hamming Distance
-  - Smith-Waterman
   - Sørensen–Dice Coefficient
   - Optimal String Alignment Distance
   - Damerau Levenshtein Distance
-  - Simon White Similarity
+  - Jaro Distance 
+  - Jaro-Winkler Distance
 *fine tune the current algorithms

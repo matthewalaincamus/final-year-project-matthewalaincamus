@@ -2,6 +2,7 @@
 
 //skeleton functions for use later
 struct WordsListing WordFetcher(int FileType);
+struct WordHashItem *initHash(int FileType);
 int linearCheck(char ** WordArray, int WordCount, char wordString[], int AlgorithmCheck, clock_t Start);
 int binaryCheck(char ** WordArray, int WordCount, char wordString[], int AlgorithmCheck, clock_t Start);
 int binarySearch(char** WordArray, int leftValue, int rightValue, char wordString[25]);
@@ -9,6 +10,10 @@ int LevenshteinDistance(char string1[], char string2[], int len1, int len2);
 int HammingDistance(char string1[], char string2[], int len1, int len2);
 int SorensenDiceCoefficient(char string1[], char string2[], int len1, int len2);
 int OptimalStringAlignmentDistance(char string1[], char string2[], int len1, int len2);
+int DamerauLevenshteinDistance(char string1[], char string2[], int len1, int len2);
+int JaroSimilarity(char string1[], char string2[], int len1, int len2);
+int JaroWinklerSimilarity(char string1[], char string2[], int len1, int len2);
+int Max(int a, int b);
 int Min(int a, int b);
 int Min3(int a, int b, int c);
 
@@ -27,6 +32,9 @@ int SpellChecker(int FileType, int CheckType, int AlgorithmCheck)
         else if (AlgorithmCheck == 2) printf("Simple Check Spell Check with Hamming Distance based suggestions:\n");
         else if (AlgorithmCheck == 3) printf("Simple Check Spell Check with Sorensen-Dice Coefficient based suggestions:\n");
         else if (AlgorithmCheck == 4) printf("Simple Check Spell Check with Optimal String Alignment Distance based suggestions:\n");
+        else if (AlgorithmCheck == 5) printf("Simple Check Spell Check with Damereau-Levenshtein Distance based suggestions:\n");
+        else if (AlgorithmCheck == 6) printf("Simple Check Spell Check with Jaro Similarity based suggestions:\n");
+        else if (AlgorithmCheck == 7) printf("Simple Check Spell Check with Jaro-Winkler Similarity based suggestions:\n");
         else
         {
             printf("Error: LevCheck value wrong\n");
@@ -117,6 +125,7 @@ int SpellChecker(int FileType, int CheckType, int AlgorithmCheck)
     return 0;
 }
 
+//convert word file into a single word array
 struct WordsListing WordFetcher(int FileType)
 {
     struct WordsListing returnStruct;
@@ -197,6 +206,77 @@ struct WordsListing WordFetcher(int FileType)
     return returnStruct;
 }
 
+struct WordHashItem *initHash(int FileType)
+{
+    FILE* fp;
+
+    int MaxSize = 10000;
+
+    if (FileType == 0)
+    {
+        fp = fopen("./corpus/LWD.txt", "r");
+    }
+    else if(FileType == 1)
+    {
+        fp = fopen("./corpus/LWND.txt", "r");
+    }
+    else if(FileType == 2)
+    {
+        fp = fopen("./corpus/LWDS.txt", "r");
+    }
+    else if(FileType == 3)
+    {
+        fp = fopen("./corpus/LWNDS.txt", "r");
+    }
+    else
+    {
+        printf("Error: bad fileflag found\n");
+        return;
+    }
+
+    if (fp == NULL)
+    {
+        printf("Error: unable to open word file\n");
+        return;
+    }
+
+    int WordCount = 0;
+
+    char nextChar = ' ';
+    char nextString[25];
+
+    //for testing
+    int lineCount = 0;
+    
+    int charCount = 0;
+
+    while (nextChar != EOF)
+    {
+        nextChar = fgetc(fp);
+
+        if (isalpha(nextChar))
+        {
+            nextString[charCount] = nextChar;
+            charCount++;
+        }
+        else if (nextChar == '\n')
+        {
+            nextString[charCount] = '\0';
+            printf("%s\n", nextString);
+            
+            WordCount++;
+            
+            lineCount++;
+            charCount = 0;
+        }
+    }
+
+    fclose(fp);
+
+    return;
+}
+
+//linear search checker
 int linearCheck(char ** WordArray, int WordCount, char wordString[], int AlgorithmCheck, clock_t Start)
 {
     int WordFlag = 0;
@@ -245,6 +325,18 @@ int linearCheck(char ** WordArray, int WordCount, char wordString[], int Algorit
             {
                 AlgorithmArray[i] = OptimalStringAlignmentDistance(wordString, WordArray[i], strlen(wordString), strlen(WordArray[i]));
             }
+            else if (AlgorithmCheck == 5)
+            {
+                AlgorithmArray[i] = DamerauLevenshteinDistance(wordString, WordArray[i], strlen(wordString), strlen(WordArray[i]));
+            }
+            else if (AlgorithmCheck == 6)
+            {
+                AlgorithmArray[i] = JaroSimilarity(wordString, WordArray[i], strlen(wordString), strlen(WordArray[i]));
+            }
+            else if (AlgorithmCheck == 7)
+            {
+                AlgorithmArray[i] = JaroWinklerSimilarity(wordString, WordArray[i], strlen(wordString), strlen(WordArray[i]));
+            }
         }
     }
 
@@ -256,51 +348,24 @@ int linearCheck(char ** WordArray, int WordCount, char wordString[], int Algorit
         //if anything other than a simple check, get the top 10 results of the specified algorithm
         if (AlgorithmCheck != 0)
         {
-            //for Sorensen-Dice Coefficient, larger values indicate closer proximity
-            if (AlgorithmCheck == 3)
+            //get top 10 suggestions
+            for (int i = 0; i < 10; i++)
             {
-                //get top 10 suggestions
-                for (int i = 0; i < 10; i++)
-                {
-                    int CurrentMax = 0;
-                    int CurrentMaxIndex = 0;
+                int CurrentMin = 100;
+                int CurrentMinIndex = 0;
 
-                    for(int j = 0; j < WordCount; j++)
+                for(int j = 0; j < WordCount; j++)
+                {
+                    if (AlgorithmArray[j] < CurrentMin)
                     {
-                        if (AlgorithmArray[j] > CurrentMax)
-                        {
-                            CurrentMax = AlgorithmArray[j];
-                            CurrentMaxIndex = j;
-                        }
+                        CurrentMin = AlgorithmArray[j];
+                        CurrentMinIndex = j;
                     }
-
-                    AlgorithmArray[CurrentMaxIndex] = 0;
-
-                    printf("Suggestion %i: %s\n", i+1, WordArray[CurrentMaxIndex]);
                 }
-            } 
-            //otherwise, lower values indicate close proximity
-            else
-                {
-                //get top 10 suggestions
-                for (int i = 0; i < 10; i++)
-                {
-                    int CurrentMin = 50;
-                    int CurrentMinIndex = 0;
 
-                    for(int j = 0; j < WordCount; j++)
-                    {
-                        if (AlgorithmArray[j] < CurrentMin)
-                        {
-                            CurrentMin = AlgorithmArray[j];
-                            CurrentMinIndex = j;
-                        }
-                    }
+                AlgorithmArray[CurrentMinIndex] = 100;
 
-                    AlgorithmArray[CurrentMinIndex] = 50;
-
-                    printf("Suggestion %i: %s\n", i+1, WordArray[CurrentMinIndex]);
-                }
+                printf("Suggestion %i: %s\n", i+1, WordArray[CurrentMinIndex]);
             }
         }
 
@@ -312,6 +377,7 @@ int linearCheck(char ** WordArray, int WordCount, char wordString[], int Algorit
     return 0;
 }
 
+//binary search checkcer
 int binaryCheck(char ** WordArray, int WordCount, char wordString[], int AlgorithmCheck, clock_t Start)
 {
     //perform the binary search
@@ -343,59 +409,43 @@ int binaryCheck(char ** WordArray, int WordCount, char wordString[], int Algorit
                 }
                 else if (AlgorithmCheck == 4)
                 {
-                    //temporary
                     AlgorithmArray[i] = OptimalStringAlignmentDistance(wordString, WordArray[i], strlen(wordString), strlen(WordArray[i]));
+                }
+                else if (AlgorithmCheck == 5)
+                {
+                    AlgorithmArray[i] = DamerauLevenshteinDistance(wordString, WordArray[i], strlen(wordString), strlen(WordArray[i]));
+                }
+                else if (AlgorithmCheck == 6)
+                {
+                    AlgorithmArray[i] = JaroSimilarity(wordString, WordArray[i], strlen(wordString), strlen(WordArray[i]));
+                }
+                else if (AlgorithmCheck == 7)
+                {
+                    AlgorithmArray[i] = JaroWinklerSimilarity(wordString, WordArray[i], strlen(wordString), strlen(WordArray[i]));
                 }
             }
 
             //if anything other than a simple check, get the top 10 results of the specified algorithm
             if (AlgorithmCheck != 0)
             {
-                //for Sorensen-Dice Coefficient, larger values indicate closer proximity
-                if (AlgorithmCheck == 3)
+                //get top 10 suggestions
+                for (int i = 0; i < 10; i++)
                 {
-                    //get top 10 suggestions
-                    for (int i = 0; i < 10; i++)
-                    {
-                        int CurrentMax = 0;
-                        int CurrentMaxIndex = 0;
+                    int CurrentMin = 100;
+                    int CurrentMinIndex = 0;
 
-                        for(int j = 0; j < WordCount; j++)
+                    for(int j = 0; j < WordCount; j++)
+                    {
+                        if (AlgorithmArray[j] < CurrentMin)
                         {
-                            if (AlgorithmArray[j] > CurrentMax)
-                            {
-                                CurrentMax = AlgorithmArray[j];
-                                CurrentMaxIndex = j;
-                            }
+                            CurrentMin = AlgorithmArray[j];
+                            CurrentMinIndex = j;
                         }
-
-                        AlgorithmArray[CurrentMaxIndex] = 0;
-
-                        printf("Suggestion %i: %s\n", i+1, WordArray[CurrentMaxIndex]);
                     }
-                } 
-                //otherwise, lower values indicate close proximity
-                else
-                    {
-                    //get top 10 suggestions
-                    for (int i = 0; i < 10; i++)
-                    {
-                        int CurrentMin = 50;
-                        int CurrentMinIndex = 0;
 
-                        for(int j = 0; j < WordCount; j++)
-                        {
-                            if (AlgorithmArray[j] < CurrentMin)
-                            {
-                                CurrentMin = AlgorithmArray[j];
-                                CurrentMinIndex = j;
-                            }
-                        }
+                    AlgorithmArray[CurrentMinIndex] = 100;
 
-                        AlgorithmArray[CurrentMinIndex] = 50;
-
-                        printf("Suggestion %i: %s\n", i+1, WordArray[CurrentMinIndex]);
-                    }
+                    printf("Suggestion %i: %s\n", i+1, WordArray[CurrentMinIndex]);
                 }
             }
         }
@@ -414,6 +464,7 @@ int binaryCheck(char ** WordArray, int WordCount, char wordString[], int Algorit
     return 0;
 }
 
+//binary search recursive algorithm
 int binarySearch(char** WordArray, int leftValue, int rightValue, char wordString[25])
 {
     if (rightValue >= leftValue)
@@ -435,6 +486,7 @@ int binarySearch(char** WordArray, int leftValue, int rightValue, char wordStrin
     return 0;
 }
 
+//Levenshtein distance calculator
 int LevenshteinDistance(char string1[], char string2[], int len1, int len2)
 {
     //empty string1
@@ -498,7 +550,9 @@ int SorensenDiceCoefficient(char string1[], char string2[], int len1, int len2)
 
     //would usually be a value between 0 and 1, but for uniformity of keeping all algorithm values
     // int, times the value by 100 and use that instead
-    return 100 * ((2 * matches) / ((len1 - 1) + (len2 - 1)));
+    //also, minus the value from 100, so that similar values are close to 0 than 100 so the 
+    // top 10 results calculator and just look for the smallest values
+    return 100 - (100 * ( (2 * matches) / ( (len1 - 1) + (len2 - 1) ) ) );
 }
 
 //Optimal String Alignment Distance calculator
@@ -511,23 +565,23 @@ int OptimalStringAlignmentDistance(char string1[], char string2[], int len1, int
     for (int i = 0; i <= len1; i++) CalculationArray[i][0] = i;
     for (int j = 0; j <= len2; j++) CalculationArray[0][j] = j;
 
-    for (int i = 1; i <= len1; i++)
+    for (int i = 0; i <= len1; i++)
     {
-        for (int j = 1; j <= len2; j++)
+        for (int j = 0; j <= len2; j++)
         {
             int cost;
 
             if (string1[i] == string2[j]) cost = 0;
             else cost = 1;
 
-            CalculationArray[i][j] = Min3(CalculationArray[i-1][j] + 1, //deletion
-                                            CalculationArray[i][j-1] + 1, //insertion
-                                            CalculationArray[i-1][j-1] + cost); //substitution
+            CalculationArray[i+1][j+1] = Min3(CalculationArray[i][j+1] + 1, //deletion
+                                            CalculationArray[i+1][j] + 1, //insertion
+                                            CalculationArray[i][j] + cost); //substitution
             
-            if ((i > 1) && (j > 1) && (string1[i] == string2[j-1]) && (string1[i-1] == string2[j]))
+            if ((i > 0) && (j > 0) && (string1[i+1] == string2[j]) && (string1[i] == string2[j+1]))
             {
                 CalculationArray[i][j] = Min(CalculationArray[i][j],
-                                                CalculationArray[i-2][j-2] + 1); //transposition
+                                                CalculationArray[i-1][j-1] + 1); //transposition
             }
         }   
     }
@@ -544,7 +598,7 @@ int DamerauLevenshteinDistance(char string1[], char string2[], int len1, int len
     for (int i = 0; i < 26; i++) alphabet[i] = 0;
 
     //array to store results of calculations
-    int CalculationArray[len1+1][len2+1];
+    int CalculationArray[len1+2][len2+2];
 
     //get the maximum distance
     int maxDist = len1 + len2;
@@ -554,33 +608,148 @@ int DamerauLevenshteinDistance(char string1[], char string2[], int len1, int len
     for (int i = 1; i <= len1; i++)
     {
         CalculationArray[i][0] = maxDist;
-        CalculationArray[i][1] = i;
+        CalculationArray[i][1] = i-1;
     }
     for (int j = 1; j <= len2; j++)
     {
         CalculationArray[0][j] = maxDist;
-        CalculationArray[1][j] = j;
+        CalculationArray[1][j] = j-1;
     }
 
     //main calculation loop
-    for (int i = 2; i <= len1; i++)
+    for (int i = 0; i <= len1; i++)
     {
         int db = 0;
-        for (int j = 2; j <= len2; j++)
+        for (int j = 0; j <= len2; j++)
         {
-            
+            int k = alphabet[(int)string2[j] % 97];
+            int l = db;
+            int cost;
+
+            if (string1[i] == string2[j])
+            {
+                cost = 0;
+                db = j;
+            }
+            else cost = 1;
+
+            CalculationArray[i+2][j+2] = Min( Min(CalculationArray[i+1][j+1]+cost, //substitution
+                                                    CalculationArray[i+2][j+1]+1 ), //insertion
+                                              Min(CalculationArray[i+1][j+2]+1, //deletion
+                                                    CalculationArray[k][l]+(i-k+1)+1+(j-l+1)) ); //transpostion
+        alphabet[(int)string1[i]%97] = i+2;
         }
     }
+
+    return CalculationArray[len1+2][len2+2];
+}
+
+//Jaro Similarity calculator
+int JaroSimilarity(char string1[], char string2[], int len1, int len2)
+{
+    //max distance for which matching is allowed
+    int maxDist = floor(Max(len1, len2) / 2) - 1;
+
+    //count for number of total matches
+    int matches = 0;
+
+    //hashes to store matches
+    int String1Matches[len1];
+    int String2Matches[len2];
+
+    for (int i = 0; i < len1; i++)String1Matches[i] = 0;
+    for (int j = 0; j < len2; j++)String2Matches[j] = 0;
+
+    //travers the first string
+    for (int i = 0; i < len1; i++)
+    {
+        //check if there are any matches
+        for (int j = Max(0, i - maxDist); j < Min(len2, i + maxDist + 1); j++)
+        {
+            if ((string1[i] == string2[j]) && (String2Matches[j] == 0))
+            {
+                String1Matches[i] = 1;
+                String2Matches[j] = 1;
+                matches++;
+                break;
+            } 
+        }
+    }
+
+    //if nothing matches, return the larges value possible
+    if (matches == 0) return 100;
+
+    //number of transpositions
+    double t = 0;
+
+    int point = 0;
+
+
+    for(int i = 0; i < len1; i++)
+    {
+        if (String1Matches[i])
+        {
+            while (String2Matches[point] == 0) point++;
+
+            if (string1[i] != string2[point++]) t++;
+        }
+    }
+
+    t /= 2;
+
+    // Jaro Similarity Returned
+    //times by 100 and then subtract from 100 so that similar values are converted to int and close to zero
+    return 100 - (100 * ( ( ( (double)matches ) / ( (double)len1 ) 
+                        + ( (double)matches) / ( (double)len2 ) 
+                        + ( (double)matches - t) / ( (double) matches) ) / 3.0));
+}
+
+//Jaro-Winkler Similarity calculator
+int JaroWinklerSimilarity(char string1[], char string2[], int len1, int len2)
+{
+    //get the original jaro distance
+    double jaroDistance = (double)(100 - JaroSimilarity(string1, string2, len1, len2)) / 100;
+
+    //if the similarity is above a threshold
+    if (jaroDistance > 0.7)
+    {
+        int Prefix = 0;
+
+        for (int i = 0; i < Min(len1, len2); i++)
+        {
+            //if the characters match
+            if (string1[i] == string2[i]) Prefix++;
+            else break;
+        }
+
+        //maximum of 4 characters are allowed in prefix
+        Prefix = Min(4, Prefix);
+
+        //calculate jaro winkler Similarity
+        jaroDistance += 0.1 * Prefix * (1 - jaroDistance);
+    }
+
+    //return jaro distance, making sure values are int and similar values are close to zero
+    return 100 - (100 * jaroDistance);
 
     return 0;
 }
 
+//getting the maximum of 2 numbers
+int Max(int a, int b)
+{
+    if (a > b) return a;
+    else return b;
+}
+
+//getting the minimum of 2 numbers
 int Min(int a, int b)
 {
     if (a < b) return a;
     else return b;
 }
 
+//getting the minimum of 3 numbers
 int Min3(int a, int b, int c)
 {
     if ((a < b) && (a < c)) 
