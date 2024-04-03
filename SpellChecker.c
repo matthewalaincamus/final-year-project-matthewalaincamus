@@ -2,10 +2,11 @@
 
 //skeleton functions for use later
 struct WordsListing WordFetcher(int FileType);
-struct WordHashItem *initHash(int FileType);
+struct ReturnHash initHash(int FileType, int MaxSize);
 int linearCheck(char ** WordArray, int WordCount, char wordString[], int AlgorithmCheck, clock_t Start);
 int binaryCheck(char ** WordArray, int WordCount, char wordString[], int AlgorithmCheck, clock_t Start);
 int binarySearch(char** WordArray, int leftValue, int rightValue, char wordString[25]);
+int HashChecker(struct WordHashItem *HashTable, int MaxSize, int WordCount, char wordString[], int AlgorithmCheck, clock_t Start);
 int LevenshteinDistance(char string1[], char string2[], int len1, int len2);
 int HammingDistance(char string1[], char string2[], int len1, int len2);
 int SorensenDiceCoefficient(char string1[], char string2[], int len1, int len2);
@@ -42,22 +43,39 @@ int SpellChecker(int FileType, int CheckType, int AlgorithmCheck)
         }
         printf("**Current Filetype selected: ");
 
+        //display file type info
         if (FileType == 0)
         {
-            printf("text with duplicate\n\n");
+            printf("*text with duplicate\n");
         }
         else if (FileType == 1)
         {
-            printf("text without duplicates\n\n");
+            printf("*text without duplicates\n");
         }
         else if (FileType== 2)
         {
-            printf("text with duplicates sorted in alphabetical order\n\n");
+            printf("*text with duplicates sorted in alphabetical order\n");
         }
         else if (FileType == 3)
         {
-            printf("text without duplicates sorted in alphabetical order\n\n");
+            printf("*text without duplicates sorted in alphabetical order\n");
         }
+
+        //display the method used
+        if (CheckType == 0)
+        {
+            printf("*Method: Word list with linear search\n");
+        }
+        else if (CheckType == 1)
+        {
+            printf("*Method: Word list with binary search\n");
+        }
+        else if (CheckType == 2)
+        {
+            printf("*Method: Word list as a hash table\n");
+        }
+
+        printf("\n");
 
         printf("Please enter the word you wish to spell check\n");
         printf("RULES:\n");
@@ -98,28 +116,62 @@ int SpellChecker(int FileType, int CheckType, int AlgorithmCheck)
             else inputCheck = 0;
         }
 
-        struct WordsListing WordArray = WordFetcher(FileType);
-        if (WordArray.WordCount == -1) return -1;
+        if (CheckType == 0 || CheckType == 1)
+        {
+            struct WordsListing WordArray = WordFetcher(FileType);
+            if (WordArray.WordCount == -1) return -1;
 
-        //start timer
-        clock_t Start = clock();
+            //start timer
+            clock_t Start = clock();
 
-        //linear searching = 0
-        if (CheckType == 0) linearCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, AlgorithmCheck, Start);
+            //linear searching = 0
+            if (CheckType == 0) linearCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, AlgorithmCheck, Start);
 
-        //binary searching = 1
-        else if (CheckType == 1) binaryCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, AlgorithmCheck, Start); 
+            //binary searching = 1
+            else if (CheckType == 1) binaryCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, AlgorithmCheck, Start); 
+        
+            //cleanup
+            free(WordArray.WordArray);
+            WordArray.WordArray = NULL;
+        }
+        else if (CheckType == 2)
+        {
+            //max size of hash table
+            int MaxSize = 10000;
 
+            //create the hash table from the list of words
+            struct ReturnHash WordHashTable = initHash(FileType, MaxSize);
+            if (WordHashTable.WordCount == -1) return -1;
+
+            //start timer
+            clock_t Start = clock();
+
+            HashChecker(WordHashTable.HashTable, MaxSize, WordHashTable.WordCount, ActionChoice, AlgorithmCheck, Start);
+
+            //cleanup
+            struct WordNode *tmp, *currentNode;
+            for (int i = 0; i < MaxSize; i++)
+            {
+                if (WordHashTable.HashTable[i].head != NULL && WordHashTable.HashTable[i].tail != NULL)
+                {
+                    currentNode = WordHashTable.HashTable[i].head;
+                    while(currentNode->next != NULL)
+                    {
+                        tmp = currentNode->next;
+                        free(currentNode);
+                        currentNode = tmp;
+                    }
+                    tmp = currentNode;
+                    free(tmp);
+                }
+            }
+        }
         printf("\n");
 
         //user input (just to confirm that the user can return back to the previous menu)
         char ActionChoice2[128];
         printf("Type anything to enter another word: ");
         scanf("%s", ActionChoice2);
-
-        //cleanup
-        free(WordArray.WordArray);
-        WordArray.WordArray = NULL;
     }
 
     return 0;
@@ -206,12 +258,21 @@ struct WordsListing WordFetcher(int FileType)
     return returnStruct;
 }
 
-struct WordHashItem *initHash(int FileType)
+struct ReturnHash initHash(int FileType, int MaxSize)
 {
     FILE* fp;
 
-    int MaxSize = 10000;
+    struct ReturnHash HashToReturn;
+    struct WordHashItem *returnHashTable = (struct WordHashItem*) malloc(MaxSize * sizeof(struct WordHashItem));
 
+    //initialise the array
+    for (int i = 0; i < MaxSize; i++)
+    {
+        returnHashTable[i].head = NULL;
+        returnHashTable[i].tail = NULL;
+    }
+
+    //open the right file
     if (FileType == 0)
     {
         fp = fopen("./corpus/LWD.txt", "r");
@@ -231,13 +292,17 @@ struct WordHashItem *initHash(int FileType)
     else
     {
         printf("Error: bad fileflag found\n");
-        return;
+        HashToReturn.HashTable = returnHashTable;
+        HashToReturn.WordCount = -1;
+        return HashToReturn;
     }
 
     if (fp == NULL)
     {
         printf("Error: unable to open word file\n");
-        return;
+        HashToReturn.HashTable = returnHashTable;
+        HashToReturn.WordCount = -1;
+        return HashToReturn;
     }
 
     int WordCount = 0;
@@ -250,6 +315,8 @@ struct WordHashItem *initHash(int FileType)
     
     int charCount = 0;
 
+    int stringHashCode = 1;
+
     while (nextChar != EOF)
     {
         nextChar = fgetc(fp);
@@ -258,22 +325,54 @@ struct WordHashItem *initHash(int FileType)
         {
             nextString[charCount] = nextChar;
             charCount++;
+            //add ascii value of char to hash code
+            stringHashCode = (stringHashCode * (int)nextChar) % MaxSize;
         }
         else if (nextChar == '\n')
         {
+            //end off the string
             nextString[charCount] = '\0';
-            printf("%s\n", nextString);
+
+            //testing
+            //printf("%s : %d\n", nextString, stringHashCode);
             
+            //insert the string into the hash table
+            struct WordNode *nodeList = (struct WordNode*) returnHashTable[stringHashCode].head;
+
+            //create the item to add to the hash table 
+            struct WordNode *WordItem = (struct WordNode*)malloc(sizeof(struct WordNode));
+            strcpy(WordItem->Word, nextString);
+            WordItem->next = NULL;
+
+            //if there are no elements at the index
+            if (nodeList == NULL)
+            {
+                returnHashTable[stringHashCode].head = WordItem;
+                returnHashTable[stringHashCode].tail = WordItem;
+            }
+            
+            //if there is a linked list already there
+            else
+            {
+                //update the tail to the new item
+                returnHashTable[stringHashCode].tail->next = WordItem;
+                returnHashTable[stringHashCode].tail = WordItem;
+            }
+            
+
+            //update the counts ready for next word
             WordCount++;
-            
             lineCount++;
             charCount = 0;
+            stringHashCode = 1;
         }
     }
 
     fclose(fp);
 
-    return;
+    HashToReturn.HashTable = returnHashTable;
+    HashToReturn.WordCount = WordCount;
+    return HashToReturn;
 }
 
 //linear search checker
@@ -299,16 +398,11 @@ int linearCheck(char ** WordArray, int WordCount, char wordString[], int Algorit
             {
                 printf("Your word exists in the word list\n");
                 WordFlag++;
-
-                clock_t TimeDif = clock() - Start;
-                double TimeTaken = (double)TimeDif / CLOCKS_PER_SEC;
-
-                printf("Operation took: %f Seconds to complete\n\n", TimeTaken);
                 break;
             }
             lineCount++;
             
-            //if lev is active
+            //if an algorithm is active, get the distance between the two words
             if (AlgorithmCheck == 1)
             {
                 AlgorithmArray[i] = LevenshteinDistance(wordString, WordArray[i], strlen(wordString), strlen(WordArray[i]));
@@ -368,16 +462,17 @@ int linearCheck(char ** WordArray, int WordCount, char wordString[], int Algorit
                 printf("Suggestion %i: %s\n", i+1, WordArray[CurrentMinIndex]);
             }
         }
-
-        clock_t TimeDif = clock() - Start;
-        double TimeTaken = (double)TimeDif / CLOCKS_PER_SEC;
-
-        printf("Operation took: %f Seconds to complete\n\n", TimeTaken);
     }
+
+    //get the time of completion
+    clock_t TimeDif = clock() - Start;
+    double TimeTaken = (double)TimeDif / CLOCKS_PER_SEC;
+
+    printf("Operation took: %f Seconds to complete\n\n", TimeTaken);
     return 0;
 }
 
-//binary search checkcer
+//binary search checker
 int binaryCheck(char ** WordArray, int WordCount, char wordString[], int AlgorithmCheck, clock_t Start)
 {
     //perform the binary search
@@ -461,6 +556,140 @@ int binaryCheck(char ** WordArray, int WordCount, char wordString[], int Algorit
     double TimeTaken = (double)TimeDif / CLOCKS_PER_SEC;
 
     printf("Operation took: %f Seconds to complete\n\n", TimeTaken);
+    return 0;
+}
+
+//hash table checker
+int HashChecker(struct WordHashItem *HashTable, int MaxSize, int WordCount, char wordString[], int AlgorithmCheck, clock_t Start)
+{
+    //for showing if a word has been found or not
+    int WordFlag = 0;
+
+    //if the word is a single letter, no need to do any further checks as they are always valid
+    if (strlen(wordString) == 1)
+    {
+        printf("Your word exists in the word list\n");
+        WordFlag++;
+    }
+    else
+    {
+        //get the hash value for the given string
+        int StringHash = 1;
+        for (int i = 0; i < strlen(wordString); i++)
+        {
+            StringHash = (StringHash * (int)wordString[i]) % MaxSize;
+        }
+
+        //get the linked list from the index
+        //first check if the word is at the head
+        struct WordNode *LinkedList = HashTable[StringHash].head;
+
+        //provided there is anything there at the index
+        if (LinkedList != NULL)
+        {
+            if (!strcmp(LinkedList->Word, wordString))
+            {
+                printf("Your word exists in the word list\n");
+                WordFlag++;
+            }
+            //if not, loop through the linked list till you find the word or reach the tail
+            else
+            {
+                while (LinkedList->next != NULL)
+                {
+                    LinkedList = LinkedList->next;
+                    if (!strcmp(LinkedList->Word, wordString))
+                    {
+                        printf("Your word exists in the word list\n");
+                        WordFlag++;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    //if word wasn't found, get suggestions
+    if (WordFlag == 0)
+    {
+        printf("Your word doesn't exist in the word list\n");
+        
+        for (int i = 0; i < MaxSize; i++)
+        {
+            if (HashTable[i].head != NULL && HashTable[i].tail != NULL)
+            {
+                struct WordNode *currentNode = HashTable[i].head;
+                while(currentNode->next != NULL)
+                {
+                    currentNode = currentNode->next;
+                    //if an algorithm is active, get the distance between the two words
+                    if (AlgorithmCheck == 1)
+                    {
+                        currentNode->AlgorithmDistance = LevenshteinDistance(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
+                    }
+                    else if (AlgorithmCheck == 2)
+                    {
+                        currentNode->AlgorithmDistance = HammingDistance(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
+                    }
+                    else if (AlgorithmCheck == 3)
+                    {
+                        currentNode->AlgorithmDistance = SorensenDiceCoefficient(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
+                    }
+                    else if (AlgorithmCheck == 4)
+                    {
+                        currentNode->AlgorithmDistance = OptimalStringAlignmentDistance(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
+                    }
+                    else if (AlgorithmCheck == 5)
+                    {
+                        currentNode->AlgorithmDistance = DamerauLevenshteinDistance(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
+                    }
+                    else if (AlgorithmCheck == 6)
+                    {
+                        currentNode->AlgorithmDistance = JaroSimilarity(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
+                    }
+                    else if (AlgorithmCheck == 7)
+                    {
+                        currentNode->AlgorithmDistance = JaroWinklerSimilarity(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
+                    }
+
+                    currentNode = currentNode->next;
+                }
+            }
+        }
+
+        /*
+        //if anything other than a simple check, get the top 10 results of the specified algorithm
+        if (AlgorithmCheck != 0)
+        {
+            //get top 10 suggestions
+            for (int i = 0; i < 10; i++)
+            {
+                int CurrentMin = 100;
+                int CurrentMinIndex = 0;
+
+                for(int j = 0; j < WordCount; j++)
+                {
+                    if (AlgorithmArray[j] < CurrentMin)
+                    {
+                        CurrentMin = AlgorithmArray[j];
+                        CurrentMinIndex = j;
+                    }
+                }
+
+                AlgorithmArray[CurrentMinIndex] = 100;
+
+                printf("Suggestion %i: %s\n", i+1, WordArray[CurrentMinIndex]);
+            }
+        }
+        */
+    }
+
+    //get the time of completion
+    clock_t TimeDif = clock() - Start;
+    double TimeTaken = (double)TimeDif / CLOCKS_PER_SEC;
+
+    printf("Operation took: %f Seconds to complete\n\n", TimeTaken);
+
     return 0;
 }
 

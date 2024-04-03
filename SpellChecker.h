@@ -13,18 +13,26 @@ struct WordsListing
     int WordCount;
 };
 
-//for word hash table
+//hash table node
 struct WordNode
 {
-    int key;
     char Word[25];
+    int AlgorithmDistance;
     struct WordNode *next;
 };
 
+//hash table linked list
 struct WordHashItem
 {
     struct WordNode *head;
     struct WordNode *tail;
+};
+
+//hash table return struct
+struct ReturnHash
+{
+    struct WordHashItem *HashTable;
+    int WordCount;
 };
 
 
@@ -38,11 +46,14 @@ int linearCheck(char ** WordArray, int WordCount, char wordString[], int Algorit
 //binary seacher
 int binaryCheck(char ** WordArray, int WordCount, char wordString[], int AlgorithmCheck, clock_t Start);
 
+//hash table searcher
+int HashChecker(struct WordHashItem *HashTable, int MaxSize, int WordCount, char wordString[], int AlgorithmCheck, clock_t Start);
+
 //function to get words from file
 struct WordsListing WordFetcher(int FileType);
 
 //function to make hash from file data
-struct WordHashItem *initHash(int FileType);
+struct ReturnHash initHash(int FileType, int MaxSize);
 
 //recursive binary search
 int binarySearch(char** WordArray, int leftValue, int rightValue, char wordString[25]);
