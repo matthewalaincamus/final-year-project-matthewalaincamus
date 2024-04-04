@@ -16,6 +16,7 @@ struct WordsListing
 //hash table node
 struct WordNode
 {
+    int key;
     char Word[25];
     int AlgorithmDistance;
     struct WordNode *next;

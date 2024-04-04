@@ -13,6 +13,7 @@ int GenerateDataset();
 int TypeSelector();
 int SpellCheck(int FileType, int MethodType);
 int MethodCheck(int FileType);
+int AutoTesterMenu();
 
 //main program to deal with what the user wishes to do with the system
 int main()
@@ -42,6 +43,7 @@ int mainMenu()
         printf("options to choose from (indicate which option by typing its asscociated letter):\n");
         printf("(A) Generate a dataset from the Corpus\n");
         printf("(B) perform spell checking\n");
+        printf("(C) automatic testing of whole system\n");
         printf("(Z) Exit system\n");
         printf("\n");
 
@@ -74,6 +76,22 @@ int mainMenu()
             else if(!strcmp(ActionChoice, "B") || !strcmp(ActionChoice, "b"))
             {
                 int errorCheck = TypeSelector();
+
+                //if -1, an error occured.
+                //if 0, then reload the page again
+                if (errorCheck == 0)
+                {
+                    inputCheck = 2;
+                }
+                if (errorCheck == -1)
+                {
+                    inputCheck = -1;
+                }
+                
+            }
+            else if(!strcmp(ActionChoice, "C") || !strcmp(ActionChoice, "c"))
+            {
+                int errorCheck = AutoTesterMenu();
 
                 //if -1, an error occured.
                 //if 0, then reload the page again
@@ -574,7 +592,7 @@ int SpellCheck(int FileType, int MethodType)
                 }
                 
             }
-            else if(!strcmp(ActionChoice, "C") || !strcmp(ActionChoice, "c"))
+            else if(!strcmp(ActionChoice, "B") || !strcmp(ActionChoice, "b"))
             {
                 
                 int errorCheck = SpellChecker(FileType, MethodType, 1);
@@ -591,7 +609,7 @@ int SpellCheck(int FileType, int MethodType)
                 }
                 
             }
-            else if(!strcmp(ActionChoice, "E") || !strcmp(ActionChoice, "e"))
+            else if(!strcmp(ActionChoice, "C") || !strcmp(ActionChoice, "c"))
             {
                 
                 int errorCheck = SpellChecker(FileType, MethodType, 2);
@@ -608,7 +626,7 @@ int SpellCheck(int FileType, int MethodType)
                 }
                 
             }
-            else if(!strcmp(ActionChoice, "G") || !strcmp(ActionChoice, "g"))
+            else if(!strcmp(ActionChoice, "D") || !strcmp(ActionChoice, "d"))
             {
                 
                 int errorCheck = SpellChecker(FileType, MethodType, 3);
@@ -625,7 +643,7 @@ int SpellCheck(int FileType, int MethodType)
                 }
                 
             }
-            else if(!strcmp(ActionChoice, "I") || !strcmp(ActionChoice, "i"))
+            else if(!strcmp(ActionChoice, "E") || !strcmp(ActionChoice, "e"))
             {
                 
                 int errorCheck = SpellChecker(FileType, MethodType, 4);
@@ -642,7 +660,7 @@ int SpellCheck(int FileType, int MethodType)
                 }
                 
             }
-            else if(!strcmp(ActionChoice, "K") || !strcmp(ActionChoice, "k"))
+            else if(!strcmp(ActionChoice, "F") || !strcmp(ActionChoice, "f"))
             {
                 
                 int errorCheck = SpellChecker(FileType, MethodType, 5);
@@ -659,7 +677,7 @@ int SpellCheck(int FileType, int MethodType)
                 }
                 
             }
-            else if(!strcmp(ActionChoice, "M") || !strcmp(ActionChoice, "m"))
+            else if(!strcmp(ActionChoice, "G") || !strcmp(ActionChoice, "g"))
             {
                 
                 int errorCheck = SpellChecker(FileType, MethodType, 6);
@@ -676,7 +694,7 @@ int SpellCheck(int FileType, int MethodType)
                 }
                 
             }
-            else if(!strcmp(ActionChoice, "O") || !strcmp(ActionChoice, "o"))
+            else if(!strcmp(ActionChoice, "H") || !strcmp(ActionChoice, "h"))
             {
                 
                 int errorCheck = SpellChecker(FileType, MethodType, 7);
@@ -715,5 +733,29 @@ int SpellCheck(int FileType, int MethodType)
         }
     }
     
+    return returnCheck;
+}
+
+//automatic testing menu
+int AutoTesterMenu()
+{
+    //check to see if the user wants to return to the main menu
+    int returnCheck = 1;
+
+    //will loop till the user exits via typing z or Z on the keyboard in the main menu
+    while (returnCheck == 1)
+    {
+        //clear the screen so that only relevant system text is shown
+        system("cls");
+
+        //show user options for the corpus
+        printf("options for word searching methods (indicate which option by typing its asscociated letter):\n");
+        printf("(A) word dictionary as a list checked using linear search\n");
+        printf("(B) word dictionary as a list checked using binary search (sorted word list only)\n");
+        printf("(C) word dictionary as a hash table\n");
+        printf("(Z) return to previous menu\n");
+
+        break;
+    }
     return returnCheck;
 }

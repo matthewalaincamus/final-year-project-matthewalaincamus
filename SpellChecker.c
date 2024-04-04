@@ -143,6 +143,34 @@ int SpellChecker(int FileType, int CheckType, int AlgorithmCheck)
             struct ReturnHash WordHashTable = initHash(FileType, MaxSize);
             if (WordHashTable.WordCount == -1) return -1;
 
+            /*
+            struct WordNode *TestNode;
+            for (int i = 0; i < MaxSize; i++)
+            {
+                if (WordHashTable.HashTable[i].head != NULL && i < 6000 && i >5000)
+                {
+                    printf("(%d)Head: ", i);
+                    TestNode = WordHashTable.HashTable[i].head;
+                    if (TestNode->next == NULL) printf("(%d : %s) :Tail",TestNode->key,TestNode->Word);
+                    else
+                    {
+                        while(1)
+                        {   
+                            if (TestNode->next == NULL)
+                            {
+                                printf(" :Tail");
+                                break;
+                            }
+
+                            printf("(%d : %s) -> ", TestNode->key,TestNode->Word);
+                            TestNode = TestNode->next;
+                        }
+                    }
+                    printf("\n");
+                }
+            }
+            */
+
             //start timer
             clock_t Start = clock();
 
@@ -334,7 +362,7 @@ struct ReturnHash initHash(int FileType, int MaxSize)
             nextString[charCount] = '\0';
 
             //testing
-            //printf("%s : %d\n", nextString, stringHashCode);
+            //if (!strcmp(nextString, "apple")) printf("%s : %d\n", nextString, stringHashCode);
             
             //insert the string into the hash table
             struct WordNode *nodeList = (struct WordNode*) returnHashTable[stringHashCode].head;
@@ -343,6 +371,8 @@ struct ReturnHash initHash(int FileType, int MaxSize)
             struct WordNode *WordItem = (struct WordNode*)malloc(sizeof(struct WordNode));
             strcpy(WordItem->Word, nextString);
             WordItem->next = NULL;
+            WordItem->key = 0;
+            WordItem->AlgorithmDistance = 100;
 
             //if there are no elements at the index
             if (nodeList == NULL)
@@ -355,6 +385,7 @@ struct ReturnHash initHash(int FileType, int MaxSize)
             else
             {
                 //update the tail to the new item
+                WordItem->key = returnHashTable[stringHashCode].tail->key + 1;
                 returnHashTable[stringHashCode].tail->next = WordItem;
                 returnHashTable[stringHashCode].tail = WordItem;
             }
@@ -613,75 +644,154 @@ int HashChecker(struct WordHashItem *HashTable, int MaxSize, int WordCount, char
     if (WordFlag == 0)
     {
         printf("Your word doesn't exist in the word list\n");
-        
-        for (int i = 0; i < MaxSize; i++)
-        {
-            if (HashTable[i].head != NULL && HashTable[i].tail != NULL)
-            {
-                struct WordNode *currentNode = HashTable[i].head;
-                while(currentNode->next != NULL)
-                {
-                    currentNode = currentNode->next;
-                    //if an algorithm is active, get the distance between the two words
-                    if (AlgorithmCheck == 1)
-                    {
-                        currentNode->AlgorithmDistance = LevenshteinDistance(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
-                    }
-                    else if (AlgorithmCheck == 2)
-                    {
-                        currentNode->AlgorithmDistance = HammingDistance(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
-                    }
-                    else if (AlgorithmCheck == 3)
-                    {
-                        currentNode->AlgorithmDistance = SorensenDiceCoefficient(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
-                    }
-                    else if (AlgorithmCheck == 4)
-                    {
-                        currentNode->AlgorithmDistance = OptimalStringAlignmentDistance(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
-                    }
-                    else if (AlgorithmCheck == 5)
-                    {
-                        currentNode->AlgorithmDistance = DamerauLevenshteinDistance(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
-                    }
-                    else if (AlgorithmCheck == 6)
-                    {
-                        currentNode->AlgorithmDistance = JaroSimilarity(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
-                    }
-                    else if (AlgorithmCheck == 7)
-                    {
-                        currentNode->AlgorithmDistance = JaroWinklerSimilarity(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
-                    }
-
-                    currentNode = currentNode->next;
-                }
-            }
-        }
-
-        /*
-        //if anything other than a simple check, get the top 10 results of the specified algorithm
         if (AlgorithmCheck != 0)
         {
-            //get top 10 suggestions
+            for (int i = 0; i < MaxSize; i++)
+            {
+                if (HashTable[i].head != NULL && HashTable[i].tail != NULL)
+                {
+                    struct WordNode *currentNode = HashTable[i].head;
+
+                    //in the case that the linked list at the point only has 1 node
+                    if (currentNode->next == NULL)
+                    {
+                        //if an algorithm is active, get the distance between the two words
+                        if (AlgorithmCheck == 1)
+                        {
+                            currentNode->AlgorithmDistance = LevenshteinDistance(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
+                        }
+                        else if (AlgorithmCheck == 2)
+                        {
+                            currentNode->AlgorithmDistance = HammingDistance(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
+                        }
+                        else if (AlgorithmCheck == 3)
+                        {
+                            currentNode->AlgorithmDistance = SorensenDiceCoefficient(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
+                        }
+                        else if (AlgorithmCheck == 4)
+                        {
+                            currentNode->AlgorithmDistance = OptimalStringAlignmentDistance(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
+                        }
+                        else if (AlgorithmCheck == 5)
+                        {
+                            currentNode->AlgorithmDistance = DamerauLevenshteinDistance(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
+                        }
+                        else if (AlgorithmCheck == 6)
+                        {
+                            currentNode->AlgorithmDistance = JaroSimilarity(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
+                        }
+                        else if (AlgorithmCheck == 7)
+                        {
+                            currentNode->AlgorithmDistance = JaroWinklerSimilarity(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
+                        }
+                    }
+
+                    //if there are more than 1 nodes
+                    while(currentNode->next != NULL)
+                    {
+                        //if an algorithm is active, get the distance between the two words
+                        if (AlgorithmCheck == 1)
+                        {
+                            currentNode->AlgorithmDistance = LevenshteinDistance(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
+                        }
+                        else if (AlgorithmCheck == 2)
+                        {
+                            currentNode->AlgorithmDistance = HammingDistance(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
+                        }
+                        else if (AlgorithmCheck == 3)
+                        {
+                            currentNode->AlgorithmDistance = SorensenDiceCoefficient(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
+                        }
+                        else if (AlgorithmCheck == 4)
+                        {
+                            currentNode->AlgorithmDistance = OptimalStringAlignmentDistance(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
+                        }
+                        else if (AlgorithmCheck == 5)
+                        {
+                            currentNode->AlgorithmDistance = DamerauLevenshteinDistance(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
+                        }
+                        else if (AlgorithmCheck == 6)
+                        {
+                            currentNode->AlgorithmDistance = JaroSimilarity(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
+                        }
+                        else if (AlgorithmCheck == 7)
+                        {
+                            currentNode->AlgorithmDistance = JaroWinklerSimilarity(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
+                        }
+                        currentNode = currentNode->next;
+                    }
+                }
+            }
+
+            //if anything other than a simple check, get the top 10 results of the specified algorithm
             for (int i = 0; i < 10; i++)
             {
                 int CurrentMin = 100;
                 int CurrentMinIndex = 0;
+                int CurrentMinLinkedListIndex = 0;
 
-                for(int j = 0; j < WordCount; j++)
+                //loop through the entire hash table
+                for (int j = 0; j < MaxSize; j++)
                 {
-                    if (AlgorithmArray[j] < CurrentMin)
+                    //if there is a value the certain index
+                    if (HashTable[j].head != NULL && HashTable[j].tail != NULL)
                     {
-                        CurrentMin = AlgorithmArray[j];
-                        CurrentMinIndex = j;
+                        struct WordNode *currentNode = HashTable[j].head;
+                        if (currentNode->AlgorithmDistance < CurrentMin)
+                        {
+                            CurrentMin = currentNode->AlgorithmDistance;
+                            CurrentMinIndex = j;
+                            CurrentMinLinkedListIndex = currentNode->key;
+                        }
+
+                        while(currentNode->next != NULL)
+                        {
+                            currentNode = currentNode->next;
+                            if (currentNode->AlgorithmDistance < CurrentMin)
+                            {
+                                CurrentMin = currentNode->AlgorithmDistance;
+                                CurrentMinIndex = j;
+                                CurrentMinLinkedListIndex = currentNode->key;
+                            }
+                        }
+                        
                     }
                 }
 
-                AlgorithmArray[CurrentMinIndex] = 100;
+                /*
+                if (i == 0)
+                {
+                    struct WordNode *TestNode;
+                    for (int k = 0; k < MaxSize; k++)
+                    {
+                        if (HashTable[k].head != NULL && HashTable[k].tail != NULL && k < 8000)
+                        {
+                            printf("%d| ", k);
+                            TestNode = HashTable[k].head;
+                            if (TestNode->next == NULL) printf("%d:%d: %s",TestNode->key, TestNode->AlgorithmDistance, TestNode->Word);
+                            while(TestNode->next != NULL)
+                            {   
+                                printf("%d:%d: %s ->", TestNode->key, TestNode->AlgorithmDistance, TestNode->Word);
+                                TestNode = TestNode->next;
+                            }
+                            printf("\n");
+                        }
+                    }
+                }
+                */
 
-                printf("Suggestion %i: %s\n", i+1, WordArray[CurrentMinIndex]);
+                //update the min key to be large and out of the way
+                struct WordNode *updateNode = HashTable[CurrentMinIndex].head;
+                for (int k = 0; k < CurrentMinLinkedListIndex; k++) 
+                {
+                    updateNode = updateNode->next;
+                }
+                updateNode->AlgorithmDistance = 100;
+
+                printf("Suggestion %i: %s\n", i+1, updateNode->Word);
             }
         }
-        */
+        
     }
 
     //get the time of completion
