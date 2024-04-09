@@ -6,7 +6,7 @@
 #include <time.h>
 
 //list generation functions
-int DataReader(int duplicateFlag, int sortFlag);
+int DataReader(int duplicateFlag, int sortFlag, int testFlag);
 const char* GetWord(FILE fp, char** WordArray);
 
 //sorting algorithms

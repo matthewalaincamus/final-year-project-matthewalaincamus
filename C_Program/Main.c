@@ -63,14 +63,8 @@ int mainMenu()
 
                 //if -1, an error occured.
                 //if 0, then reload the page again
-                if (errorCheck == 0)
-                {
-                    inputCheck = 2;
-                }
-                if (errorCheck == -1)
-                {
-                    inputCheck = -1;
-                }
+                if (errorCheck == 0) inputCheck = 2;
+                if (errorCheck == -1) inputCheck = -1;
                 
             }
             else if(!strcmp(ActionChoice, "B") || !strcmp(ActionChoice, "b"))
@@ -79,14 +73,8 @@ int mainMenu()
 
                 //if -1, an error occured.
                 //if 0, then reload the page again
-                if (errorCheck == 0)
-                {
-                    inputCheck = 2;
-                }
-                if (errorCheck == -1)
-                {
-                    inputCheck = -1;
-                }
+                if (errorCheck == 0) inputCheck = 2;
+                if (errorCheck == -1) inputCheck = -1;
                 
             }
             else if(!strcmp(ActionChoice, "C") || !strcmp(ActionChoice, "c"))
@@ -95,14 +83,8 @@ int mainMenu()
 
                 //if -1, an error occured.
                 //if 0, then reload the page again
-                if (errorCheck == 0)
-                {
-                    inputCheck = 2;
-                }
-                if (errorCheck == -1)
-                {
-                    inputCheck = -1;
-                }
+                if (errorCheck == 0) inputCheck = 2;
+                if (errorCheck == -1) inputCheck = -1;
                 
             }
             else if(!strcmp(ActionChoice, "Z") || !strcmp(ActionChoice, "z"))
@@ -110,10 +92,10 @@ int mainMenu()
                 inputCheck = 0;
                 
                 //remove all files to save storage space
-                remove("./corpus/LWD.txt");
-                remove("./corpus/LWDS.txt");
-                remove("./corpus/LWND.txt");
-                remove("./corpus/LWNDS.txt");
+                remove("./GeneratedFiles/LWD.txt");
+                remove("./GeneratedFiles/LWDS.txt");
+                remove("./GeneratedFiles/LWND.txt");
+                remove("./GeneratedFiles/LWNDS.txt");
             }
             //if the user types an invalid answer
             else
@@ -143,7 +125,6 @@ int mainMenu()
 //function for dealing with all things regarding the generation of a file of words for use in the spell checking functions
 int GenerateDataset()
 {
-
     //check to see if the user wants to return to the main menu
     int returnCheck = 1;
 
@@ -173,7 +154,7 @@ int GenerateDataset()
 
             if(!strcmp(ActionChoice, "A") || !strcmp(ActionChoice, "a"))
             {
-                int errorCheck = DataReader(1, 0);
+                int errorCheck = DataReader(1, 0, 0);
 
                 //if -1, an error occured.
                 //if 0, then reload the page again
@@ -188,7 +169,7 @@ int GenerateDataset()
             }
             else if(!strcmp(ActionChoice, "B") || !strcmp(ActionChoice, "b"))
             {
-                int errorCheck = DataReader(0, 0);
+                int errorCheck = DataReader(0, 0, 0);
 
                 //if -1, an error occured.
                 //if 0, then reload the page again
@@ -203,7 +184,7 @@ int GenerateDataset()
             }
             else if(!strcmp(ActionChoice, "C") || !strcmp(ActionChoice, "c"))
             {
-                int errorCheck = DataReader(1, 1);
+                int errorCheck = DataReader(1, 1, 0);
 
                 //if -1, an error occured.
                 //if 0, then reload the page again
@@ -219,7 +200,7 @@ int GenerateDataset()
             }
             else if(!strcmp(ActionChoice, "D") || !strcmp(ActionChoice, "d"))
             {
-                int errorCheck = DataReader(0, 1);
+                int errorCheck = DataReader(0, 1, 0);
 
                 //if -1, an error occured.
                 //if 0, then reload the page again
@@ -265,7 +246,7 @@ int TypeSelector()
     int FileFlags[4] = {0, 0, 0, 0};
 
     struct dirent *dp;
-    char directoryName[50] = "./corpus/";
+    char directoryName[50] = "./GeneratedFiles/";
     
     DIR *dir = opendir(directoryName);
     if (!dir)
@@ -388,22 +369,10 @@ int MethodCheck(int FileType)
 
         printf("**Current Filetype selected: ");
 
-        if (FileType == 0)
-        {
-            printf("text with duplicate\n");
-        }
-        else if (FileType == 1)
-        {
-            printf("text without duplicates\n");
-        }
-        else if (FileType== 2)
-        {
-            printf("text with duplicates sorted in alphabetical order\n");
-        }
-        else if (FileType == 3)
-        {
-            printf("text without duplicates sorted in alphabetical order\n");
-        }
+        if (FileType == 0) printf("text with duplicate\n");
+        else if (FileType == 1) printf("text without duplicates\n");
+        else if (FileType== 2) printf("text with duplicates sorted in alphabetical order\n");
+        else if (FileType == 3) printf("text without duplicates sorted in alphabetical order\n");
 
         printf("\n");
 
@@ -474,34 +443,20 @@ int MethodCheck(int FileType)
                 }
                 
             }
-            else if(!strcmp(ActionChoice, "Z") || !strcmp(ActionChoice, "z"))
-            {
-                inputCheck = 0;
-            }
+            else if(!strcmp(ActionChoice, "Z") || !strcmp(ActionChoice, "z")) inputCheck = 0;
+
             //if user attempts to use a binary search with a non sorted file type, reject the request
-            else if((!strcmp(ActionChoice, "B") ||
-                !strcmp(ActionChoice, "b")) && 
-                ((FileType == 0) || (FileType == 1)))
-            {
-                printf("the selected file type needs to be sorted to perform this action\n");
-            }
+            else if(!strcmp(ActionChoice, "B") ||
+                !strcmp(ActionChoice, "b") ||
+                ((FileType == 0) || (FileType == 1))) printf("the selected file type needs to be sorted to perform this action\n");
 
             //if the user types an invalid answer
-            else
-            {
-                printf("Invalid response, please try again\n");
-            }
+            else printf("Invalid response, please try again\n");
         }
         // if inputCheck == 0 that means that the user wishes to leave the system
         // otherwise it means that the user still wishes to do other things with the system or and error has occured (system will loop)
-        if (inputCheck == 0)
-        {
-            returnCheck = 0;
-        }
-        else if(inputCheck == -1)
-        {
-            returnCheck = -1;
-        }
+        if (inputCheck == 0) returnCheck = 0;
+        else if(inputCheck == -1) returnCheck = -1;
     }
     return returnCheck;
 }
@@ -520,36 +475,16 @@ int SpellCheck(int FileType, int MethodType)
         printf("**Current Filetype selected: ");
 
         //diplay the filetype
-        if (FileType == 0)
-        {
-            printf("text with duplicate\n");
-        }
-        else if (FileType == 1)
-        {
-            printf("text without duplicates\n");
-        }
-        else if (FileType== 2)
-        {
-            printf("text with duplicates sorted in alphabetical order\n");
-        }
-        else if (FileType == 3)
-        {
-            printf("text without duplicates sorted in alphabetical order\n");
-        }
+        if (FileType == 0) printf("text with duplicate\n");  
+        else if (FileType == 1) printf("text without duplicates\n");
+        else if (FileType== 2) printf("text with duplicates sorted in alphabetical order\n");
+        else if (FileType == 3) printf("text without duplicates sorted in alphabetical order\n");
 
         //display the method used
-        if (MethodType == 0)
-        {
-            printf("*Method: Word list with linear search\n");
-        }
-        else if (MethodType == 1)
-        {
-            printf("*Method: Word list with binary search\n");
-        }
-        else if (MethodType == 2)
-        {
-            printf("*Method: Word list as a hash table\n");
-        }
+        if (MethodType == 0) printf("*Method(s): Word list with linear search\n");
+        else if (MethodType == 1) printf("*Method(s): Word list with binary search\n");
+        else if (MethodType == 2) printf("*Method(s): Word list as a hash table\n");
+        else if (MethodType == 3) printf("*Method(s): All\n");
 
         printf("\n");
 
@@ -582,14 +517,8 @@ int SpellCheck(int FileType, int MethodType)
 
                 //if -1, an error occured.
                 //if 0, then reload the page again
-                if (errorCheck == 0)
-                {
-                    inputCheck = 2;
-                }
-                else if (errorCheck == -1)
-                {
-                    inputCheck = -1;
-                }
+                if (errorCheck == 0) inputCheck = 2;
+                else if (errorCheck == -1) inputCheck = -1;
                 
             }
             else if(!strcmp(ActionChoice, "B") || !strcmp(ActionChoice, "b"))
@@ -599,14 +528,8 @@ int SpellCheck(int FileType, int MethodType)
 
                 //if -1, an error occured.
                 //if 0, then reload the page again
-                if (errorCheck == 0)
-                {
-                    inputCheck = 2;
-                }
-                else if (errorCheck == -1)
-                {
-                    inputCheck = -1;
-                }
+                if (errorCheck == 0) inputCheck = 2;
+                else if (errorCheck == -1) inputCheck = -1;
                 
             }
             else if(!strcmp(ActionChoice, "C") || !strcmp(ActionChoice, "c"))
@@ -616,14 +539,8 @@ int SpellCheck(int FileType, int MethodType)
 
                 //if -1, an error occured.
                 //if 0, then reload the page again
-                if (errorCheck == 0)
-                {
-                    inputCheck = 2;
-                }
-                else if (errorCheck == -1)
-                {
-                    inputCheck = -1;
-                }
+                if (errorCheck == 0) inputCheck = 2; 
+                else if (errorCheck == -1) inputCheck = -1;
                 
             }
             else if(!strcmp(ActionChoice, "D") || !strcmp(ActionChoice, "d"))
@@ -633,14 +550,8 @@ int SpellCheck(int FileType, int MethodType)
 
                 //if -1, an error occured.
                 //if 0, then reload the page again
-                if (errorCheck == 0)
-                {
-                    inputCheck = 2;
-                }
-                else if (errorCheck == -1)
-                {
-                    inputCheck = -1;
-                }
+                if (errorCheck == 0) inputCheck = 2;
+                else if (errorCheck == -1) inputCheck = -1;
                 
             }
             else if(!strcmp(ActionChoice, "E") || !strcmp(ActionChoice, "e"))
@@ -650,14 +561,8 @@ int SpellCheck(int FileType, int MethodType)
 
                 //if -1, an error occured.
                 //if 0, then reload the page again
-                if (errorCheck == 0)
-                {
-                    inputCheck = 2;
-                }
-                else if (errorCheck == -1)
-                {
-                    inputCheck = -1;
-                }
+                if (errorCheck == 0) inputCheck = 2;
+                else if (errorCheck == -1) inputCheck = -1;
                 
             }
             else if(!strcmp(ActionChoice, "F") || !strcmp(ActionChoice, "f"))
@@ -667,14 +572,8 @@ int SpellCheck(int FileType, int MethodType)
 
                 //if -1, an error occured.
                 //if 0, then reload the page again
-                if (errorCheck == 0)
-                {
-                    inputCheck = 2;
-                }
-                else if (errorCheck == -1)
-                {
-                    inputCheck = -1;
-                }
+                if (errorCheck == 0) inputCheck = 2;
+                else if (errorCheck == -1) inputCheck = -1;
                 
             }
             else if(!strcmp(ActionChoice, "G") || !strcmp(ActionChoice, "g"))
@@ -684,14 +583,8 @@ int SpellCheck(int FileType, int MethodType)
 
                 //if -1, an error occured.
                 //if 0, then reload the page again
-                if (errorCheck == 0)
-                {
-                    inputCheck = 2;
-                }
-                else if (errorCheck == -1)
-                {
-                    inputCheck = -1;
-                }
+                if (errorCheck == 0) inputCheck = 2;
+                else if (errorCheck == -1) inputCheck = -1;
                 
             }
             else if(!strcmp(ActionChoice, "H") || !strcmp(ActionChoice, "h"))
@@ -701,36 +594,18 @@ int SpellCheck(int FileType, int MethodType)
 
                 //if -1, an error occured.
                 //if 0, then reload the page again
-                if (errorCheck == 0)
-                {
-                    inputCheck = 2;
-                }
-                else if (errorCheck == -1)
-                {
-                    inputCheck = -1;
-                }
+                if (errorCheck == 0) inputCheck = 2;
+                else if (errorCheck == -1) inputCheck = -1;
                 
             }
-            else if(!strcmp(ActionChoice, "Z") || !strcmp(ActionChoice, "z"))
-            {
-                inputCheck = 0;
-            }
+            else if(!strcmp(ActionChoice, "Z") || !strcmp(ActionChoice, "z")) inputCheck = 0;
             //if the user types an invalid answer
-            else
-            {
-                printf("Invalid response, please try again\n");
-            }
+            else printf("Invalid response, please try again\n");
         }
         // if inputCheck == 0 that means that the user wishes to leave the system
         // otherwise it means that the user still wishes to do other things with the system or and error has occured (system will loop)
-        if (inputCheck == 0)
-        {
-            returnCheck = 0;
-        }
-        else if(inputCheck == -1)
-        {
-            returnCheck = -1;
-        }
+        if (inputCheck == 0) returnCheck = 0;
+        else if(inputCheck == -1) returnCheck = -1;
     }
     
     return returnCheck;
@@ -749,13 +624,39 @@ int AutoTesterMenu()
         system("cls");
 
         //show user options for the corpus
-        printf("options for word searching methods (indicate which option by typing its asscociated letter):\n");
-        printf("(A) word dictionary as a list checked using linear search\n");
-        printf("(B) word dictionary as a list checked using binary search (sorted word list only)\n");
-        printf("(C) word dictionary as a hash table\n");
-        printf("(Z) return to previous menu\n");
+        printf("options for automated testing (indicate which option by typing its asscociated letter):\n");
+        printf("(A) Full comparison of all avaliable methods and algorithms on wordlist with no duplicates\n");
+        printf("(A) Full comparison of all avaliable methods and algorithms on wordlist with no duplicates sorted alphabetically (merge sort)\n");
+        printf("(Z) return to main menu\n");
 
-        break;
+        int inputCheck = 1;
+
+        while(inputCheck == 1)
+        {
+            //user input
+            char ActionChoice[128];
+            printf(": ");
+            scanf("%s", ActionChoice);
+
+            if(!strcmp(ActionChoice, "A") || !strcmp(ActionChoice, "a"))
+            {
+                
+                int errorCheck = DataReader(0, 0, 1);
+
+                //if -1, an error occured.
+                //if 0, then reload the page again
+                if (errorCheck == 0) inputCheck == 2;
+                else if (errorCheck == -1) inputCheck = -1;
+            }
+            else if(!strcmp(ActionChoice, "Z") || !strcmp(ActionChoice, "z")) inputCheck = 0;
+            //if the user types an invalid answer
+            else printf("Invalid response, please try again\n");
+        }
+        // if inputCheck == 0 that means that the user wishes to leave the system
+        // otherwise it means that the user still wishes to do other things with the system or and error has occured (system will loop)
+        if (inputCheck == 0) returnCheck = 0;
+        else if(inputCheck == -1) returnCheck = -1;
     }
     return returnCheck;
 }
+

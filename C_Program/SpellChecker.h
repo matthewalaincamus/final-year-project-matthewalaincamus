@@ -88,3 +88,6 @@ int Min(int a, int b);
 
 //min for 3 number function used in Optimal String Alignment Distance algorithm
 int Min3(int a, int b, int c);
+
+//function to handle full testing and comparison of methods and algorithms
+int AutoSpellChecker(int FileType);

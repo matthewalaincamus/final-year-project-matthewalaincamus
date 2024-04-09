@@ -17,7 +17,12 @@ int JaroWinklerSimilarity(char string1[], char string2[], int len1, int len2);
 int Max(int a, int b);
 int Min(int a, int b);
 int Min3(int a, int b, int c);
+int AutoSpellChecker(int FileType);
 
+
+//FileType = file used
+//CheckType = method used
+//algorithmCheck = Algorithm used
 int SpellChecker(int FileType, int CheckType, int AlgorithmCheck)
 {
     //check to see if the user wants to return to the main menu
@@ -44,36 +49,16 @@ int SpellChecker(int FileType, int CheckType, int AlgorithmCheck)
         printf("**Current Filetype selected: ");
 
         //display file type info
-        if (FileType == 0)
-        {
-            printf("*text with duplicate\n");
-        }
-        else if (FileType == 1)
-        {
-            printf("*text without duplicates\n");
-        }
-        else if (FileType== 2)
-        {
-            printf("*text with duplicates sorted in alphabetical order\n");
-        }
-        else if (FileType == 3)
-        {
-            printf("*text without duplicates sorted in alphabetical order\n");
-        }
+        if (FileType == 0) printf("*text with duplicate\n");
+        else if (FileType == 1) printf("*text without duplicates\n");
+        else if (FileType== 2) printf("*text with duplicates sorted in alphabetical order\n");
+        else if (FileType == 3) printf("*text without duplicates sorted in alphabetical order\n");
 
         //display the method used
-        if (CheckType == 0)
-        {
-            printf("*Method: Word list with linear search\n");
-        }
-        else if (CheckType == 1)
-        {
-            printf("*Method: Word list with binary search\n");
-        }
-        else if (CheckType == 2)
-        {
-            printf("*Method: Word list as a hash table\n");
-        }
+        if (CheckType == 0) printf("*Method: Word list with linear search\n");
+        else if (CheckType == 1) printf("*Method: Word list with binary search\n");
+        else if (CheckType == 2) printf("*Method: Word list as a hash table\n");
+        else if (CheckType == 3) printf("*Method(s): All");
 
         printf("\n");
 
@@ -94,10 +79,8 @@ int SpellChecker(int FileType, int CheckType, int AlgorithmCheck)
             printf(": ");
             scanf("%s", ActionChoice);
 
-            if(!strcmp(ActionChoice, "?"))
-            {
-                return 0;
-            }
+            //question mark denotes return to menu
+            if(!strcmp(ActionChoice, "?")) return 0;
 
             int WordCheck = 0;
 
@@ -214,19 +197,19 @@ struct WordsListing WordFetcher(int FileType)
 
     if (FileType == 0)
     {
-        fp = fopen("./corpus/LWD.txt", "r");
+        fp = fopen("./GeneratedFiles/LWD.txt", "r");
     }
     else if(FileType == 1)
     {
-        fp = fopen("./corpus/LWND.txt", "r");
+        fp = fopen("./GeneratedFiles/LWND.txt", "r");
     }
     else if(FileType == 2)
     {
-        fp = fopen("./corpus/LWDS.txt", "r");
+        fp = fopen("./GeneratedFiles/LWDS.txt", "r");
     }
     else if(FileType == 3)
     {
-        fp = fopen("./corpus/LWNDS.txt", "r");
+        fp = fopen("./GeneratedFiles/LWNDS.txt", "r");
     }
     else
     {
@@ -303,19 +286,19 @@ struct ReturnHash initHash(int FileType, int MaxSize)
     //open the right file
     if (FileType == 0)
     {
-        fp = fopen("./corpus/LWD.txt", "r");
+        fp = fopen("./GeneratedFiles/LWD.txt", "r");
     }
     else if(FileType == 1)
     {
-        fp = fopen("./corpus/LWND.txt", "r");
+        fp = fopen("./GeneratedFiles/LWND.txt", "r");
     }
     else if(FileType == 2)
     {
-        fp = fopen("./corpus/LWDS.txt", "r");
+        fp = fopen("./GeneratedFiles/LWDS.txt", "r");
     }
     else if(FileType == 3)
     {
-        fp = fopen("./corpus/LWNDS.txt", "r");
+        fp = fopen("./GeneratedFiles/LWNDS.txt", "r");
     }
     else
     {
@@ -1097,4 +1080,69 @@ int Min3(int a, int b, int c)
     }
     else if (b < c) return b;
     else return c;
+}
+
+int AutoSpellChecker(int FileType)
+{
+    //check to see if the user wants to return to the main menu
+    int returnCheck = 1;
+
+    //will loop till the user exits via typing z or Z on the keyboard in the main menu
+    while (returnCheck == 1)
+    {
+        system("cls");
+
+        printf("Full Spell Check:\n");
+        
+        printf("**Current Filetype selected: ");
+
+        //display file type info
+        if (FileType == 0) printf("*text with duplicate\n");
+        else if (FileType == 1) printf("*text without duplicates\n");
+        else if (FileType== 2) printf("*text with duplicates sorted in alphabetical order\n");
+        else if (FileType == 3) printf("*text without duplicates sorted in alphabetical order\n");
+
+        printf("\n");
+
+        printf("Please enter the word you wish to spell check\n");
+        printf("RULES:\n");
+        printf("- no numbers or non alphabet characters\n");
+        printf("- maximum length string of 25 characters\n");
+        printf("- all characters must be in lowercase\n\n");
+        printf("If you wish to return to the previous screen, please type '?' and then press enter\n");
+
+        int inputCheck = 1;
+
+        char ActionChoice[128];
+
+        while(inputCheck == 1)
+        {
+            //user input
+            printf(": ");
+            scanf("%s", ActionChoice);
+
+            //question mark denotes return to menu
+            if(!strcmp(ActionChoice, "?")) returnCheck = 0;
+
+            int WordCheck = 0;
+
+            for (int i = 0; i < 128; i++)
+            {
+                if (i > 24) WordCheck++;
+
+                int charToInt = (int)ActionChoice[i];
+
+                if (ActionChoice[i] == '\0') break;
+                else if (isdigit(ActionChoice[i])) WordCheck++;
+                else if (charToInt < 97 || charToInt > 122) WordCheck++;
+            }
+
+            if (WordCheck > 0) printf("Please enter a valid word\n");
+            else inputCheck = 0;
+        }
+
+        
+    }
+
+    return 0;
 }

@@ -8,8 +8,9 @@ const char* GetWord(FILE fp, char** WordArray)
 
 //**function for making list of words from corpus
 //if duplicateFlag == 0 (no duplicates), if duplicateFlag == 1 (duplicates)
-//if sortFlag = 0 (no sort), if sortFlag = 1 (sort alphabetically), if sortFlag == 2 (sort by frequency)
-int DataReader(int duplicateFlag, int sortFlag)
+//if sortFlag = 0 (no sort), if sortFlag = 1 (sort alphabetically)
+//if testFlag = 0 (normal operations), if testFlag = 1 (use test value as folder to retrieve and cancel all intermediate print statements for speed)
+int DataReader(int duplicateFlag, int sortFlag, int testFlag)
 {
     //clear the screen so that only relevant system text is shown
     system("cls");
@@ -62,10 +63,10 @@ int DataReader(int duplicateFlag, int sortFlag)
     FILE* Wfp;
 
     //this is the file where all the words are deposited
-    if (sortFlag == 0 && duplicateFlag == 1)Wfp = fopen("./corpus/LWD.txt", "w");
-    else if (sortFlag == 1 && duplicateFlag == 1)Wfp = fopen("./corpus/LWDS.txt", "w");
-    else if (sortFlag == 0 && duplicateFlag == 0)Wfp = fopen("./corpus/LWND.txt", "w");
-    else if (sortFlag == 1 && duplicateFlag == 0)Wfp = fopen("./corpus/LWNDS.txt", "w");
+    if (sortFlag == 0 && duplicateFlag == 1)Wfp = fopen("./GeneratedFiles/LWD.txt", "w");
+    else if (sortFlag == 1 && duplicateFlag == 1)Wfp = fopen("./GeneratedFiles/LWDS.txt", "w");
+    else if (sortFlag == 0 && duplicateFlag == 0)Wfp = fopen("./GeneratedFiles/LWND.txt", "w");
+    else if (sortFlag == 1 && duplicateFlag == 0)Wfp = fopen("./GeneratedFiles/LWNDS.txt", "w");
     else
     {
         printf("Error: invalid sortCheck or duplicateCheck value given\n");
@@ -79,7 +80,7 @@ int DataReader(int duplicateFlag, int sortFlag)
     }
 
     struct dirent *dp;
-    char directoryName[50] = "./corpus/Texts/";
+    char directoryName[50] = "../corpus/Texts/";
     strcat(directoryName, ActionChoice1);
     //printf("%s\n", directoryName);
 
@@ -120,7 +121,7 @@ int DataReader(int duplicateFlag, int sortFlag)
                             strcat(FinalDirectoryName, innerdp->d_name);
 
                             //print the files as they load
-                            printf("%s\n", FinalDirectoryName);
+                            if (testFlag == 0) printf("%s\n", FinalDirectoryName);
 
                             FILE* fp;
                             char nextChar = ' ';
@@ -275,8 +276,8 @@ int DataReader(int duplicateFlag, int sortFlag)
         closedir(dir);
     }
 
+    
     printf("**Loading Complete\n");
-
     printf("WordCount: %d\n", WordCount);
 
     //for testing
