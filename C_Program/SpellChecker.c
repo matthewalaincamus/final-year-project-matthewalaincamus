@@ -3,10 +3,10 @@
 //skeleton functions for use later
 struct WordsListing WordFetcher(int FileType);
 struct ReturnHash initHash(int FileType, int MaxSize);
-int linearCheck(char ** WordArray, int WordCount, char wordString[], int AlgorithmCheck, clock_t Start);
-int binaryCheck(char ** WordArray, int WordCount, char wordString[], int AlgorithmCheck, clock_t Start);
+int linearCheck(char ** WordArray, int WordCount, char wordString[], int AlgorithmCheck, clock_t Start, int TestFlag);
+int binaryCheck(char ** WordArray, int WordCount, char wordString[], int AlgorithmCheck, clock_t Start, int TestFlag);
 int binarySearch(char** WordArray, int leftValue, int rightValue, char wordString[25]);
-int HashChecker(struct WordHashItem *HashTable, int MaxSize, int WordCount, char wordString[], int AlgorithmCheck, clock_t Start);
+int HashChecker(struct WordHashItem *HashTable, int MaxSize, int WordCount, char wordString[], int AlgorithmCheck, clock_t Start, int TestFlag);
 int LevenshteinDistance(char string1[], char string2[], int len1, int len2);
 int HammingDistance(char string1[], char string2[], int len1, int len2);
 int SorensenDiceCoefficient(char string1[], char string2[], int len1, int len2);
@@ -108,10 +108,10 @@ int SpellChecker(int FileType, int CheckType, int AlgorithmCheck)
             clock_t Start = clock();
 
             //linear searching = 0
-            if (CheckType == 0) linearCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, AlgorithmCheck, Start);
+            if (CheckType == 0) linearCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, AlgorithmCheck, Start, 0);
 
             //binary searching = 1
-            else if (CheckType == 1) binaryCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, AlgorithmCheck, Start); 
+            else if (CheckType == 1) binaryCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, AlgorithmCheck, Start, 0); 
         
             //cleanup
             free(WordArray.WordArray);
@@ -156,8 +156,7 @@ int SpellChecker(int FileType, int CheckType, int AlgorithmCheck)
 
             //start timer
             clock_t Start = clock();
-
-            HashChecker(WordHashTable.HashTable, MaxSize, WordHashTable.WordCount, ActionChoice, AlgorithmCheck, Start);
+            HashChecker(WordHashTable.HashTable, MaxSize, WordHashTable.WordCount, ActionChoice, AlgorithmCheck, Start, 0);
 
             //cleanup
             struct WordNode *tmp, *currentNode;
@@ -390,8 +389,22 @@ struct ReturnHash initHash(int FileType, int MaxSize)
 }
 
 //linear search checker
-int linearCheck(char ** WordArray, int WordCount, char wordString[], int AlgorithmCheck, clock_t Start)
+int linearCheck(char ** WordArray, int WordCount, char wordString[], int AlgorithmCheck, clock_t Start, int TestFlag)
 {
+
+    //if called from automated testing, print out data differently
+    if (TestFlag == 1)
+    {
+        //first print out algorithm used:
+        if (AlgorithmCheck == 0) printf("|%-30s", "None");
+        else if (AlgorithmCheck == 1) printf("|%-30s", "LevenshteinDistance");
+        else if (AlgorithmCheck == 2) printf("|%-30s", "HammingDistance");
+        else if (AlgorithmCheck == 3) printf("|%-30s", "SorensenDiceCoefficient");
+        else if (AlgorithmCheck == 4) printf("|%-30s", "OptimalStringAlignmentDistance");
+        else if (AlgorithmCheck == 5) printf("|%-30s", "DamerauLevenshteinDistance");
+        else if (AlgorithmCheck == 6) printf("|%-30s", "JaroSimilarity");
+        else if (AlgorithmCheck == 7) printf("|%-30s", "JaroWinklerSimilarity");
+    }
     int WordFlag = 0;
     int lineCount = 0;
 
@@ -401,7 +414,7 @@ int linearCheck(char ** WordArray, int WordCount, char wordString[], int Algorit
     //if the word is a single letter, no need to do any further checks as they are always valid
     if (strlen(wordString) == 1)
     {
-        printf("Your word exists in the word list\n");
+        if (TestFlag == 0) printf("Your word exists in the word list\n");
         WordFlag++;
     }
     else
@@ -410,48 +423,28 @@ int linearCheck(char ** WordArray, int WordCount, char wordString[], int Algorit
         {
             if(!strcmp(WordArray[i], wordString))
             {
-                printf("Your word exists in the word list\n");
+                if (TestFlag == 0) printf("Your word exists in the word list\n");
                 WordFlag++;
                 break;
             }
             lineCount++;
             
             //if an algorithm is active, get the distance between the two words
-            if (AlgorithmCheck == 1)
-            {
-                AlgorithmArray[i] = LevenshteinDistance(wordString, WordArray[i], strlen(wordString), strlen(WordArray[i]));
-            }
-            else if (AlgorithmCheck == 2)
-            {
-                AlgorithmArray[i] = HammingDistance(wordString, WordArray[i], strlen(wordString), strlen(WordArray[i]));
-            }
-            else if (AlgorithmCheck == 3)
-            {
-                AlgorithmArray[i] = SorensenDiceCoefficient(wordString, WordArray[i], strlen(wordString), strlen(WordArray[i]));
-            }
-            else if (AlgorithmCheck == 4)
-            {
-                AlgorithmArray[i] = OptimalStringAlignmentDistance(wordString, WordArray[i], strlen(wordString), strlen(WordArray[i]));
-            }
-            else if (AlgorithmCheck == 5)
-            {
-                AlgorithmArray[i] = DamerauLevenshteinDistance(wordString, WordArray[i], strlen(wordString), strlen(WordArray[i]));
-            }
-            else if (AlgorithmCheck == 6)
-            {
-                AlgorithmArray[i] = JaroSimilarity(wordString, WordArray[i], strlen(wordString), strlen(WordArray[i]));
-            }
-            else if (AlgorithmCheck == 7)
-            {
-                AlgorithmArray[i] = JaroWinklerSimilarity(wordString, WordArray[i], strlen(wordString), strlen(WordArray[i]));
-            }
+            if (AlgorithmCheck == 1) AlgorithmArray[i] = LevenshteinDistance(wordString, WordArray[i], strlen(wordString), strlen(WordArray[i]));
+            else if (AlgorithmCheck == 2) AlgorithmArray[i] = HammingDistance(wordString, WordArray[i], strlen(wordString), strlen(WordArray[i]));
+            else if (AlgorithmCheck == 3) AlgorithmArray[i] = SorensenDiceCoefficient(wordString, WordArray[i], strlen(wordString), strlen(WordArray[i]));
+            else if (AlgorithmCheck == 4) AlgorithmArray[i] = OptimalStringAlignmentDistance(wordString, WordArray[i], strlen(wordString), strlen(WordArray[i]));
+            else if (AlgorithmCheck == 5) AlgorithmArray[i] = DamerauLevenshteinDistance(wordString, WordArray[i], strlen(wordString), strlen(WordArray[i]));
+            else if (AlgorithmCheck == 6) AlgorithmArray[i] = JaroSimilarity(wordString, WordArray[i], strlen(wordString), strlen(WordArray[i]));
+            else if (AlgorithmCheck == 7) AlgorithmArray[i] = JaroWinklerSimilarity(wordString, WordArray[i], strlen(wordString), strlen(WordArray[i]));
         }
     }
 
     //if word wasn't found, get suggestions
     if (WordFlag == 0)
     {
-        printf("Your word doesn't exist in the word list\n");
+        if (TestFlag == 0) printf("Your word doesn't exist in the word list\n");
+        else if (TestFlag == 1) printf("|%-15s", "False");
 
         //if anything other than a simple check, get the top 10 results of the specified algorithm
         if (AlgorithmCheck != 0)
@@ -473,65 +466,63 @@ int linearCheck(char ** WordArray, int WordCount, char wordString[], int Algorit
 
                 AlgorithmArray[CurrentMinIndex] = 100;
 
-                printf("Suggestion %i: %s\n", i+1, WordArray[CurrentMinIndex]);
+                if (TestFlag == 0) printf("Suggestion %i: %s\n", i+1, WordArray[CurrentMinIndex]);
+                else if (TestFlag == 1 && i == 0) printf("|%-25s|\n", WordArray[CurrentMinIndex]);
+                else if (TestFlag == 1 && i > 0) printf("|%-30s|%-15s|%-25s|\n", "", "",  WordArray[CurrentMinIndex]);
             }
         }
+        else if (AlgorithmCheck == 0 && TestFlag == 1) printf("|%-25s|\n", "N/A");
     }
+    else if (WordFlag > 0 && TestFlag == 1) printf("|%-15s|%-25s|\n", "True", "");
 
     //get the time of completion
     clock_t TimeDif = clock() - Start;
     double TimeTaken = (double)TimeDif / CLOCKS_PER_SEC;
 
-    printf("Operation took: %f Seconds to complete\n\n", TimeTaken);
+    if (TestFlag == 0) printf("Operation took: %f Seconds to complete\n\n", TimeTaken);
+    else if (TestFlag == 1) printf("|Time to complete: %.10f secs%-37s|\n",  TimeTaken, "");
     return 0;
 }
 
 //binary search checker
-int binaryCheck(char ** WordArray, int WordCount, char wordString[], int AlgorithmCheck, clock_t Start)
+int binaryCheck(char ** WordArray, int WordCount, char wordString[], int AlgorithmCheck, clock_t Start, int TestFlag)
 {
+    //if called from automated testing, print out data differently
+    if (TestFlag == 1)
+    {
+        //first print out algorithm used:
+        if (AlgorithmCheck == 0) printf("|%-30s", "None");
+        else if (AlgorithmCheck == 1) printf("|%-30s", "LevenshteinDistance");
+        else if (AlgorithmCheck == 2) printf("|%-30s", "HammingDistance");
+        else if (AlgorithmCheck == 3) printf("|%-30s", "SorensenDiceCoefficient");
+        else if (AlgorithmCheck == 4) printf("|%-30s", "OptimalStringAlignmentDistance");
+        else if (AlgorithmCheck == 5) printf("|%-30s", "DamerauLevenshteinDistance");
+        else if (AlgorithmCheck == 6) printf("|%-30s", "JaroSimilarity");
+        else if (AlgorithmCheck == 7) printf("|%-30s", "JaroWinklerSimilarity");
+    }
+
     //perform the binary search
     int binaryCheck = binarySearch(WordArray, 0, WordCount - 1, wordString);
     if (binaryCheck == 0) 
     {
-        printf("Your word doesn't exist in the word list\n");
+        if (TestFlag == 0) printf("Your word doesn't exist in the word list\n");
+        else if (TestFlag == 1) printf("|%-15s", "False");
 
         if (AlgorithmCheck != 0)
         {
             //for suggestion calculations
             int AlgorithmArray [WordCount];
 
-            //get all the levenshtein distances from string linearly
+            //get all the distances from the list linearly
             for (int i = 0; i < WordCount; i++)
             {   
-                //if lev is active
-                if (AlgorithmCheck == 1)
-                {
-                    AlgorithmArray[i] = LevenshteinDistance(wordString, WordArray[i], strlen(wordString), strlen(WordArray[i]));
-                }
-                else if(AlgorithmCheck == 2)
-                {
-                    AlgorithmArray[i] = HammingDistance(wordString, WordArray[i], strlen(wordString), strlen(WordArray[i]));
-                }
-                else if (AlgorithmCheck == 3)
-                {
-                    AlgorithmArray[i] = SorensenDiceCoefficient(wordString, WordArray[i], strlen(wordString), strlen(WordArray[i]));
-                }
-                else if (AlgorithmCheck == 4)
-                {
-                    AlgorithmArray[i] = OptimalStringAlignmentDistance(wordString, WordArray[i], strlen(wordString), strlen(WordArray[i]));
-                }
-                else if (AlgorithmCheck == 5)
-                {
-                    AlgorithmArray[i] = DamerauLevenshteinDistance(wordString, WordArray[i], strlen(wordString), strlen(WordArray[i]));
-                }
-                else if (AlgorithmCheck == 6)
-                {
-                    AlgorithmArray[i] = JaroSimilarity(wordString, WordArray[i], strlen(wordString), strlen(WordArray[i]));
-                }
-                else if (AlgorithmCheck == 7)
-                {
-                    AlgorithmArray[i] = JaroWinklerSimilarity(wordString, WordArray[i], strlen(wordString), strlen(WordArray[i]));
-                }
+                if (AlgorithmCheck == 1) AlgorithmArray[i] = LevenshteinDistance(wordString, WordArray[i], strlen(wordString), strlen(WordArray[i]));
+                else if(AlgorithmCheck == 2) AlgorithmArray[i] = HammingDistance(wordString, WordArray[i], strlen(wordString), strlen(WordArray[i]));
+                else if (AlgorithmCheck == 3) AlgorithmArray[i] = SorensenDiceCoefficient(wordString, WordArray[i], strlen(wordString), strlen(WordArray[i]));
+                else if (AlgorithmCheck == 4) AlgorithmArray[i] = OptimalStringAlignmentDistance(wordString, WordArray[i], strlen(wordString), strlen(WordArray[i]));
+                else if (AlgorithmCheck == 5) AlgorithmArray[i] = DamerauLevenshteinDistance(wordString, WordArray[i], strlen(wordString), strlen(WordArray[i]));
+                else if (AlgorithmCheck == 6) AlgorithmArray[i] = JaroSimilarity(wordString, WordArray[i], strlen(wordString), strlen(WordArray[i]));
+                else if (AlgorithmCheck == 7) AlgorithmArray[i] = JaroWinklerSimilarity(wordString, WordArray[i], strlen(wordString), strlen(WordArray[i]));
             }
 
             //if anything other than a simple check, get the top 10 results of the specified algorithm
@@ -554,35 +545,57 @@ int binaryCheck(char ** WordArray, int WordCount, char wordString[], int Algorit
 
                     AlgorithmArray[CurrentMinIndex] = 100;
 
-                    printf("Suggestion %i: %s\n", i+1, WordArray[CurrentMinIndex]);
+                    if (TestFlag == 0) printf("Suggestion %i: %s\n", i+1, WordArray[CurrentMinIndex]);
+                    else if (TestFlag == 1 && i == 0) printf("|%-25s|\n", WordArray[CurrentMinIndex]);
+                    else if (TestFlag == 1 && i > 0) printf("|%-30s|%-15s|%-25s|\n", "", "",  WordArray[CurrentMinIndex]);
                 }
             }
         }
+        else if (AlgorithmCheck == 0 && TestFlag == 1) printf("|%-25s|\n", "N/A");
     }
-    else if (binaryCheck == 1) printf("Your word exists in the word list\n");
+    else if (binaryCheck == 1) 
+    {
+        if (TestFlag == 0) printf("Your word exists in the word list\n");
+        else if (TestFlag == 1) printf("|%-15s|%-25s|\n", "True", "");
+    }
     else
     {
-        printf("Error: problem with binary search\n");
+        if (TestFlag == 0) printf("Error: problem with binary search\n");
     }
 
     //get the time taken
     clock_t TimeDif = clock() - Start;
     double TimeTaken = (double)TimeDif / CLOCKS_PER_SEC;
 
-    printf("Operation took: %f Seconds to complete\n\n", TimeTaken);
+    if (TestFlag == 0) printf("Operation took: %f Seconds to complete\n\n", TimeTaken);
+    else if (TestFlag == 1) printf("|Time to complete: %.10f secs%-37s|\n",  TimeTaken, "");
     return 0;
 }
 
 //hash table checker
-int HashChecker(struct WordHashItem *HashTable, int MaxSize, int WordCount, char wordString[], int AlgorithmCheck, clock_t Start)
+int HashChecker(struct WordHashItem *HashTable, int MaxSize, int WordCount, char wordString[], int AlgorithmCheck, clock_t Start, int TestFlag)
 {
+    //if called from automated testing, print out data differently
+    if (TestFlag == 1)
+    {
+        //first print out algorithm used:
+        if (AlgorithmCheck == 0) printf("|%-30s", "None");
+        else if (AlgorithmCheck == 1) printf("|%-30s", "LevenshteinDistance");
+        else if (AlgorithmCheck == 2) printf("|%-30s", "HammingDistance");
+        else if (AlgorithmCheck == 3) printf("|%-30s", "SorensenDiceCoefficient");
+        else if (AlgorithmCheck == 4) printf("|%-30s", "OptimalStringAlignmentDistance");
+        else if (AlgorithmCheck == 5) printf("|%-30s", "DamerauLevenshteinDistance");
+        else if (AlgorithmCheck == 6) printf("|%-30s", "JaroSimilarity");
+        else if (AlgorithmCheck == 7) printf("|%-30s", "JaroWinklerSimilarity");
+    }
+
     //for showing if a word has been found or not
     int WordFlag = 0;
 
     //if the word is a single letter, no need to do any further checks as they are always valid
     if (strlen(wordString) == 1)
     {
-        printf("Your word exists in the word list\n");
+        if (TestFlag == 0) printf("Your word exists in the word list\n");
         WordFlag++;
     }
     else
@@ -603,7 +616,7 @@ int HashChecker(struct WordHashItem *HashTable, int MaxSize, int WordCount, char
         {
             if (!strcmp(LinkedList->Word, wordString))
             {
-                printf("Your word exists in the word list\n");
+                if (TestFlag == 0) printf("Your word exists in the word list\n");
                 WordFlag++;
             }
             //if not, loop through the linked list till you find the word or reach the tail
@@ -614,7 +627,7 @@ int HashChecker(struct WordHashItem *HashTable, int MaxSize, int WordCount, char
                     LinkedList = LinkedList->next;
                     if (!strcmp(LinkedList->Word, wordString))
                     {
-                        printf("Your word exists in the word list\n");
+                        if (TestFlag == 0) printf("Your word exists in the word list\n");
                         WordFlag++;
                         break;
                     }
@@ -626,7 +639,9 @@ int HashChecker(struct WordHashItem *HashTable, int MaxSize, int WordCount, char
     //if word wasn't found, get suggestions
     if (WordFlag == 0)
     {
-        printf("Your word doesn't exist in the word list\n");
+        if (TestFlag == 0) printf("Your word doesn't exist in the word list\n");
+        else if (TestFlag == 1) printf("|%-15s", "False");
+        
         if (AlgorithmCheck != 0)
         {
             for (int i = 0; i < MaxSize; i++)
@@ -639,68 +654,26 @@ int HashChecker(struct WordHashItem *HashTable, int MaxSize, int WordCount, char
                     if (currentNode->next == NULL)
                     {
                         //if an algorithm is active, get the distance between the two words
-                        if (AlgorithmCheck == 1)
-                        {
-                            currentNode->AlgorithmDistance = LevenshteinDistance(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
-                        }
-                        else if (AlgorithmCheck == 2)
-                        {
-                            currentNode->AlgorithmDistance = HammingDistance(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
-                        }
-                        else if (AlgorithmCheck == 3)
-                        {
-                            currentNode->AlgorithmDistance = SorensenDiceCoefficient(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
-                        }
-                        else if (AlgorithmCheck == 4)
-                        {
-                            currentNode->AlgorithmDistance = OptimalStringAlignmentDistance(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
-                        }
-                        else if (AlgorithmCheck == 5)
-                        {
-                            currentNode->AlgorithmDistance = DamerauLevenshteinDistance(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
-                        }
-                        else if (AlgorithmCheck == 6)
-                        {
-                            currentNode->AlgorithmDistance = JaroSimilarity(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
-                        }
-                        else if (AlgorithmCheck == 7)
-                        {
-                            currentNode->AlgorithmDistance = JaroWinklerSimilarity(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
-                        }
+                        if (AlgorithmCheck == 1) currentNode->AlgorithmDistance = LevenshteinDistance(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
+                        else if (AlgorithmCheck == 2) currentNode->AlgorithmDistance = HammingDistance(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
+                        else if (AlgorithmCheck == 3) currentNode->AlgorithmDistance = SorensenDiceCoefficient(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
+                        else if (AlgorithmCheck == 4) currentNode->AlgorithmDistance = OptimalStringAlignmentDistance(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
+                        else if (AlgorithmCheck == 5) currentNode->AlgorithmDistance = DamerauLevenshteinDistance(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
+                        else if (AlgorithmCheck == 6) currentNode->AlgorithmDistance = JaroSimilarity(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
+                        else if (AlgorithmCheck == 7) currentNode->AlgorithmDistance = JaroWinklerSimilarity(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
                     }
 
                     //if there are more than 1 nodes
                     while(currentNode->next != NULL)
                     {
                         //if an algorithm is active, get the distance between the two words
-                        if (AlgorithmCheck == 1)
-                        {
-                            currentNode->AlgorithmDistance = LevenshteinDistance(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
-                        }
-                        else if (AlgorithmCheck == 2)
-                        {
-                            currentNode->AlgorithmDistance = HammingDistance(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
-                        }
-                        else if (AlgorithmCheck == 3)
-                        {
-                            currentNode->AlgorithmDistance = SorensenDiceCoefficient(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
-                        }
-                        else if (AlgorithmCheck == 4)
-                        {
-                            currentNode->AlgorithmDistance = OptimalStringAlignmentDistance(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
-                        }
-                        else if (AlgorithmCheck == 5)
-                        {
-                            currentNode->AlgorithmDistance = DamerauLevenshteinDistance(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
-                        }
-                        else if (AlgorithmCheck == 6)
-                        {
-                            currentNode->AlgorithmDistance = JaroSimilarity(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
-                        }
-                        else if (AlgorithmCheck == 7)
-                        {
-                            currentNode->AlgorithmDistance = JaroWinklerSimilarity(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
-                        }
+                        if (AlgorithmCheck == 1) currentNode->AlgorithmDistance = LevenshteinDistance(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
+                        else if (AlgorithmCheck == 2) currentNode->AlgorithmDistance = HammingDistance(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
+                        else if (AlgorithmCheck == 3) currentNode->AlgorithmDistance = SorensenDiceCoefficient(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
+                        else if (AlgorithmCheck == 4) currentNode->AlgorithmDistance = OptimalStringAlignmentDistance(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
+                        else if (AlgorithmCheck == 5) currentNode->AlgorithmDistance = DamerauLevenshteinDistance(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
+                        else if (AlgorithmCheck == 6) currentNode->AlgorithmDistance = JaroSimilarity(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
+                        else if (AlgorithmCheck == 7) currentNode->AlgorithmDistance = JaroWinklerSimilarity(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
                         currentNode = currentNode->next;
                     }
                 }
@@ -771,17 +744,21 @@ int HashChecker(struct WordHashItem *HashTable, int MaxSize, int WordCount, char
                 }
                 updateNode->AlgorithmDistance = 100;
 
-                printf("Suggestion %i: %s\n", i+1, updateNode->Word);
+                if (TestFlag == 0) printf("Suggestion %i: %s\n", i+1, updateNode->Word);
+                else if (TestFlag == 1 && i == 0) printf("|%-25s|\n", updateNode->Word);
+                else if (TestFlag == 1 && i > 0) printf("|%-30s|%-15s|%-25s|\n", "", "",  updateNode->Word);
             }
         }
-        
+        else if (AlgorithmCheck == 0 && TestFlag == 1) printf("|%-25s|\n", "N/A");
     }
+    else if (WordFlag > 0 && TestFlag == 1) printf("|%-15s|%-25s|\n", "True", "");
 
     //get the time of completion
     clock_t TimeDif = clock() - Start;
     double TimeTaken = (double)TimeDif / CLOCKS_PER_SEC;
 
-    printf("Operation took: %f Seconds to complete\n\n", TimeTaken);
+    if (TestFlag == 0) printf("Operation took: %f Seconds to complete\n\n", TimeTaken);
+    else if (TestFlag == 1) printf("|Time to complete: %.10f secs%-37s|\n",  TimeTaken, "");
 
     return 0;
 }
@@ -1122,7 +1099,7 @@ int AutoSpellChecker(int FileType)
             scanf("%s", ActionChoice);
 
             //question mark denotes return to menu
-            if(!strcmp(ActionChoice, "?")) returnCheck = 0;
+            if(!strcmp(ActionChoice, "?")) return 0;
 
             int WordCheck = 0;
 
@@ -1141,7 +1118,200 @@ int AutoSpellChecker(int FileType)
             else inputCheck = 0;
         }
 
+        //start the process of testing every method and algorithm all together
+
+        //first generate the wordlist data structure for linear and binary searching
+        struct WordsListing WordArray = WordFetcher(FileType);
+        if (WordArray.WordCount == -1) return -1;
+
+        //then begin testing:
+
+        //**linear:
+        printf("**Method: Linear Search**\n");
+        printf("--------------------------------------------------------------------------\n");
+        printf("|Algorithm:                    |StringFound:   |Suggestions:             |\n");
+        printf("|------------------------------+---------------+-------------------------|\n");
+
+        //no algorithm
+        clock_t Start = clock();
+        linearCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, 0, Start, 1);
+        printf("|------------------------------+---------------+-------------------------|\n");
+
+        //Levenshtein Distance
+        Start = clock();
+        linearCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, 1, Start, 1);
+        printf("|------------------------------+---------------+-------------------------|\n");
+
+        //Hamming Distance
+        Start = clock();
+        linearCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, 2, Start, 1);
+        printf("|------------------------------+---------------+-------------------------|\n");
+
+        //Sørensen–Dice Coefficient
+        Start = clock();
+        linearCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, 3, Start, 1);
+        printf("|------------------------------+---------------+-------------------------|\n");
+
+        //Optimal String Alignment Distance
+        Start = clock();
+        linearCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, 4, Start, 1);
+        printf("|------------------------------+---------------+-------------------------|\n");
+
+        //Damerau-Levenshtein Distance
+        Start = clock();
+        linearCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, 5, Start, 1);
+        printf("|------------------------------+---------------+-------------------------|\n");
+
+        //Jaro Distance
+        Start = clock();
+        linearCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, 6, Start, 1);
+        printf("|------------------------------+---------------+-------------------------|\n");
+
+        //Jaro-Winkler Distance
+        Start = clock();
+        linearCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, 7, Start, 1);
+
+        printf("--------------------------------------------------------------------------\n");
+        printf("\n\n");
+
+        //**binary:
+        printf("**Method: Binary Search**\n");
+
+        //need a sorted array to use this
+        if (FileType == 3)
+        {
+            printf("--------------------------------------------------------------------------\n");
+            printf("|Algorithm:                    |StringFound:   |Suggestions:             |\n");
+            printf("|------------------------------+---------------+-------------------------|\n");
+
+            //no algorithm
+            Start = clock();
+            binaryCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, 0, Start, 1);
+            printf("|------------------------------+---------------+-------------------------|\n");
+
+            //Levenshtein Distance
+            Start = clock();
+            binaryCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, 1, Start, 1);
+            printf("|------------------------------+---------------+-------------------------|\n");
+
+            //Hamming Distance
+            Start = clock();
+            binaryCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, 2, Start, 1);
+            printf("|------------------------------+---------------+-------------------------|\n");
+
+            //Sørensen–Dice Coefficient
+            Start = clock();
+            binaryCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, 3, Start, 1);
+            printf("|------------------------------+---------------+-------------------------|\n");
+
+            //Optimal String Alignment Distance
+            Start = clock();
+            binaryCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, 4, Start, 1);
+            printf("|------------------------------+---------------+-------------------------|\n");
+
+            //Damerau-Levenshtein Distance
+            Start = clock();
+            binaryCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, 5, Start, 1);
+            printf("|------------------------------+---------------+-------------------------|\n");
+
+            //Jaro Distance
+            Start = clock();
+            binaryCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, 6, Start, 1);
+            printf("|------------------------------+---------------+-------------------------|\n");
+
+            //Jaro-Winkler Distance
+            Start = clock();
+            binaryCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, 7, Start, 1);
+
+            printf("--------------------------------------------------------------------------\n");
+        }
+        else printf("Only possible on sorted data\n");
+
+        printf("\n\n");
+
+        //cleanup word array
+        free(WordArray.WordArray);
+        WordArray.WordArray = NULL;
+
+        //Hash Table:
+
+        //max size of hash table
+        int MaxSize = 10000;
+
+        //create the hash table from the list of words
+        struct ReturnHash WordHashTable = initHash(FileType, MaxSize);
+        if (WordHashTable.WordCount == -1) return -1;
+
+        printf("**Method: Hash Table**\n");
+        printf("--------------------------------------------------------------------------\n");
+        printf("|Algorithm:                    |StringFound:   |Suggestions:             |\n");
+        printf("|------------------------------+---------------+-------------------------|\n");
+
+        //no algorithm
+        Start = clock();
+        HashChecker(WordHashTable.HashTable, MaxSize, WordHashTable.WordCount, ActionChoice, 0, Start, 1);
+        printf("|------------------------------+---------------+-------------------------|\n");
+
+        //Levenshtein Distance
+        Start = clock();
+        HashChecker(WordHashTable.HashTable, MaxSize, WordHashTable.WordCount, ActionChoice, 1, Start, 1);
+        printf("|------------------------------+---------------+-------------------------|\n");
+
+        //Hamming Distance
+        Start = clock();
+        HashChecker(WordHashTable.HashTable, MaxSize, WordHashTable.WordCount, ActionChoice, 2, Start, 1);
+        printf("|------------------------------+---------------+-------------------------|\n");
+
+        //Sørensen–Dice Coefficient
+        Start = clock();
+        HashChecker(WordHashTable.HashTable, MaxSize, WordHashTable.WordCount, ActionChoice, 3, Start, 1);
+        printf("|------------------------------+---------------+-------------------------|\n");
+
+        //Optimal String Alignment Distance
+        Start = clock();
+        HashChecker(WordHashTable.HashTable, MaxSize, WordHashTable.WordCount, ActionChoice, 4, Start, 1);
+        printf("|------------------------------+---------------+-------------------------|\n");
+
+        //Damerau-Levenshtein Distance
+        Start = clock();
+        HashChecker(WordHashTable.HashTable, MaxSize, WordHashTable.WordCount, ActionChoice, 5, Start, 1);
+        printf("|------------------------------+---------------+-------------------------|\n");
+
+        //Jaro Distance
+        Start = clock();
+        HashChecker(WordHashTable.HashTable, MaxSize, WordHashTable.WordCount, ActionChoice, 6, Start, 1);
+        printf("|------------------------------+---------------+-------------------------|\n");
+
+        //Jaro-Winkler Distance
+        Start = clock();
+        HashChecker(WordHashTable.HashTable, MaxSize, WordHashTable.WordCount, ActionChoice, 7, Start, 1);
+
+        printf("--------------------------------------------------------------------------\n");
+        printf("\n\n");
+
+        //cleanup hash table
+        struct WordNode *tmp, *currentNode;
+        for (int i = 0; i < MaxSize; i++)
+        {
+            if (WordHashTable.HashTable[i].head != NULL && WordHashTable.HashTable[i].tail != NULL)
+            {
+                currentNode = WordHashTable.HashTable[i].head;
+                while(currentNode->next != NULL)
+                {
+                    tmp = currentNode->next;
+                    free(currentNode);
+                    currentNode = tmp;
+                }
+                tmp = currentNode;
+                free(tmp);
+            }
+        }
         
+
+        //user input (just to confirm that the user can return back to the previous menu)
+        char ActionChoice2[128];
+        printf("Type anything to enter another word: ");
+        scanf("%s", ActionChoice2);
     }
 
     return 0;

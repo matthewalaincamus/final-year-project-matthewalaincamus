@@ -42,13 +42,13 @@ struct ReturnHash
 int SpellChecker(int FileType, int CheckType, int LevCheck);
 
 //linear searcher
-int linearCheck(char ** WordArray, int WordCount, char wordString[], int AlgorithmCheck, clock_t Start);
+int linearCheck(char ** WordArray, int WordCount, char wordString[], int AlgorithmCheck, clock_t Start, int TestFlag);
 
 //binary seacher
-int binaryCheck(char ** WordArray, int WordCount, char wordString[], int AlgorithmCheck, clock_t Start);
+int binaryCheck(char ** WordArray, int WordCount, char wordString[], int AlgorithmCheck, clock_t Start, int TestFlag);
 
 //hash table searcher
-int HashChecker(struct WordHashItem *HashTable, int MaxSize, int WordCount, char wordString[], int AlgorithmCheck, clock_t Start);
+int HashChecker(struct WordHashItem *HashTable, int MaxSize, int WordCount, char wordString[], int AlgorithmCheck, clock_t Start, int TestFlag);
 
 //function to get words from file
 struct WordsListing WordFetcher(int FileType);
