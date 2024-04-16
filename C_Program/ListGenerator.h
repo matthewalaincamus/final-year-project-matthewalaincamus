@@ -7,7 +7,6 @@
 
 //list generation functions
 int DataReader(int duplicateFlag, int sortFlag, int testFlag);
-const char* GetWord(FILE fp, char** WordArray);
 
 //sorting algorithms
 char** sortingAlphabeticallyFunction(char **WordArray, int WordCount);

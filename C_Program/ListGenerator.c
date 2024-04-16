@@ -1,11 +1,5 @@
 #include "ListGenerator.h"
 
-//**function used to get a valid word from a given file pointer
-const char* GetWord(FILE fp, char** WordArray)
-{
-    return "hi";
-}
-
 //**function for making list of words from corpus
 //if duplicateFlag == 0 (no duplicates), if duplicateFlag == 1 (duplicates)
 //if sortFlag = 0 (no sort), if sortFlag = 1 (sort alphabetically)

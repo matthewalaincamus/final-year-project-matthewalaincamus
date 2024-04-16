@@ -1,3 +1,5 @@
 *.exe
 /.vscode
 /C_Program/GeneratedFiles/*.txt
+/Python_Program/.venv
+/Python_Program/__pycache__

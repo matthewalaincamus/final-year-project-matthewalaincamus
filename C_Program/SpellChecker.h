@@ -3,7 +3,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <dirent.h>
-#include <time.h>
+#include <sys/time.h>
 #include <math.h>
 
 //for single word array
@@ -39,16 +39,16 @@ struct ReturnHash
 
 
 //spell checking function
-int SpellChecker(int FileType, int CheckType, int LevCheck);
+int SpellChecker(int FileType, int CheckType, int AlgorithmCheck);
 
 //linear searcher
-int linearCheck(char ** WordArray, int WordCount, char wordString[], int AlgorithmCheck, clock_t Start, int TestFlag);
+int linearCheck(char ** WordArray, int WordCount, char wordString[], int AlgorithmCheck, struct timeval Start, int TestFlag);
 
 //binary seacher
-int binaryCheck(char ** WordArray, int WordCount, char wordString[], int AlgorithmCheck, clock_t Start, int TestFlag);
+int binaryCheck(char ** WordArray, int WordCount, char wordString[], int AlgorithmCheck, struct timeval Start, int TestFlag);
 
 //hash table searcher
-int HashChecker(struct WordHashItem *HashTable, int MaxSize, int WordCount, char wordString[], int AlgorithmCheck, clock_t Start, int TestFlag);
+int HashChecker(struct WordHashItem *HashTable, int MaxSize, int WordCount, char wordString[], int AlgorithmCheck, struct timeval Start, int TestFlag);
 
 //function to get words from file
 struct WordsListing WordFetcher(int FileType);
