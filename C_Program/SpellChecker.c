@@ -823,7 +823,7 @@ int LevenshteinDistance(char string1[], char string2[], int len1, int len2)
 int HammingDistance(char string1[], char string2[], int len1, int len2)
 {
     //strings need to be same length
-    if (len1 != len2) return 50; 
+    if (len1 != len2) return 100; 
 
     int HammingScore = 0;
 
