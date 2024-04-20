@@ -565,7 +565,7 @@ int binaryCheck(char ** WordArray, int WordCount, char wordString[], int Algorit
     }
     else
     {
-        if (TestFlag == 0) printf("Error: problem with binary search\n");
+        printf("Error: problem with binary search\n");
     }
 
     //get the time taken
@@ -671,17 +671,27 @@ int HashChecker(struct WordHashItem *HashTable, int MaxSize, int WordCount, char
                     }
 
                     //if there are more than 1 nodes
-                    while(currentNode->next != NULL)
-                    {
-                        //if an algorithm is active, get the distance between the two words
-                        if (AlgorithmCheck == 1) currentNode->AlgorithmDistance = LevenshteinDistance(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
-                        else if (AlgorithmCheck == 2) currentNode->AlgorithmDistance = HammingDistance(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
-                        else if (AlgorithmCheck == 3) currentNode->AlgorithmDistance = SorensenDiceCoefficient(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
-                        else if (AlgorithmCheck == 4) currentNode->AlgorithmDistance = OptimalStringAlignmentDistance(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
-                        else if (AlgorithmCheck == 5) currentNode->AlgorithmDistance = DamerauLevenshteinDistance(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
-                        else if (AlgorithmCheck == 6) currentNode->AlgorithmDistance = JaroSimilarity(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
-                        else if (AlgorithmCheck == 7) currentNode->AlgorithmDistance = JaroWinklerSimilarity(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
-                        currentNode = currentNode->next;
+                    else
+                    {   //if an algorithm is active, get the distance between the two words
+                            if (AlgorithmCheck == 1) currentNode->AlgorithmDistance = LevenshteinDistance(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
+                            else if (AlgorithmCheck == 2) currentNode->AlgorithmDistance = HammingDistance(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
+                            else if (AlgorithmCheck == 3) currentNode->AlgorithmDistance = SorensenDiceCoefficient(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
+                            else if (AlgorithmCheck == 4) currentNode->AlgorithmDistance = OptimalStringAlignmentDistance(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
+                            else if (AlgorithmCheck == 5) currentNode->AlgorithmDistance = DamerauLevenshteinDistance(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
+                            else if (AlgorithmCheck == 6) currentNode->AlgorithmDistance = JaroSimilarity(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
+                            else if (AlgorithmCheck == 7) currentNode->AlgorithmDistance = JaroWinklerSimilarity(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
+                        while(currentNode->next != NULL)
+                        {
+                            currentNode = currentNode->next;
+                            //if an algorithm is active, get the distance between the two words
+                            if (AlgorithmCheck == 1) currentNode->AlgorithmDistance = LevenshteinDistance(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
+                            else if (AlgorithmCheck == 2) currentNode->AlgorithmDistance = HammingDistance(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
+                            else if (AlgorithmCheck == 3) currentNode->AlgorithmDistance = SorensenDiceCoefficient(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
+                            else if (AlgorithmCheck == 4) currentNode->AlgorithmDistance = OptimalStringAlignmentDistance(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
+                            else if (AlgorithmCheck == 5) currentNode->AlgorithmDistance = DamerauLevenshteinDistance(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
+                            else if (AlgorithmCheck == 6) currentNode->AlgorithmDistance = JaroSimilarity(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
+                            else if (AlgorithmCheck == 7) currentNode->AlgorithmDistance = JaroWinklerSimilarity(wordString, currentNode->Word, strlen(wordString), strlen(currentNode->Word));
+                        }
                     }
                 }
             }
@@ -706,7 +716,7 @@ int HashChecker(struct WordHashItem *HashTable, int MaxSize, int WordCount, char
                             CurrentMinIndex = j;
                             CurrentMinLinkedListIndex = currentNode->key;
                         }
-
+                                                
                         while(currentNode->next != NULL)
                         {
                             currentNode = currentNode->next;
@@ -968,7 +978,7 @@ int JaroSimilarity(char string1[], char string2[], int len1, int len2)
     for (int i = 0; i < len1; i++)String1Matches[i] = 0;
     for (int j = 0; j < len2; j++)String2Matches[j] = 0;
 
-    //travers the first string
+    //traverse the first string
     for (int i = 0; i < len1; i++)
     {
         //check if there are any matches
@@ -991,7 +1001,6 @@ int JaroSimilarity(char string1[], char string2[], int len1, int len2)
     double t = 0;
 
     int point = 0;
-
 
     for(int i = 0; i < len1; i++)
     {
@@ -1039,8 +1048,6 @@ int JaroWinklerSimilarity(char string1[], char string2[], int len1, int len2)
 
     //return jaro distance, making sure values are int and similar values are close to zero
     return 100 - (100 * jaroDistance);
-
-    return 0;
 }
 
 //getting the maximum of 2 numbers

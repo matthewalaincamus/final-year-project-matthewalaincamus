@@ -1,5 +1,6 @@
 import os
 from timeit import default_timer
+import math
 
 #hash table node
 class Node:
@@ -119,14 +120,14 @@ def linearCheck(WordArray, wordString : str, AlgorithmCheck : int, TestFlag : bo
     #if called from automated testing, print out data differently
     if TestFlag == True:
         #first print out algorithm used:
-        if AlgorithmCheck == 0: print("|%-30s" % ("None"))
-        elif AlgorithmCheck == 1: print("|%-30s" % ("LevenshteinDistance"))
-        elif AlgorithmCheck == 2: print("|%-30s" % ("HammingDistance"))
-        elif AlgorithmCheck == 3: print("|%-30s" % ("SorensenDiceCoefficient"))
-        elif AlgorithmCheck == 4: print("|%-30s" % ("OptimalStringAlignmentDistance"))
-        elif AlgorithmCheck == 5: print("|%-30s" % ("DamerauLevenshteinDistance"))
-        elif AlgorithmCheck == 6: print("|%-30s" % ("JaroSimilarity"))
-        elif AlgorithmCheck == 7: print("|%-30s" % ("JaroWinklerSimilarity"))
+        if AlgorithmCheck == 0: print("|%-30s" % ("None"), end='')
+        elif AlgorithmCheck == 1: print("|%-30s" % ("LevenshteinDistance"), end='')
+        elif AlgorithmCheck == 2: print("|%-30s" % ("HammingDistance"), end='')
+        elif AlgorithmCheck == 3: print("|%-30s" % ("SorensenDiceCoefficient"), end='')
+        elif AlgorithmCheck == 4: print("|%-30s" % ("OptimalStringAlignmentDistance"), end='')
+        elif AlgorithmCheck == 5: print("|%-30s" % ("DamerauLevenshteinDistance"), end='')
+        elif AlgorithmCheck == 6: print("|%-30s" % ("JaroSimilarity"), end='')
+        elif AlgorithmCheck == 7: print("|%-30s" % ("JaroWinklerSimilarity"), end='')
 
     #for checking if a word is found
     WordFlag = 0
@@ -160,7 +161,7 @@ def linearCheck(WordArray, wordString : str, AlgorithmCheck : int, TestFlag : bo
     #if word isn't found, get any suggestions
     if WordFlag == 0:
         if TestFlag == False: print("Your word doesn't exist in the word list")
-        elif TestFlag == True: print("|%-15s" % ("False"))
+        elif TestFlag == True: print("|%-15s" % ("False"), end='')
 
         #if anything other than a simple check, get the top 10 suggestions
         if AlgorithmCheck != 0:
@@ -181,10 +182,10 @@ def linearCheck(WordArray, wordString : str, AlgorithmCheck : int, TestFlag : bo
     elif WordFlag > 0 and TestFlag == True: print("|%-15s|%-25s|" % ("True", ""))
 
     #get the time of completion
-    TimeTaken = default_timer() - start
+    TimeTaken = (default_timer() - start) * 1000
 
-    if TestFlag == False: print("Operation took: %f secs to complete\n" % (TimeTaken))
-    elif TestFlag == True: print("|Time to complete: %-10f secs%-41s|\n" %  (TimeTaken, ""))
+    if TestFlag == False: print("Operation took: %f miliseconds to complete\n" % (TimeTaken))
+    elif TestFlag == True: print("|Time to complete: %-10f ms%-41s|" %  (TimeTaken, ""))
     return 0
 
 #perform binary search method
@@ -196,19 +197,19 @@ def binaryCheck(WordArray, wordString : str, AlgorithmCheck : int, TestFlag : bo
     #if called from automated testing, print out data differently
     if TestFlag == True:
         #first print out algorithm used:
-        if AlgorithmCheck == 0: print("|%-30s" % ("None"))
-        elif AlgorithmCheck == 1: print("|%-30s" % ("LevenshteinDistance"))
-        elif AlgorithmCheck == 2: print("|%-30s" % ("HammingDistance"))
-        elif AlgorithmCheck == 3: print("|%-30s" % ("SorensenDiceCoefficient"))
-        elif AlgorithmCheck == 4: print("|%-30s" % ("OptimalStringAlignmentDistance"))
-        elif AlgorithmCheck == 5: print("|%-30s" % ("DamerauLevenshteinDistance"))
-        elif AlgorithmCheck == 6: print("|%-30s" % ("JaroSimilarity"))
-        elif AlgorithmCheck == 7: print("|%-30s" % ("JaroWinklerSimilarity"))
+        if AlgorithmCheck == 0: print("|%-30s" % ("None"), end='')
+        elif AlgorithmCheck == 1: print("|%-30s" % ("LevenshteinDistance"), end='')
+        elif AlgorithmCheck == 2: print("|%-30s" % ("HammingDistance"), end='')
+        elif AlgorithmCheck == 3: print("|%-30s" % ("SorensenDiceCoefficient"), end='')
+        elif AlgorithmCheck == 4: print("|%-30s" % ("OptimalStringAlignmentDistance"), end='')
+        elif AlgorithmCheck == 5: print("|%-30s" % ("DamerauLevenshteinDistance"), end='')
+        elif AlgorithmCheck == 6: print("|%-30s" % ("JaroSimilarity"), end='')
+        elif AlgorithmCheck == 7: print("|%-30s" % ("JaroWinklerSimilarity"), end='')
 
     binaryChecker = binarySearch(WordArray, 0, len(WordArray) - 1, wordString)
-    if binaryChecker == 0:
+    if binaryChecker == -1:
         if TestFlag == False: print("Your word doesn't exist in the word list")
-        elif TestFlag == True: print("|%-15s" % ("False"))
+        elif TestFlag == True: print("|%-15s" % ("False"), end='')
 
         if AlgorithmCheck != 0:
             
@@ -241,35 +242,33 @@ def binaryCheck(WordArray, wordString : str, AlgorithmCheck : int, TestFlag : bo
                     #update the current min value so its no longer min
                     AlgorithmArray[CurrentMinIndex] = 100
 
-            elif AlgorithmCheck == 0 and TestFlag == True: print("|%-25s|" % ("N/A"))
+        elif AlgorithmCheck == 0 and TestFlag == True: print("|%-25s|" % ("N/A"))
 
-        elif binaryChecker == 1:
-            if TestFlag == 0: print("Your word exists in the word list")
-            elif TestFlag == 1: print("|%-15s|%-25s|" % ("True", ""))
-
-        else:
-            print("Error: problem with binary search")
+    else:
+        if TestFlag == False: print("Your word does exist in the word list")
+        elif TestFlag == True: print("|%-15s|%-25s|" % ("True", ""))
 
     #get the time of completion
-    TimeTaken = default_timer() - start
+    TimeTaken = (default_timer() - start) * 1000
 
-    if TestFlag == False: print("Operation took: %f secs to complete\n" % (TimeTaken))
-    elif TestFlag == True: print("|Time to complete: %-10f secs%-41s|\n" %  (TimeTaken, ""))
+    if TestFlag == False: print("Operation took: %f miliseconds to complete\n" % (TimeTaken))
+    elif TestFlag == True: print("|Time to complete: %-10f ms%-41s|" %  (TimeTaken, ""))
 
     return 0
 
-#perform binary search algorithm (recursive)
+#perform binary search algorithm (iterative)
 def binarySearch(WordArray, leftValue : int, rightValue : int, wordString : str):
-    
-    if rightValue >= leftValue:
 
-        middleValue = leftValue + (rightValue - leftValue) / 2
+    while leftValue <= rightValue:
 
-        if wordString == WordArray[middleValue]: return 1
-        elif wordString < WordArray[middleValue]: return binarySearch(WordArray, leftValue, middleValue - 1, wordString)
-        elif wordString > WordArray[middleValue]: return binarySearch(WordArray, middleValue + 1, rightValue, wordString)
-        
-    return 0
+        middleValue = leftValue + (rightValue - leftValue) // 2
+
+        if WordArray[middleValue] > wordString : rightValue = middleValue - 1
+        elif WordArray[middleValue] < wordString: leftValue = middleValue + 1
+        else: return middleValue
+
+    #if not found, return -1
+    return -1
 
 #perform hash table search method
 def hashCheck(HashTable : HashTable, wordString : str, AlgorithmCheck : int, TestFlag : bool ):
@@ -280,14 +279,14 @@ def hashCheck(HashTable : HashTable, wordString : str, AlgorithmCheck : int, Tes
     #if called from automated testing, print out data differently
     if TestFlag == True:
         #first print out algorithm used:
-        if AlgorithmCheck == 0: print("|%-30s" % ("None"))
-        elif AlgorithmCheck == 1: print("|%-30s" % ("LevenshteinDistance"))
-        elif AlgorithmCheck == 2: print("|%-30s" % ("HammingDistance"))
-        elif AlgorithmCheck == 3: print("|%-30s" % ("SorensenDiceCoefficient"))
-        elif AlgorithmCheck == 4: print("|%-30s" % ("OptimalStringAlignmentDistance"))
-        elif AlgorithmCheck == 5: print("|%-30s" % ("DamerauLevenshteinDistance"))
-        elif AlgorithmCheck == 6: print("|%-30s" % ("JaroSimilarity"))
-        elif AlgorithmCheck == 7: print("|%-30s" % ("JaroWinklerSimilarity"))
+        if AlgorithmCheck == 0: print("|%-30s" % ("None"), end='')
+        elif AlgorithmCheck == 1: print("|%-30s" % ("LevenshteinDistance"), end='')
+        elif AlgorithmCheck == 2: print("|%-30s" % ("HammingDistance"), end='')
+        elif AlgorithmCheck == 3: print("|%-30s" % ("SorensenDiceCoefficient"), end='')
+        elif AlgorithmCheck == 4: print("|%-30s" % ("OptimalStringAlignmentDistance"), end='')
+        elif AlgorithmCheck == 5: print("|%-30s" % ("DamerauLevenshteinDistance"), end='')
+        elif AlgorithmCheck == 6: print("|%-30s" % ("JaroSimilarity"), end='')
+        elif AlgorithmCheck == 7: print("|%-30s" % ("JaroWinklerSimilarity"), end='')
     
     #for checking if a word is found
     WordFlag = 0
@@ -321,7 +320,7 @@ def hashCheck(HashTable : HashTable, wordString : str, AlgorithmCheck : int, Tes
 
     if WordFlag == 0:
         if TestFlag == 0: print("Your word doesn't exist in the word list")
-        elif TestFlag == 1: print("|%-15s" % ("False"))
+        elif TestFlag == 1: print("|%-15s" % ("False"), end='')
 
         #if suggestions are needed, loop linearly through the hash table and update
         #the algorithm distance for each word based on the distance between a node and the user word
@@ -342,8 +341,8 @@ def hashCheck(HashTable : HashTable, wordString : str, AlgorithmCheck : int, Tes
                         elif AlgorithmCheck == 7: currentNode.AlgorithmDistance = JaroWinklerSimilarity(wordString, currentNode.Word, len(wordString), len(currentNode.Word))
     
                     #if there is more than one node
-                    while currentNode.next is not None:
-                        #if an algorithm is active, get the distance between the two words
+                    else:
+                        #check the first node
                         if AlgorithmCheck == 1: currentNode.AlgorithmDistance = LevenshteinDistance(wordString, currentNode.Word, len(wordString), len(currentNode.Word))
                         elif AlgorithmCheck == 2: currentNode.AlgorithmDistance = HammingDistance(wordString, currentNode.Word, len(wordString), len(currentNode.Word))
                         elif AlgorithmCheck == 3: currentNode.AlgorithmDistance = SorensenDiceCoefficient(wordString, currentNode.Word, len(wordString), len(currentNode.Word))
@@ -351,7 +350,18 @@ def hashCheck(HashTable : HashTable, wordString : str, AlgorithmCheck : int, Tes
                         elif AlgorithmCheck == 5: currentNode.AlgorithmDistance = DamerauLevenshteinDistance(wordString, currentNode.Word, len(wordString), len(currentNode.Word))
                         elif AlgorithmCheck == 6: currentNode.AlgorithmDistance = JaroSimilarity(wordString, currentNode.Word, len(wordString), len(currentNode.Word))
                         elif AlgorithmCheck == 7: currentNode.AlgorithmDistance = JaroWinklerSimilarity(wordString, currentNode.Word, len(wordString), len(currentNode.Word))
-                        currentNode = currentNode.next
+                        
+                        while currentNode.next is not None:
+                            currentNode = currentNode.next
+
+                            #if an algorithm is active, get the distance between the two words
+                            if AlgorithmCheck == 1: currentNode.AlgorithmDistance = LevenshteinDistance(wordString, currentNode.Word, len(wordString), len(currentNode.Word))
+                            elif AlgorithmCheck == 2: currentNode.AlgorithmDistance = HammingDistance(wordString, currentNode.Word, len(wordString), len(currentNode.Word))
+                            elif AlgorithmCheck == 3: currentNode.AlgorithmDistance = SorensenDiceCoefficient(wordString, currentNode.Word, len(wordString), len(currentNode.Word))
+                            elif AlgorithmCheck == 4: currentNode.AlgorithmDistance = OptimalStringAlignmentDistance(wordString, currentNode.Word, len(wordString), len(currentNode.Word))
+                            elif AlgorithmCheck == 5: currentNode.AlgorithmDistance = DamerauLevenshteinDistance(wordString, currentNode.Word, len(wordString), len(currentNode.Word))
+                            elif AlgorithmCheck == 6: currentNode.AlgorithmDistance = JaroSimilarity(wordString, currentNode.Word, len(wordString), len(currentNode.Word))
+                            elif AlgorithmCheck == 7: currentNode.AlgorithmDistance = JaroWinklerSimilarity(wordString, currentNode.Word, len(wordString), len(currentNode.Word))
     
             #get the top 10 suggestions for the user word
             for i in range(10):
@@ -359,30 +369,38 @@ def hashCheck(HashTable : HashTable, wordString : str, AlgorithmCheck : int, Tes
                 currentMinIndex = 0
                 currentMinKeyIndex = 0
 
-                for i in range (HashTable.maxSize):
-                    if HashTable.table[i] is not None:
-                        currentNode = HashTable.table[i]
+                for j in range (HashTable.maxSize):
+                    if HashTable.table[j] is not None:
+                        currentNode = HashTable.table[j]
 
                         #if there is only one node in a linked list
                         if currentNode.next is None:
                             if currentNode.AlgorithmDistance < currentMin:
                                 currentMin = currentNode.AlgorithmDistance
-                                currentMinIndex = i
+                                currentMinIndex = j
                                 currentMinKeyIndex = currentNode.key
         
                         #if there is more than one node
-                        while currentNode.next is not None:                            
-                            currentNode = currentNode.next
-
+                        else:
+                            #check the first node in the linked list
                             if currentNode.AlgorithmDistance < currentMin:
-                                currentMin = currentNode.AlgorithmDistance
-                                currentMinIndex = i
-                                currentMinKeyIndex = currentNode.key
+                                    currentMin = currentNode.AlgorithmDistance
+                                    currentMinIndex = j
+                                    currentMinKeyIndex = currentNode.key
+
+                            #then the rest
+                            while currentNode.next is not None:                            
+                                currentNode = currentNode.next
+                                
+                                if currentNode.AlgorithmDistance < currentMin:
+                                    currentMin = currentNode.AlgorithmDistance
+                                    currentMinIndex = j
+                                    currentMinKeyIndex = currentNode.key
                             
                 
                 #update the min node to be large
                 updateNode = HashTable.table[currentMinIndex]
-                for i in range(currentMinKeyIndex):
+                for k in range(currentMinKeyIndex):
                     updateNode = updateNode.next
 
                 updateNode.AlgorithmDistance = 100
@@ -397,10 +415,10 @@ def hashCheck(HashTable : HashTable, wordString : str, AlgorithmCheck : int, Tes
 
 
     #get the time of completion
-    TimeTaken = default_timer() - start
+    TimeTaken = (default_timer() - start) * 1000
 
-    if TestFlag == False: print("Operation took: %f secs to complete\n" % (TimeTaken))
-    elif TestFlag == True: print("|Time to complete: %-10f secs%-41s|\n" %  (TimeTaken, ""))
+    if TestFlag == False: print("Operation took: %f miliseconds to complete\n" % (TimeTaken))
+    elif TestFlag == True: print("|Time to complete: %-10f ms%-41s|" %  (TimeTaken, ""))
 
     return 0
 
@@ -478,6 +496,8 @@ def initHash(FileType : int, MaxSize : int):
                 if currentNode.next == None:
                     currentNode.next = Node(currentNode.key + 1, word[:-1], 100)
                     break
+                else:
+                    currentNode = currentNode.next
 
         #update the word count of the hash table
         WordHashTable.wordCount += 1
@@ -545,14 +565,14 @@ def SorensenDiceCoefficient(string1 : str, string2 : str, len1 : int, len2 : int
 #Optimal String Alignment Distance algorithm
 def OptimalStringAlignmentDistance(string1 : str, string2 : str, len1 : int, len2 : int):
     #array to store results of calculations
-    CalculationArray = [len1+1][len2+1]
+    CalculationArray = [ [0 for x in range(len2+1)] for y in range (len1+1)]
 
     #add starting values to calculation array
     for i in range(len1 + 1): CalculationArray[i][0] = i
     for j in range(len2 + 1): CalculationArray[0][j] = j
 
-    for i in range(len1 + 1):
-        for j in range(len2 + 1):
+    for i in range(len1):
+        for j in range(len2):
             cost = 0
 
             if string1[i] == string2[j]: cost = 0
@@ -562,7 +582,7 @@ def OptimalStringAlignmentDistance(string1 : str, string2 : str, len1 : int, len
                                             CalculationArray[i+1][j] + 1, #insertion
                                             CalculationArray[i][j] + cost) #substitution
             
-            if i > 0 and j > 0 and string1[i+1] == string2[j] and string1[i] == string2[j+1]:
+            if i > 0 and j > 0 and string1[i] == string2[j-1] and string1[i-1] == string2[j]:
                 CalculationArray[i][j] = min(CalculationArray[i][j],
                                                 CalculationArray[i-1][j-1] + 1) #transposition
 
@@ -570,16 +590,309 @@ def OptimalStringAlignmentDistance(string1 : str, string2 : str, len1 : int, len
 
 #Damerau-Levenshtein Distance algorithm
 def DamerauLevenshteinDistance(string1 : str, string2 : str, len1 : int, len2 : int):
-    return 0
+    
+    #make an array of the size of the alphabet for calculations
+    alphabet = []
+
+    for i in range (26): alphabet.append(0)
+
+    #array to store results of calculations
+    CalculationArray = [ [0 for x in range(len2+2)] for y in range (len1+2)]
+
+    #get the maximum distance
+    maxDist = len1 + len2
+    CalculationArray[0][0] = maxDist
+
+    #setup the starting values to the array
+    for i in range(1, len1+1):
+        CalculationArray[i][0] = maxDist
+        CalculationArray[i][1] = i-1
+
+    for j in range(1, len2+1):
+        CalculationArray[0][j] = maxDist
+        CalculationArray[1][j] = j-1
+
+    #main calculation loop
+    for i in range(len1):
+        db = 0
+        for j in range(len2):
+            k = alphabet[ord(string2[j]) % 97]
+            l = db
+            cost = 0
+
+            if string1[i] == string2[j]:
+                cost = 0
+                db = j
+
+            else: cost = 1
+
+            CalculationArray[i+2][j+2] = min( min(CalculationArray[i+1][j+1]+cost, #substitution
+                                                    CalculationArray[i+2][j+1]+1 ), #insertion
+                                              min(CalculationArray[i+1][j+2]+1, #deletion
+                                                    CalculationArray[k][l]+(i-k+1)+1+(j-l+1)) ) #transpostion
+        alphabet[ord(string1[i]) % 97] = i+2
+
+    return CalculationArray[len1+1][len2+1]
 
 #Jaro Similarity algorithm
 def JaroSimilarity(string1 : str, string2 : str, len1 : int, len2 : int):
-    return 0
+    
+    #max distance for which matching is allowed
+    maxDist = math.floor(max(len1, len2) / 2) - 1
+
+    #count for number of total matches
+    matches = 0
+
+    #hashes to store matches
+    String1Matches = [0 for x in range(len1)]
+    String2Matches = [0 for y in range(len2)]
+
+    for i in range(len1): String1Matches[i] = 0
+    for j in range(len2): String2Matches[j] = 0
+
+    #traverse the first string
+    for i in range(len1):
+        #check if there are any matches
+        for j in range(max(0, i - maxDist), min(len2, i + maxDist + 1)):
+            if string1[i] == string2[j] and String2Matches[j] == 0:
+                String1Matches[i] = 1
+                String2Matches[j] = 1
+                matches+=1
+                break
+
+    #if nothing matches, return the larges value possible
+    if matches == 0: return 100
+
+    #number of transpositions
+    t = 0
+    point = 0
+
+    for i in range(len1):
+        if String1Matches[i]:
+            while String2Matches[point] == 0: point+=1
+
+            if string1[i] != string2[point]: t+=1
+
+            point+=1
+    
+    t = t // 2
+
+    # Jaro Similarity Returned
+    #times by 100 and then subtract from 100 so that similar values are converted to int and close to zero
+    return 100 - 100 * (matches  / len1  + matches / len2  + (matches - t) / matches) / 3.0
 
 #Jaro-Winkler Similarity algorithm
 def JaroWinklerSimilarity(string1 : str, string2 : str, len1 : int, len2 : int):
-    return 0
+    #get the original jaro distance
+    jaroDistance = (100 - JaroSimilarity(string1, string2, len1, len2)) / 100
+
+    #if the similarity is above a threshold
+    if jaroDistance > 0.7:
+        Prefix = 0
+
+        for i in range(0, min(len1, len2)):
+            #if the characters match
+            if string1[i] == string2[i]: Prefix+=1
+            else: break
+
+        #maximum of 4 characters are allowed in prefix
+        Prefix = min(4, Prefix)
+
+        #calculate jaro winkler Similarity
+        jaroDistance += 0.1 * Prefix * (1 - jaroDistance)
+
+    #return jaro distance, making sure values are int and similar values are close to zero
+    return 100 - (100 * jaroDistance)
 
 #function to handle full testing and comparison of methods and algorithms
 def AutoSpellChecker(FileType : int):
+    #check to see if the user wants to return to the main menu
+    returnCheck = 1
+
+    #will loop till the user exits via typing z or Z on the keyboard in the main menu
+    while returnCheck == 1:
+        os.system("cls")
+
+        print("Full Spell Check:")
+        
+        print("**Current Filetype selected: ")
+
+        #display file type info
+        if FileType == 0: print("*text with duplicate")
+        elif FileType == 1: print("*text without duplicates")
+        elif FileType== 2: print("*text with duplicates sorted in alphabetical order")
+        elif FileType == 3: print("*text without duplicates sorted in alphabetical order")
+
+        print("")
+
+        print("Please enter the word you wish to spell check")
+        print("RULES:")
+        print("- no numbers or non alphabet characters")
+        print("- maximum length string of 25 characters")
+        print("- all characters must be in lowercase\n")
+        print("If you wish to return to the previous screen, please type '?' and then press enter")
+
+        inputCheck = 1
+
+        while inputCheck == 1:
+            #user input
+            ActionChoice = input(": ")
+
+            #question mark denotes return to menu
+            if ActionChoice ==  "?": return 0
+
+            WordCheck = 0
+
+            #check letters for non-alpha characters
+            for letter in ActionChoice:
+                if ord(letter) < 97 or ord(letter) > 122: WordCheck+=1
+
+            #check that no errors occured, and that the length of the word is valid
+            if WordCheck > 0 or len(ActionChoice) > 25:
+                print("Please enter a valid word")
+            else: inputCheck = 0
+
+        #start the process of testing every method and algorithm all together
+
+        #first generate the wordlist data structure for linear and binary searching
+        WordArray = WordFetcher(FileType)
+        if WordArray == -1: return -1
+
+        #then begin testing:
+
+        #**linear:
+        print("**Method: Linear Search**")
+        print("--------------------------------------------------------------------------")
+        print("|Algorithm:                    |StringFound:   |Suggestions:             |")
+        print("|------------------------------+---------------+-------------------------|")
+
+        #no algorithm
+        linearCheck(WordArray, ActionChoice, 0, True)
+        print("|------------------------------+---------------+-------------------------|")
+
+        #Levenshtein Distance
+        linearCheck(WordArray, ActionChoice, 1, True)
+        print("|------------------------------+---------------+-------------------------|")
+
+        #Hamming Distance
+        linearCheck(WordArray, ActionChoice, 2, True)
+        print("|------------------------------+---------------+-------------------------|")
+
+        #Sørensen–Dice Coefficient
+        linearCheck(WordArray, ActionChoice, 3, True)
+        print("|------------------------------+---------------+-------------------------|")
+
+        #Optimal String Alignment Distance
+        linearCheck(WordArray, ActionChoice, 4, True)
+        print("|------------------------------+---------------+-------------------------|")
+
+        #Damerau-Levenshtein Distance
+        linearCheck(WordArray, ActionChoice, 5, True)
+        print("|------------------------------+---------------+-------------------------|")
+
+        #Jaro Distance
+        linearCheck(WordArray, ActionChoice, 6, True)
+        print("|------------------------------+---------------+-------------------------|")
+
+        #Jaro-Winkler Distance
+        linearCheck(WordArray, ActionChoice, 6, True)
+        print("--------------------------------------------------------------------------")
+        print("\n")
+
+        #**binary:
+        print("**Method: Binary Search**")
+
+        #need a sorted array to use this
+        if FileType == 3:
+            print("--------------------------------------------------------------------------")
+            print("|Algorithm:                    |StringFound:   |Suggestions:             |")
+            print("|------------------------------+---------------+-------------------------|")
+
+            #no algorithm
+            binaryCheck(WordArray, ActionChoice, 0, True)
+            print("|------------------------------+---------------+-------------------------|")
+
+            #Levenshtein Distance
+            binaryCheck(WordArray, ActionChoice, 1, True)
+            print("|------------------------------+---------------+-------------------------|")
+
+            #Hamming Distance
+            binaryCheck(WordArray, ActionChoice, 2, True)
+            print("|------------------------------+---------------+-------------------------|")
+
+            #Sørensen–Dice Coefficient
+            binaryCheck(WordArray, ActionChoice, 3, True)
+            print("|------------------------------+---------------+-------------------------|")
+
+            #Optimal String Alignment Distance
+            binaryCheck(WordArray, ActionChoice, 4, True)
+            print("|------------------------------+---------------+-------------------------|")
+
+            #Damerau-Levenshtein Distance
+            binaryCheck(WordArray, ActionChoice, 5, True)
+            print("|------------------------------+---------------+-------------------------|")
+
+            #Jaro Distance
+            binaryCheck(WordArray, ActionChoice, 6, True)
+            print("|------------------------------+---------------+-------------------------|")
+
+            #Jaro-Winkler Distance
+            binaryCheck(WordArray, ActionChoice, 7, True)
+            print("--------------------------------------------------------------------------")
+
+        else: print("Only possible on sorted data")
+
+        print("\n")
+
+        #Hash Table:
+
+        #max size of hash table
+        MaxSize = 10000
+
+        #create the hash table from the list of words
+        WordHashTable : HashTable = initHash(FileType, MaxSize)
+        if WordHashTable == -1: return -1
+
+        print("**Method: Hash Table**")
+        print("--------------------------------------------------------------------------")
+        print("|Algorithm:                    |StringFound:   |Suggestions:             |")
+        print("|------------------------------+---------------+-------------------------|")
+
+        #no algorithm
+        hashCheck(WordHashTable, ActionChoice, 0, True)
+        print("|------------------------------+---------------+-------------------------|")
+
+        #Levenshtein Distance
+        hashCheck(WordHashTable, ActionChoice, 1, True)
+        print("|------------------------------+---------------+-------------------------|")
+
+        #Hamming Distance
+        hashCheck(WordHashTable, ActionChoice, 2, True)
+        print("|------------------------------+---------------+-------------------------|")
+
+        #Sørensen–Dice Coefficient
+        hashCheck(WordHashTable, ActionChoice, 3, True)
+        print("|------------------------------+---------------+-------------------------|")
+
+        #Optimal String Alignment Distance
+        hashCheck(WordHashTable, ActionChoice, 4, True)
+        print("|------------------------------+---------------+-------------------------|")
+
+        #Damerau-Levenshtein Distance
+        hashCheck(WordHashTable, ActionChoice, 5, True)
+        print("|------------------------------+---------------+-------------------------|")
+
+        #Jaro Distance
+        hashCheck(WordHashTable, ActionChoice, 6, True)
+        print("|------------------------------+---------------+-------------------------|")
+
+        #Jaro-Winkler Distance
+        hashCheck(WordHashTable, ActionChoice, 7, True)
+
+        print("--------------------------------------------------------------------------")
+        print("\n")
+
+        #user input (just to confirm that the user can return back to the previous menu)
+        ActionChoice2 = input("Type anything to enter another word: ")
+
     return 0

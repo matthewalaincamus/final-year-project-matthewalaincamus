@@ -92,17 +92,23 @@ def DataReader(duplicateFlag : bool, sortFlag : bool, testFlag : bool):
                         thirdSplit = split2.split("/")
 
                         for split3 in thirdSplit:
-                            #if word longer than 1 length allow it
-                            if len(split3) > 1:
-                                #duplicate check
-                                if duplicateFlag == False:
-                                    if split3 not in WordArrayNoDuplicates:
-                                        #if not alread checked, add to list then add to file
-                                        WordArrayNoDuplicates[split3] = 1
+                            
+                            #fourth split, based on .
+                            fourthSplit = split3.split(".")
+
+                            for split4 in fourthSplit:
+                                #if word longer than 1 length allow it
+                                if len(split4) > 1:
+                                    #duplicate check
+                                    if duplicateFlag == False:
+                                        if split4 not in WordArrayNoDuplicates:
+                                            #if not alread checked, add to list then add to file
+                                            WordArrayNoDuplicates[split4] = 1
+                                            WordCount+=1
+                                    else:
+                                        WordArrayDuplicates.append(split4)
                                         WordCount+=1
-                                else:
-                                    WordArrayDuplicates.append(split3)
-                                    WordCount+=1
+                            
 
             #close afterwards
             fp.close()

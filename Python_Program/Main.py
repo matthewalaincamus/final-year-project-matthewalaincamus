@@ -428,7 +428,67 @@ def SpellCheck(FileType : int, MethodType : int):
     return returnCheck
 
 def AutoTesterMenu():
-    return 0
+    #check to see if the user wants to return to the main menu
+    returnCheck = 1
+
+    #will loop till the user exits via typing z or Z on the keyboard in the main menu
+    while returnCheck == 1:
+        #clear the screen so that only relevant system text is shown
+        os.system("cls")
+
+        #show user options for the corpus
+        print("options for automated testing (indicate which option by typing its asscociated letter):")
+        print("(A) Full comparison of all avaliable methods and algorithms on wordlist with no duplicates")
+        print("(B) Full comparison of all avaliable methods and algorithms on wordlist with no duplicates sorted alphabetically (merge sort)")
+        print("(Z) return to main menu\n")
+
+        inputCheck = 1
+
+        while inputCheck == 1:
+            #user input
+            ActionChoice = input(": ")
+
+            if ActionChoice == "A" or ActionChoice == "a":
+                
+                errorCheck = ListGenerator.DataReader(0, 0, 1)
+
+                #if -1, an error occured.
+                #if 0, then reload the page again
+                if errorCheck == 0:
+                    #perform the automated spell checking
+                    errorCheck = SpellChecker.AutoSpellChecker(1)
+
+                    if errorCheck == 0: inputCheck = 2
+                    elif errorCheck == -1: inputCheck = -1
+
+                elif errorCheck == -1: inputCheck = -1
+
+            if ActionChoice == "B" or ActionChoice == "b":
+                
+                errorCheck = ListGenerator.DataReader(0, 1, 1)
+
+                #if -1, an error occured.
+                #if 0, then reload the page again
+                if errorCheck == 0:
+                    #perform the automated spell checking
+                    errorCheck = SpellChecker.AutoSpellChecker(3)
+
+                    if errorCheck == 0: inputCheck = 2
+                    elif errorCheck == -1: inputCheck = -1
+
+                elif errorCheck == -1: inputCheck = -1
+
+            elif ActionChoice == "Z" or ActionChoice ==  "z": inputCheck = 0
+            
+            #if the user types an invalid answer
+            else: print("Invalid response, please try again")
+
+        # if inputCheck == 0 that means that the user wishes to leave the system
+        # otherwise it means that the user still wishes to do other things with the system or and error has occured (system will loop)
+        if inputCheck == 0: returnCheck = 0
+        elif inputCheck == -1: returnCheck = -1
+
+    return returnCheck
 
 if __name__ == "__main__":
     
