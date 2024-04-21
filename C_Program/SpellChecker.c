@@ -849,18 +849,18 @@ int HammingDistance(char string1[], char string2[], int len1, int len2)
 //hamming distance calculator
 int SorensenDiceCoefficient(char string1[], char string2[], int len1, int len2)
 {
-    //number of bigraphs that match
+    //number of bigrams that match
     double matches = 0;
 
     int i = 0, j = 0;
 
-    //loop through, getting the number of bigraphs that match and updating the count
+    //loop through, getting the number of bigrams that match and updating the count
     while (i < len1 - 1 && j < len2 - 1)
     {
-        char bigraph1[3] = {string1[i], string2[i+1], '\0'};
-        char bigraph2[3] = {string2[j], string2[j+1], '\0'};
+        char bigram1[3] = {string1[i], string2[i+1], '\0'};
+        char bigram2[3] = {string2[j], string2[j+1], '\0'};
 
-        if (!strcmp(bigraph1, bigraph2)) matches++;
+        if (!strcmp(bigram1, bigram2)) matches++;
 
         ++i;
         ++j;

@@ -540,18 +540,18 @@ def HammingDistance(string1 : str, string2 : str, len1 : int, len2 : int):
 
 #Sørensen-Dice Coefficient algorithm
 def SorensenDiceCoefficient(string1 : str, string2 : str, len1 : int, len2 : int):
-    #number of bigraphs that match
+    #number of bigrams that match
     matches = 0.0
 
     i = 0
     j = 0
 
-    #loop through, getting the number of bigraphs that match and updating the count
+    #loop through, getting the number of bigrams that match and updating the count
     while i < len1 - 1 and j < len2 - 1:
-        bigraph1 = "" + string1[i] + string2[i+1]
-        bigraph2 = "" + string2[j] + string2[j+1]
+        bigram1 = "" + string1[i] + string2[i+1]
+        bigram2 = "" + string2[j] + string2[j+1]
 
-        if bigraph1 == bigraph2: matches+=1
+        if bigram1 == bigram2: matches+=1
 
         i+=1
         j+=1

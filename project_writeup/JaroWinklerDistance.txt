@@ -1,0 +1,31 @@
+algorithm JaroWinklerDistance is
+	input: strings a[0 ... length(a)], b[0 ... length(b)]
+	output: distance, float
+
+	//get the standard Jaro distance
+	let jaro_distance := jaroDistance(a, b)	
+
+	//if the jaro similarity is above a threshold
+	if jaro_distance > 0.7 then
+		
+		//find the length of common prefix
+		let prefix := 0
+
+		for i := 0 to min(length(a), length(b)) inclusive do
+			
+			//if the characters match
+			if a[i] = b[i] then
+				prefix := prefix + 1
+
+			//else break
+			otherwise then
+				break from the for loop
+
+		//maximum of 4 characters are allowed in prefix
+		prefix := min(4, prefix)
+
+		//calculate jaro winkler similarity
+		jaro_distance = jaro_distance + 0.1 * prefix * (1 - jaro_distance)
+
+	return jaro_distance
+

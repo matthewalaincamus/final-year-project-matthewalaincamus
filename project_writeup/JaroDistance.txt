@@ -1,0 +1,54 @@
+algorithm jaroDistance is
+	input: strings a[0 ... length(a)], b[0 ... length(b)]
+	output: distance, float
+
+	//maximum distance up to which matching is allowed
+	let max_distance:= (max(length(a), length(b)) / 2) - 1
+
+	//count of matches
+	let matches:= 0
+
+	//hashes for matches
+	let string1Hash[0 ... length(a)] be an array of zeros, dimensions length(a)
+	let string2Hash[0 ... length(b)] be an array of zeros, dimensions length(b)
+
+	//traverse through string a
+	for i:= 0 to length(a) inclusive do
+		
+		//check if there are any matches
+		for j:= max( 0, i - max_distance) to min(length(b), i + max_distance + 1) inclusive do
+			
+			#if there is a match
+			if a[i] = b[j] and string2Hash[j] = 0 then
+				string1Hash[i] := 1
+				string2Hash[j] := 1
+				matches := matches + 1
+				break from for loop
+
+	if matches = 0 then
+		return 0.0
+
+	#number of transpositions
+	let t := 0
+	let point := 0
+
+	//count number of occurences where two characters match but there is a third matched character
+	//in between the indices
+	for i := 0 to length(a) inclusive do
+		if string1Hash[i] = 1 then
+			
+			//find the next matched character in the second string
+			while string2Hash[point] = 0 do
+				point := point + 1
+
+			if a[i] != b[point] then
+				point := point + 1
+				t := t + 1
+			otherwise then
+				point := point + 1
+
+		t := t / 2
+
+	return ((matches / length(a) + matches / length(b) + (matches - t) / matches) / 3.0)
+
+				

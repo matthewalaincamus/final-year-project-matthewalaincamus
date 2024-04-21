@@ -1,0 +1,24 @@
+algorithm levenshteinRecursive is 
+	input: strings a[0 ... length(a)], b[0 ... length(b)]
+	output: distance, integer
+
+	//if string a is empty
+	if length(a) = 0 then
+		return length(b)
+	
+	//if string b is empty
+	if length(b) = 0 then
+		return length(a)
+
+	if a[length(a) - 1] = b[length(b) - 1] then
+		return levenshteinRecursive(a[0 ... length(a) - 1], b[0 ... length(b) - 1])
+	
+	return 1 + min(
+		levenshteinRecursive(a[0 ... length(a)], b[0 ... length(b) - 1]), //insert
+		min(
+			levenshteinRecursive(a[0 ... length(a) - 1], b[0 ... length(b)]), //Remove
+			levenshteinRecursive(a[0 ... length(a) - 1], b[0 ... length(b) - 1]) ) // replace
+	)
+ 
+
+	

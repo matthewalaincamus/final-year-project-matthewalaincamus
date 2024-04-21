@@ -1,5 +1,5 @@
 algorithm HammingDistance is
-	input: strings a[0 ... length(a), b[0 ... length(b)
+	input: strings a[0 ... length(a)], b[0 ... length(b)]
 	output: distance, integer
 
 	//both strings need to be the same length
@@ -16,3 +16,5 @@ algorithm HammingDistance is
 			score := score + 1
 
 	return score
+
+
