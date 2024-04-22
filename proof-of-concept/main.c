@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/time.h>
 
 int main(){
     
@@ -62,7 +63,11 @@ int main(){
     //user input
     char userWord[128];
     printf("Enter a word you want to check: ");
-    scanf("%s", &userWord);
+    scanf("%s", userWord);
+
+    //start timer
+    struct timeval Start;
+    gettimeofday(&Start, 0);
 
     //check to see if the word is in the list
     int WordFoundFlag = 0;
@@ -80,6 +85,14 @@ int main(){
     else{
         printf("word isn't in the dictionary\n");
     }
+
+    //get the time of completion
+    struct timeval Stop;
+    gettimeofday(&Stop, 0);
+
+    float TimeTaken = (Stop.tv_sec - Start.tv_sec) * 1000.f + (Stop.tv_usec - Start.tv_usec) / 1000.f;
+
+    printf("Operation took: %f miliseconds to complete\n\n", TimeTaken);
 
     //cleanup
     free(WordArray);

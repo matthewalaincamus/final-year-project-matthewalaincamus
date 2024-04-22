@@ -340,6 +340,8 @@ struct ReturnHash initHash(int FileType, int MaxSize)
             charCount++;
             //add ascii value of char to hash code
             stringHashCode = (stringHashCode * (int)nextChar) % MaxSize;
+            //so most of the nodes don't congregate at zero
+            if (stringHashCode == 0) stringHashCode++;
         }
         else if (nextChar == '\n')
         {
@@ -612,6 +614,7 @@ int HashChecker(struct WordHashItem *HashTable, int MaxSize, int WordCount, char
         for (int i = 0; i < strlen(wordString); i++)
         {
             StringHash = (StringHash * (int)wordString[i]) % MaxSize;
+            if (StringHash == 0) StringHash++;
         }
 
         //get the linked list from the index
@@ -807,26 +810,34 @@ int binarySearch(char** WordArray, int leftValue, int rightValue, char wordStrin
 //Levenshtein distance calculator
 int LevenshteinDistance(char string1[], char string2[], int len1, int len2)
 {
-    //empty string1
-    if (len1 == 0) return len2;
+    //array to store results of calculations
+    int CalculationArray[len1+1][len2+1];
 
-    //empty string2
-    if (len2 == 0) return len1;
+    //add starting values to calculation array
+    for (int i = 0; i <= len1; i++) CalculationArray[i][0] = i;
+    for (int j = 0; j <= len2; j++) CalculationArray[0][j] = j;
 
-    if(string1[len1 - 1] == string2[len2 - 1])
+    //fill in the matrix using dynamic programming
+    for (int i = 1; i <= len1; i++)
     {
-        return LevenshteinDistance(string1, string2, len1 - 1, len2 - 1);
+        for (int j = 1; j <= len2; j++)
+        {
+            if (string1[i - 1] == string2[j - 1])
+            {
+                //characters match, no operation needed
+                CalculationArray[i][j] = CalculationArray[i-1][j-1];
+            }
+            else
+            {
+                //characters don't match, choose minimum cost among insertion, deletion, substitution
+                CalculationArray[i][j] = 1 + Min3(
+                                        CalculationArray[i][j-1],
+                                        CalculationArray[i-1][j],
+                                        CalculationArray[i-1][j-1]);
+            }
+        }
     }
-    
-    return 1 + Min( 
-        //insert
-        LevenshteinDistance(string1, string2, len1, len2 -1),
-        Min(
-            //Remove
-            LevenshteinDistance(string1, string2, len1 - 1, len2),
-            //Replace
-            LevenshteinDistance(string1, string2, len1 - 1, len2 - 1)
-        ));
+    return CalculationArray[len1][len2];
 }
 
 //hamming distance calculator

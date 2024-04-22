@@ -1,0 +1,46 @@
+Corpus Generation Pseudocode:
+
+	//(A) Allow duplicates
+	//(B) Don't allow duplicates
+	//(C) Allow duplicates and sort in alphabetical order
+	//(D) Don't allow duplicates and sort in alphabetical order
+	//(Z) return to main menu
+	print options for file generation to the user
+
+	//start at corpus generation menu
+	let Action := input character from user input
+	
+	if Action = A or B or C or D then
+		DataReader(Action)
+	else if Action = z then
+		return to main menu
+	else
+		loop until valid answer is given
+
+function DataReader()
+	input: char Action
+	output: file of words
+
+	depending on the Action, the system will check for duplicates / allow sorting 
+
+	//get the users choice of corpora	
+	let CorporaChoice := input character from user input	
+
+	//generate the data file
+	for subfolder in corpora do
+		for file in subfolder do
+			read all valid words from the file
+			if duplicates are allowed then 
+				check that any new words don't exist in the list before storing
+
+	if sorting is allowed then
+		sort the whole word array in alphabetical order
+
+	open new file
+
+	write all words in array to the new file
+
+	close new file
+
+	return
+

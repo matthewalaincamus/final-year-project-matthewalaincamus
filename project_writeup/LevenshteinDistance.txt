@@ -1,24 +1,27 @@
-algorithm levenshteinRecursive is 
+algorithm levenshteinDistance is 
 	input: strings a[0 ... length(a)], b[0 ... length(b)]
 	output: distance, integer
 
-	//if string a is empty
-	if length(a) = 0 then
-		return length(b)
-	
-	//if string b is empty
-	if length(b) = 0 then
-		return length(a)
+	let CalculationMatrix[0 ... length(a)+1, 0 ... length(b)+1] be a 2-d array of zeros, dimensions length(a)+1, length(b)
 
-	if a[length(a) - 1] = b[length(b) - 1] then
-		return levenshteinRecursive(a[0 ... length(a) - 1], b[0 ... length(b) - 1])
+	//initialise the first row of the matrix	
+	for i := 0 to length(a) inclusive do
+		CalculationMatrix[i][0] := i
+	for j := 0 to length(a) inclusive do
+		CalculationMatrix[0][j] := j
+
+	for i := 1 to length(a) inclusive do
+		for j := 1 to length(b) inclusive do
+			if a[i-1] = b[j-1] then
+				#characters match, do nothing
+				CalculationMatrix[i][j] := CalculationMatrix[i-1][j-1]
+			else
+				#characters don't match, choose minimum cost from insertion, deletion, substitution
+				CalculationMatrix[i][j] := 1 + min(
+								CalculationMatrix[i][j-1],
+								CalculationMatrix[i-1][j],
+								CalculationMatrix[i-1][j-1])
+	return CalculationMatrix[length(a)][length(b)]
 	
-	return 1 + min(
-		levenshteinRecursive(a[0 ... length(a)], b[0 ... length(b) - 1]), //insert
-		min(
-			levenshteinRecursive(a[0 ... length(a) - 1], b[0 ... length(b)]), //Remove
-			levenshteinRecursive(a[0 ... length(a) - 1], b[0 ... length(b) - 1]) ) // replace
-	)
- 
 
 	

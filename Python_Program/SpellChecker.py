@@ -300,6 +300,7 @@ def hashCheck(HashTable : HashTable, wordString : str, AlgorithmCheck : int, Tes
         StringHash = 1
         for letter in wordString:
             StringHash = (StringHash * ord(letter)) % HashTable.maxSize
+            if StringHash == 0: StringHash += 1
 
         #get the data from the table using the hash value
         currentNode : Node = HashTable.table[StringHash]
@@ -484,6 +485,8 @@ def initHash(FileType : int, MaxSize : int):
         hashValue = 1
         for letter in word[:-1]:
             hashValue = (hashValue * ord(letter)) % MaxSize
+            #so most of the nodes don't congregate at zero
+            if hashValue == 0: hashValue += 1
 
         #if there is no item at the given hash index, make a new node there
         #otherwise, append it the the linked list
@@ -507,21 +510,26 @@ def initHash(FileType : int, MaxSize : int):
 #Levenshtein Distance algorithm
 def LevenshteinDistance(string1 : str, string2 : str, len1 : int, len2 : int):
     
-    #empty string1
-    if len1 == 0: return len2
+    #array to store results of calculations
+    CalculationArray = [[0 for x in range(len2 + 1)] for y in range(len1+1)]
 
-    #empty string2
-    if len2 == 0: return len1
+    #add starting values to calculation array
+    for i in range(len1+1): CalculationArray[i][0] = i
+    for j in range(len2+1): CalculationArray[0][j] = j
 
-    if string1[len1 - 1] == string2[len2 - 1]:
-        return LevenshteinDistance(string1, string2, len1 - 1, len2 - 1)
-    
-    return 1 + min(
-        LevenshteinDistance(string1, string2, len1, len2 -1), #insert
-        min( 
-            LevenshteinDistance(string1, string2, len1 - 1, len2), #remove
-            LevenshteinDistance(string1, string2, len1 - 1, len2 - 1) #replace
-        ))
+    #fill in the matrix using dynamic programming
+    for i in range(1, len1+1):
+        for j in range(1, len2+1):
+            if string1[i - 1] == string2[j - 1]:
+                #characters match, no operation needed
+                CalculationArray[i][j] = CalculationArray[i-1][j-1]
+            else:
+                #characters don't match, choose minimum cost among insertion, deletion, substitution
+                CalculationArray[i][j] = 1 + min(
+                                        CalculationArray[i][j-1],
+                                        CalculationArray[i-1][j],
+                                        CalculationArray[i-1][j-1])
+    return CalculationArray[len1][len2]
 
 #Hamming Distance algorithm
 def HammingDistance(string1 : str, string2 : str, len1 : int, len2 : int):
