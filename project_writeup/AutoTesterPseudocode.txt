@@ -1,0 +1,53 @@
+AutoTester Menu Pseudocode
+
+	ask user to generate word file
+	let FileNumber := the number associated with the file generated
+	
+	let errorCheck := AutoTester(FileNumber)
+	if errorCheck = error code then
+		return errorCheck	 
+	
+
+function AutoTester() is
+	input: integer FileNumber
+	output: integer returnCode
+
+	//perpare the data for tests	
+	load file using FileNumber into an array
+	load file using FileNumber into a hash table with linked lists
+
+	while user wants to enter a new word do
+
+		let userString := word user wants to spell check
+
+		if userString is valid then
+			//loop though every algorithm in system
+			//expect when doing binary search on an unsorted file
+			if method = binary_search and generatedFileType = unsorted then
+				skip method
+			for method in system do
+				//for every method test every algorithm on it
+				for algorithm in system do
+					start a timer
+		
+					perform search for word depending on the method as indicated by the MethodNumber
+
+					if the word exists in the data structure then
+						print that it exists
+
+					else
+						print that it doesn't exist
+						if AlgorithmNumber != none then
+							// create an array to store the distances between the user word and all other words	
+							let algorithmArray := [0 ... WordCount] be a 1-D array of integers of size wordcount 	
+
+							for i := 0 to WordCount inclusive do
+								using algorithm defined by AlgorithmNumber do 						
+									algorithmArray[i] = distance between userString and dataStructure[i]
+			
+							print out 10 suggestions which are closest to the userString
+			
+					end timer and print time taken to find word			
+			
+
+			 	

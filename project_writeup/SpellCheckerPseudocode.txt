@@ -4,62 +4,58 @@ Spell Checker Menu Pseudocode
 	if file doesn't exist then
 		return error
 
-	print available word files that can be used
-	let Action := user inputted character
-
-	If Action = letter describing a word file then
-		MethodCheck(Action)
-	else if Action = Z then
-		return to main menu
 	else
-		loop till valid user input is given
+		let FileNumber := number of file type the user wants to use
+		
+		let MethodNumber := number of method type the user wants to use
 
-function MethodCheck() is
-	input: character Action
-	ouput: integer returnCode
+		let AlgorithmNumber := number of algorithm type the user wants to use
 
-	//(A) list with linear search
-	//(B) list with binary search
-	//(C) Hash Table
-	//(Z) return to previous menu
-	print out options for user
-
-	let secondAction := user inputted character
-
-	if secondAction = A or B or C then
-		SpellCheck(Action, secondAction)
-
-	else if secondAction = Z then
-		return back to spell checker menu
-	else
-		loop till valid user input is given
-
-function SpellCheck() is
-	input: character Action, character secondAction
-	output: integer returnCode
-
-	//(A) no suggestions
-	//(B) levenshtein Distance
-	//(C) Hamming Distance
-	//(D) Sorensen-Dice Coefficient
-	//(E) Optimal String Alignment Distance
-	//(F) Damerau-Levenshtein Distance
-	//(G) Jaro Similarity
-	//(H) Jaro-Winkler Similarity
-	print out he options for user
-
-	let thirdAction := user inputted character
-
-	if thirdAction = A through to H then
-		SpellChecker(Action, secondAction, thirdAction)
-
-	else if thirdAction = Z then
-		return back to MethodCheck() function
-
-	else
-		loop till valid user input is given
+		let errorCheck = SpellChecker(FileNumber, MethodNumber, AlgorithmNumber)
+		
+		if errorCheck = an error code then
+			return errorCheck
+		else
+			ask the user if they want to return to the main menu or not
+	
 
 function SpellChecker() is
-	input: character Action, character secondAction, character thirdAction
+	input: integer FileNumber, integer MethodNumber, integer AlgorithmNumber
 	output: integer returnCode
+
+	//generate the data structures depending on the users request
+	if methodNumber refers to linear search or binary search then
+		load file using FileNumber into an array
 	
+	else if methodNumber refers to hash table with linked lists then
+		load file using FileNumber into a hash table with linked lists
+
+	while user wants to enter a new word do
+
+		let userString := word user wants to spell check
+
+		if userString is valid then
+
+			start a timer
+		
+			perform search for word depending on the method as indicated by the MethodNumber
+
+			if the word exists in the data structure then
+				print that it exists
+
+			else
+				print that it doesn't exist
+				if AlgorithmNumber != none then
+					// create an array to store the distances between the user word and all other words	
+					let algorithmArray := [0 ... WordCount] be a 1-D array of integers of size wordcount 	
+
+					for i := 0 to WordCount inclusive do
+						using algorithm defined by AlgorithmNumber do 						
+							algorithmArray[i] = distance between userString and dataStructure[i]
+			
+					print out 10 suggestions which are closest to the userString
+			
+			end timer and print time taken to find word			
+			
+
+			 	

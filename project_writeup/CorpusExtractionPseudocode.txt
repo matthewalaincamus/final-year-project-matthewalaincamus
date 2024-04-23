@@ -1,4 +1,4 @@
-Corpus Generation Pseudocode:
+Corpus Extraction Pseudocode:
 
 	//(A) Allow duplicates
 	//(B) Don't allow duplicates
