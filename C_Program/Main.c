@@ -36,7 +36,7 @@ int mainMenu()
         system("cls");
 
         //introduce the system
-        printf("***Welcome to Matthew Camus's spell checking software***\n");
+        printf("***Welcome to Matthew Camus's spell checking software in C***\n");
         printf("\n");
 
         //show user options that they can do
@@ -566,37 +566,105 @@ int AutoTesterMenu()
 
             if(!strcmp(ActionChoice, "A") || !strcmp(ActionChoice, "a"))
             {
-                
-                int errorCheck = DataReader(0, 0, 1);
-
-                //if -1, an error occured.
-                //if 0, then reload the page again
-                if (errorCheck == 0)
+                //check if a version of the file doesn't already exist
+                if (access("./GeneratedFiles/LWND.txt", F_OK) == 0)
                 {
-                    //perform the automated spell checking
-                    errorCheck = AutoSpellChecker(1);
+                    printf("A file of this type exists, do you want to use it (y/n)?\n");
+                    printf(": ");
+                    scanf("%s", ActionChoice);
 
-                    if (errorCheck == 0)inputCheck = 2;
+                    if ( !strcmp(ActionChoice, "Y") || !strcmp(ActionChoice,"y"))
+                    {
+                        //perform the automated spell checking
+                        int errorCheck = AutoSpellChecker(1);
+
+                        if (errorCheck == 0)inputCheck = 2;
+                        else if (errorCheck == -1) inputCheck = -1;
+                    }
+                    else
+                    {
+                        int errorCheck = DataReader(0, 0, 1);
+                    
+                        //if -1, an error occured.
+                        //if 0, then reload the page again
+                        if (errorCheck == 0)
+                        {
+                            //perform the automated spell checking
+                            errorCheck = AutoSpellChecker(1);
+
+                            if (errorCheck == 0)inputCheck = 2;
+                            else if (errorCheck == -1) inputCheck = -1;
+                        }
+                        else if (errorCheck == -1) inputCheck = -1;
+                    }
+                }
+                else
+                {
+                    int errorCheck = DataReader(0, 0, 1);
+                
+                    //if -1, an error occured.
+                    //if 0, then reload the page again
+                    if (errorCheck == 0)
+                    {
+                        //perform the automated spell checking
+                        errorCheck = AutoSpellChecker(1);
+
+                        if (errorCheck == 0)inputCheck = 2;
+                        else if (errorCheck == -1) inputCheck = -1;
+                    }
                     else if (errorCheck == -1) inputCheck = -1;
                 }
-                else if (errorCheck == -1) inputCheck = -1;
             }
             if(!strcmp(ActionChoice, "B") || !strcmp(ActionChoice, "b"))
             {
-                
-                int errorCheck = DataReader(0, 1, 1);
-
-                //if -1, an error occured.
-                //if 0, then reload the page again
-                if (errorCheck == 0)
+                //check if a version of the file doesn't already exist
+                if (access("./GeneratedFiles/LWNDS.txt", F_OK) == 0)
                 {
-                    //perform the automated spell checking
-                    errorCheck = AutoSpellChecker(3);
+                    printf("A file of this type exists, do you want to use it (y/n)?\n");
+                    printf(": ");
+                    scanf("%s", ActionChoice);
 
-                    if (errorCheck == 0)inputCheck = 2;
+                    if ( !strcmp(ActionChoice, "Y") || !strcmp(ActionChoice,"y"))
+                    {
+                        //perform the automated spell checking
+                        int errorCheck = AutoSpellChecker(3);
+
+                        if (errorCheck == 0)inputCheck = 2;
+                        else if (errorCheck == -1) inputCheck = -1;
+                    }
+                    else
+                    {
+                        int errorCheck = DataReader(0, 1, 1);
+                    
+                        //if -1, an error occured.
+                        //if 0, then reload the page again
+                        if (errorCheck == 0)
+                        {
+                            //perform the automated spell checking
+                            errorCheck = AutoSpellChecker(3);
+
+                            if (errorCheck == 0)inputCheck = 2;
+                            else if (errorCheck == -1) inputCheck = -1;
+                        }
+                        else if (errorCheck == -1) inputCheck = -1;
+                    }
+                }
+                else
+                {
+                    int errorCheck = DataReader(0, 1, 1);
+                
+                    //if -1, an error occured.
+                    //if 0, then reload the page again
+                    if (errorCheck == 0)
+                    {
+                        //perform the automated spell checking
+                        errorCheck = AutoSpellChecker(3);
+
+                        if (errorCheck == 0)inputCheck = 2;
+                        else if (errorCheck == -1) inputCheck = -1;
+                    }
                     else if (errorCheck == -1) inputCheck = -1;
                 }
-                else if (errorCheck == -1) inputCheck = -1;
             }
             else if(!strcmp(ActionChoice, "Z") || !strcmp(ActionChoice, "z")) inputCheck = 0;
             //if the user types an invalid answer

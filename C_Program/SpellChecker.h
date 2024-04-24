@@ -3,7 +3,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <dirent.h>
-#include <sys/time.h>
+#include <sys/timeb.h>
 #include <math.h>
 
 //for single word array
@@ -13,11 +13,18 @@ struct WordsListing
     int WordCount;
 };
 
+//for automated testing
+struct TimeAndSuggestion
+{
+    float TimeTaken;
+    int SuggestionNumber;
+};
+
 //hash table node
 struct WordNode
 {
     int key;
-    char Word[25];
+    char Word[50];
     int AlgorithmDistance;
     struct WordNode *next;
 };
@@ -42,13 +49,13 @@ struct ReturnHash
 int SpellChecker(int FileType, int CheckType, int AlgorithmCheck);
 
 //linear searcher
-int linearCheck(char ** WordArray, int WordCount, char wordString[], int AlgorithmCheck, struct timeval Start, int TestFlag);
+float linearCheck(char ** WordArray, int WordCount, char wordString[], int AlgorithmCheck, int TestFlag);
 
 //binary seacher
-int binaryCheck(char ** WordArray, int WordCount, char wordString[], int AlgorithmCheck, struct timeval Start, int TestFlag);
+float binaryCheck(char ** WordArray, int WordCount, char wordString[], int AlgorithmCheck, int TestFlag);
 
 //hash table searcher
-int HashChecker(struct WordHashItem *HashTable, int MaxSize, int WordCount, char wordString[], int AlgorithmCheck, struct timeval Start, int TestFlag);
+float HashChecker(struct WordHashItem *HashTable, int MaxSize, int WordCount, char wordString[], int AlgorithmCheck, int TestFlag);
 
 //function to get words from file
 struct WordsListing WordFetcher(int FileType);
@@ -57,7 +64,7 @@ struct WordsListing WordFetcher(int FileType);
 struct ReturnHash initHash(int FileType, int MaxSize);
 
 //recursive binary search
-int binarySearch(char** WordArray, int leftValue, int rightValue, char wordString[25]);
+int binarySearch(char** WordArray, int leftValue, int rightValue, char wordString[]);
 
 //levenshtein algorithm
 int LevenshteinDistance(char string1[], char string2[], int len1, int len2);
@@ -91,3 +98,6 @@ int Min3(int a, int b, int c);
 
 //function to handle full testing and comparison of methods and algorithms
 int AutoSpellChecker(int FileType);
+
+//function to compare the algorithms against the mispelled data
+int AlgorithmAssessor(int FileType);

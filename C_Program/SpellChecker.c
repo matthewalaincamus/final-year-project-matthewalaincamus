@@ -3,10 +3,10 @@
 //skeleton functions for use later
 struct WordsListing WordFetcher(int FileType);
 struct ReturnHash initHash(int FileType, int MaxSize);
-int linearCheck(char ** WordArray, int WordCount, char wordString[], int AlgorithmCheck, struct timeval Start, int TestFlag);
-int binaryCheck(char ** WordArray, int WordCount, char wordString[], int AlgorithmCheck, struct timeval Start, int TestFlag);
-int binarySearch(char** WordArray, int leftValue, int rightValue, char wordString[25]);
-int HashChecker(struct WordHashItem *HashTable, int MaxSize, int WordCount, char wordString[], int AlgorithmCheck, struct timeval Start, int TestFlag);
+float linearCheck(char ** WordArray, int WordCount, char wordString[], int AlgorithmCheck, int TestFlag);
+float binaryCheck(char ** WordArray, int WordCount, char wordString[], int AlgorithmCheck, int TestFlag);
+int binarySearch(char** WordArray, int leftValue, int rightValue, char wordString[]);
+float HashChecker(struct WordHashItem *HashTable, int MaxSize, int WordCount, char wordString[], int AlgorithmCheck, int TestFlag);
 int LevenshteinDistance(char string1[], char string2[], int len1, int len2);
 int HammingDistance(char string1[], char string2[], int len1, int len2);
 int SorensenDiceCoefficient(char string1[], char string2[], int len1, int len2);
@@ -65,7 +65,7 @@ int SpellChecker(int FileType, int CheckType, int AlgorithmCheck)
         printf("Please enter the word you wish to spell check\n");
         printf("RULES:\n");
         printf("- no numbers or non alphabet characters\n");
-        printf("- maximum length string of 25 characters\n");
+        printf("- maximum length string of 50 characters\n");
         printf("- all characters must be in lowercase\n\n");
         printf("If you wish to return to the previous screen, please type '?' and then press enter\n");
 
@@ -86,7 +86,7 @@ int SpellChecker(int FileType, int CheckType, int AlgorithmCheck)
 
             for (int i = 0; i < 128; i++)
             {
-                if (i > 24) WordCheck++;
+                if (i > 49) WordCheck++;
 
                 int charToInt = (int)ActionChoice[i];
 
@@ -105,14 +105,14 @@ int SpellChecker(int FileType, int CheckType, int AlgorithmCheck)
             if (WordArray.WordCount == -1) return -1;
 
             //start timer
-            struct timeval Start;
-            gettimeofday(&Start, 0);
+            struct timeb Start;
+            ftime(&Start);
 
             //linear searching = 0
-            if (CheckType == 0) linearCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, AlgorithmCheck, Start, 0);
+            if (CheckType == 0) linearCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, AlgorithmCheck, 0);
 
             //binary searching = 1
-            else if (CheckType == 1) binaryCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, AlgorithmCheck, Start, 0); 
+            else if (CheckType == 1) binaryCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, AlgorithmCheck, 0); 
         
             //cleanup
             free(WordArray.WordArray);
@@ -155,11 +155,8 @@ int SpellChecker(int FileType, int CheckType, int AlgorithmCheck)
             }
             */
 
-            //start timer
-            struct timeval Start;
-            gettimeofday(&Start, 0);
-
-            HashChecker(WordHashTable.HashTable, MaxSize, WordHashTable.WordCount, ActionChoice, AlgorithmCheck, Start, 0);
+            //perform hash checking
+            HashChecker(WordHashTable.HashTable, MaxSize, WordHashTable.WordCount, ActionChoice, AlgorithmCheck, 0);
 
             //cleanup
             struct WordNode *tmp, *currentNode;
@@ -233,7 +230,7 @@ struct WordsListing WordFetcher(int FileType)
     int WordCount = 0;
 
     char nextChar = ' ';
-    char nextString[25];
+    char nextString[50];
 
     //for testing
     int lineCount = 0;
@@ -254,7 +251,7 @@ struct WordsListing WordFetcher(int FileType)
             nextString[charCount] = '\0';
             //printf("%s\n", nextString);
 
-            WordArray[WordCount] = malloc(25 * sizeof(char));
+            WordArray[WordCount] = malloc(50 * sizeof(char));
             strcpy(WordArray[WordCount], nextString);
             WordCount++;
             
@@ -321,7 +318,7 @@ struct ReturnHash initHash(int FileType, int MaxSize)
     int WordCount = 0;
 
     char nextChar = ' ';
-    char nextString[25];
+    char nextString[50];
 
     //for testing
     int lineCount = 0;
@@ -394,8 +391,11 @@ struct ReturnHash initHash(int FileType, int MaxSize)
 }
 
 //linear search checker
-int linearCheck(char ** WordArray, int WordCount, char wordString[], int AlgorithmCheck, struct timeval Start, int TestFlag)
+float linearCheck(char ** WordArray, int WordCount, char wordString[], int AlgorithmCheck, int TestFlag)
 {
+    //start timer:
+    struct timeb Start;
+    ftime(&Start);
 
     //if called from automated testing, print out data differently
     if (TestFlag == 1)
@@ -481,19 +481,24 @@ int linearCheck(char ** WordArray, int WordCount, char wordString[], int Algorit
     else if (WordFlag > 0 && TestFlag == 1) printf("|%-15s|%-25s|\n", "True", "");
 
     //get the time of completion
-    struct timeval Stop;
-    gettimeofday(&Stop, 0);
+    struct timeb Stop;
+    ftime(&Stop);
 
-    float TimeTaken = (Stop.tv_sec - Start.tv_sec) * 1000.f + (Stop.tv_usec - Start.tv_usec) / 1000.f;
+    float TimeTaken = 1000.0 * (Stop.time - Start.time) + (Stop.millitm - Start.millitm);
 
     if (TestFlag == 0) printf("Operation took: %f miliseconds to complete\n\n", TimeTaken);
     else if (TestFlag == 1) printf("|Time to complete: %-10f ms%-41s|\n",  TimeTaken, "");
-    return 0;
+    else if (TestFlag == 2) return TimeTaken;
+    return 0.0;
 }
 
 //binary search checker
-int binaryCheck(char ** WordArray, int WordCount, char wordString[], int AlgorithmCheck, struct timeval Start, int TestFlag)
+float binaryCheck(char ** WordArray, int WordCount, char wordString[], int AlgorithmCheck, int TestFlag)
 {
+    //start timer:
+    struct timeb Start;
+    ftime(&Start);
+
     //if called from automated testing, print out data differently
     if (TestFlag == 1)
     {
@@ -571,19 +576,24 @@ int binaryCheck(char ** WordArray, int WordCount, char wordString[], int Algorit
     }
 
     //get the time taken
-    struct timeval Stop;
-    gettimeofday(&Stop, 0);
+    struct timeb Stop;
+    ftime(&Stop);
 
-    float TimeTaken = (Stop.tv_sec - Start.tv_sec) * 1000.f + (Stop.tv_usec - Start.tv_usec) / 1000.f;
+    float TimeTaken = 1000.0 * (Stop.time - Start.time) + (Stop.millitm - Start.millitm);
 
     if (TestFlag == 0) printf("Operation took: %f miliseconds to complete\n\n", TimeTaken);
     else if (TestFlag == 1) printf("|Time to complete: %-10f ms%-41s|\n",  TimeTaken, "");
-    return 0;
+    else if (TestFlag == 2) return TimeTaken;
+    return 0.0;
 }
 
 //hash table checker
-int HashChecker(struct WordHashItem *HashTable, int MaxSize, int WordCount, char wordString[], int AlgorithmCheck, struct timeval Start, int TestFlag)
+float HashChecker(struct WordHashItem *HashTable, int MaxSize, int WordCount, char wordString[], int AlgorithmCheck, int TestFlag)
 {
+    //start timer:
+    struct timeb Start;
+    ftime(&Start);
+
     //if called from automated testing, print out data differently
     if (TestFlag == 1)
     {
@@ -774,19 +784,20 @@ int HashChecker(struct WordHashItem *HashTable, int MaxSize, int WordCount, char
     else if (WordFlag > 0 && TestFlag == 1) printf("|%-15s|%-25s|\n", "True", "");
 
     //get the time of completion
-    struct timeval Stop;
-    gettimeofday(&Stop, 0);
+    struct timeb Stop;
+    ftime(&Stop);
 
-    float TimeTaken = (Stop.tv_sec - Start.tv_sec) * 1000.f + (Stop.tv_usec - Start.tv_usec) / 1000.f;
+    float TimeTaken = 1000.0 * (Stop.time - Start.time) + (Stop.millitm - Start.millitm);
 
     if (TestFlag == 0) printf("Operation took: %f miliseconds to complete\n\n", TimeTaken);
     else if (TestFlag == 1) printf("|Time to complete: %-10f ms%-41s|\n",  TimeTaken, "");
 
-    return 0;
+    else if (TestFlag == 2) return TimeTaken;
+    return 0.0;
 }
 
 //binary search recursive algorithm
-int binarySearch(char** WordArray, int leftValue, int rightValue, char wordString[25])
+int binarySearch(char** WordArray, int leftValue, int rightValue, char wordString[])
 {
     if (rightValue >= leftValue)
     {
@@ -1111,9 +1122,10 @@ int AutoSpellChecker(int FileType)
         printf("Please enter the word you wish to spell check\n");
         printf("RULES:\n");
         printf("- no numbers or non alphabet characters\n");
-        printf("- maximum length string of 25 characters\n");
+        printf("- maximum length string of 50 characters\n");
         printf("- all characters must be in lowercase\n\n");
-        printf("If you wish to return to the previous screen, please type '?' and then press enter\n");
+        printf("If you wish to return to the previous screen, please type '?'\n");
+        printf("If you wish to launch the mispelled word tester, please type '!'\n");
 
         int inputCheck = 1;
 
@@ -1127,12 +1139,13 @@ int AutoSpellChecker(int FileType)
 
             //question mark denotes return to menu
             if(!strcmp(ActionChoice, "?")) return 0;
+            if(!strcmp(ActionChoice, "!")) break;
 
             int WordCheck = 0;
 
             for (int i = 0; i < 128; i++)
             {
-                if (i > 24) WordCheck++;
+                if (i > 49) WordCheck++;
 
                 int charToInt = (int)ActionChoice[i];
 
@@ -1145,202 +1158,249 @@ int AutoSpellChecker(int FileType)
             else inputCheck = 0;
         }
 
-        //start the process of testing every method and algorithm all together
-
-        //first generate the wordlist data structure for linear and binary searching
-        struct WordsListing WordArray = WordFetcher(FileType);
-        if (WordArray.WordCount == -1) return -1;
-
-        //then begin testing:
-
-        //**linear:
-        printf("**Method: Linear Search**\n");
-        printf("--------------------------------------------------------------------------\n");
-        printf("|Algorithm:                    |StringFound:   |Suggestions:             |\n");
-        printf("|------------------------------+---------------+-------------------------|\n");
-
-        //no algorithm
-        struct timeval Start;
-        gettimeofday(&Start, 0);
-        linearCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, 0, Start, 1);
-        printf("|------------------------------+---------------+-------------------------|\n");
-
-        //Levenshtein Distance
-        gettimeofday(&Start, 0);
-        linearCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, 1, Start, 1);
-        printf("|------------------------------+---------------+-------------------------|\n");
-
-        //Hamming Distance
-        gettimeofday(&Start, 0);
-        linearCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, 2, Start, 1);
-        printf("|------------------------------+---------------+-------------------------|\n");
-
-        //Sørensen–Dice Coefficient
-        gettimeofday(&Start, 0);
-        linearCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, 3, Start, 1);
-        printf("|------------------------------+---------------+-------------------------|\n");
-
-        //Optimal String Alignment Distance
-        gettimeofday(&Start, 0);
-        linearCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, 4, Start, 1);
-        printf("|------------------------------+---------------+-------------------------|\n");
-
-        //Damerau-Levenshtein Distance
-        gettimeofday(&Start, 0);
-        linearCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, 5, Start, 1);
-        printf("|------------------------------+---------------+-------------------------|\n");
-
-        //Jaro Distance
-        gettimeofday(&Start, 0);
-        linearCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, 6, Start, 1);
-        printf("|------------------------------+---------------+-------------------------|\n");
-
-        //Jaro-Winkler Distance
-        gettimeofday(&Start, 0);
-        linearCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, 7, Start, 1);
-
-        printf("--------------------------------------------------------------------------\n");
-        printf("\n\n");
-
-        //**binary:
-        printf("**Method: Binary Search**\n");
-
-        //need a sorted array to use this
-        if (FileType == 3)
+        if (!strcmp(ActionChoice,"!"))
         {
+            AlgorithmAssessor(FileType);
+        }
+        else
+        {
+
+            //start the process of testing every method and algorithm all together
+
+            //first generate the wordlist data structure for linear and binary searching
+            struct WordsListing WordArray = WordFetcher(FileType);
+            if (WordArray.WordCount == -1) return -1;
+
+            //then begin testing:
+
+            //**linear:
+            printf("**Method: Linear Search**\n");
             printf("--------------------------------------------------------------------------\n");
             printf("|Algorithm:                    |StringFound:   |Suggestions:             |\n");
             printf("|------------------------------+---------------+-------------------------|\n");
 
             //no algorithm
-            gettimeofday(&Start, 0);
-            binaryCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, 0, Start, 1);
+            linearCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, 0, 1);
             printf("|------------------------------+---------------+-------------------------|\n");
 
             //Levenshtein Distance
-            gettimeofday(&Start, 0);
-            binaryCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, 1, Start, 1);
+            linearCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, 1, 1);
             printf("|------------------------------+---------------+-------------------------|\n");
 
             //Hamming Distance
-            gettimeofday(&Start, 0);
-            binaryCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, 2, Start, 1);
+            linearCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, 2, 1);
             printf("|------------------------------+---------------+-------------------------|\n");
 
             //Sørensen–Dice Coefficient
-            gettimeofday(&Start, 0);
-            binaryCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, 3, Start, 1);
+            linearCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, 3, 1);
             printf("|------------------------------+---------------+-------------------------|\n");
 
             //Optimal String Alignment Distance
-            gettimeofday(&Start, 0);
-            binaryCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, 4, Start, 1);
+            linearCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, 4, 1);
             printf("|------------------------------+---------------+-------------------------|\n");
 
             //Damerau-Levenshtein Distance
-            gettimeofday(&Start, 0);
-            binaryCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, 5, Start, 1);
+            linearCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, 5, 1);
             printf("|------------------------------+---------------+-------------------------|\n");
 
             //Jaro Distance
-            gettimeofday(&Start, 0);
-            binaryCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, 6, Start, 1);
+            linearCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, 6, 1);
             printf("|------------------------------+---------------+-------------------------|\n");
 
             //Jaro-Winkler Distance
-            gettimeofday(&Start, 0);
-            binaryCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, 7, Start, 1);
+            linearCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, 7, 1);
 
             printf("--------------------------------------------------------------------------\n");
-        }
-        else printf("Only possible on sorted data\n");
+            printf("\n\n");
 
-        printf("\n\n");
+            //**binary:
+            printf("**Method: Binary Search**\n");
 
-        //cleanup word array
-        free(WordArray.WordArray);
-        WordArray.WordArray = NULL;
-
-        //Hash Table:
-
-        //max size of hash table
-        int MaxSize = 10000;
-
-        //create the hash table from the list of words
-        struct ReturnHash WordHashTable = initHash(FileType, MaxSize);
-        if (WordHashTable.WordCount == -1) return -1;
-
-        printf("**Method: Hash Table**\n");
-        printf("--------------------------------------------------------------------------\n");
-        printf("|Algorithm:                    |StringFound:   |Suggestions:             |\n");
-        printf("|------------------------------+---------------+-------------------------|\n");
-
-        //no algorithm
-        gettimeofday(&Start, 0);
-        HashChecker(WordHashTable.HashTable, MaxSize, WordHashTable.WordCount, ActionChoice, 0, Start, 1);
-        printf("|------------------------------+---------------+-------------------------|\n");
-
-        //Levenshtein Distance
-        gettimeofday(&Start, 0);
-        HashChecker(WordHashTable.HashTable, MaxSize, WordHashTable.WordCount, ActionChoice, 1, Start, 1);
-        printf("|------------------------------+---------------+-------------------------|\n");
-
-        //Hamming Distance
-        gettimeofday(&Start, 0);
-        HashChecker(WordHashTable.HashTable, MaxSize, WordHashTable.WordCount, ActionChoice, 2, Start, 1);
-        printf("|------------------------------+---------------+-------------------------|\n");
-
-        //Sørensen–Dice Coefficient
-        gettimeofday(&Start, 0);
-        HashChecker(WordHashTable.HashTable, MaxSize, WordHashTable.WordCount, ActionChoice, 3, Start, 1);
-        printf("|------------------------------+---------------+-------------------------|\n");
-
-        //Optimal String Alignment Distance
-        gettimeofday(&Start, 0);
-        HashChecker(WordHashTable.HashTable, MaxSize, WordHashTable.WordCount, ActionChoice, 4, Start, 1);
-        printf("|------------------------------+---------------+-------------------------|\n");
-
-        //Damerau-Levenshtein Distance
-        gettimeofday(&Start, 0);
-        HashChecker(WordHashTable.HashTable, MaxSize, WordHashTable.WordCount, ActionChoice, 5, Start, 1);
-        printf("|------------------------------+---------------+-------------------------|\n");
-
-        //Jaro Distance
-        gettimeofday(&Start, 0);
-        HashChecker(WordHashTable.HashTable, MaxSize, WordHashTable.WordCount, ActionChoice, 6, Start, 1);
-        printf("|------------------------------+---------------+-------------------------|\n");
-
-        //Jaro-Winkler Distance
-        gettimeofday(&Start, 0);
-        HashChecker(WordHashTable.HashTable, MaxSize, WordHashTable.WordCount, ActionChoice, 7, Start, 1);
-
-        printf("--------------------------------------------------------------------------\n");
-        printf("\n\n");
-
-        //cleanup hash table
-        struct WordNode *tmp, *currentNode;
-        for (int i = 0; i < MaxSize; i++)
-        {
-            if (WordHashTable.HashTable[i].head != NULL && WordHashTable.HashTable[i].tail != NULL)
+            //need a sorted array to use this
+            if (FileType == 3)
             {
-                currentNode = WordHashTable.HashTable[i].head;
-                while(currentNode->next != NULL)
-                {
-                    tmp = currentNode->next;
-                    free(currentNode);
-                    currentNode = tmp;
-                }
-                tmp = currentNode;
-                free(tmp);
-            }
-        }
-        
+                printf("--------------------------------------------------------------------------\n");
+                printf("|Algorithm:                    |StringFound:   |Suggestions:             |\n");
+                printf("|------------------------------+---------------+-------------------------|\n");
 
-        //user input (just to confirm that the user can return back to the previous menu)
-        char ActionChoice2[128];
-        printf("Type anything to enter another word: ");
-        scanf("%s", ActionChoice2);
+                //no algorithm
+                binaryCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, 0, 1);
+                printf("|------------------------------+---------------+-------------------------|\n");
+
+                //Levenshtein Distance
+                binaryCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, 1, 1);
+                printf("|------------------------------+---------------+-------------------------|\n");
+
+                //Hamming Distance
+                binaryCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, 2, 1);
+                printf("|------------------------------+---------------+-------------------------|\n");
+
+                //Sørensen–Dice Coefficient
+                binaryCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, 3, 1);
+                printf("|------------------------------+---------------+-------------------------|\n");
+
+                //Optimal String Alignment Distance
+                binaryCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, 4, 1);
+                printf("|------------------------------+---------------+-------------------------|\n");
+
+                //Damerau-Levenshtein Distance
+                binaryCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, 5, 1);
+                printf("|------------------------------+---------------+-------------------------|\n");
+
+                //Jaro Distance
+                binaryCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, 6, 1);
+                printf("|------------------------------+---------------+-------------------------|\n");
+
+                //Jaro-Winkler Distance
+                binaryCheck(WordArray.WordArray, WordArray.WordCount, ActionChoice, 7, 1);
+
+                printf("--------------------------------------------------------------------------\n");
+            }
+            else printf("Only possible on sorted data\n");
+
+            printf("\n\n");
+
+            //cleanup word array
+            free(WordArray.WordArray);
+            WordArray.WordArray = NULL;
+
+            //Hash Table:
+
+            //max size of hash table
+            int MaxSize = 10000;
+
+            //create the hash table from the list of words
+            struct ReturnHash WordHashTable = initHash(FileType, MaxSize);
+            if (WordHashTable.WordCount == -1) return -1;
+
+            printf("**Method: Hash Table**\n");
+            printf("--------------------------------------------------------------------------\n");
+            printf("|Algorithm:                    |StringFound:   |Suggestions:             |\n");
+            printf("|------------------------------+---------------+-------------------------|\n");
+
+            //no algorithm
+            HashChecker(WordHashTable.HashTable, MaxSize, WordHashTable.WordCount, ActionChoice, 0, 1);
+            printf("|------------------------------+---------------+-------------------------|\n");
+
+            //Levenshtein Distance
+            HashChecker(WordHashTable.HashTable, MaxSize, WordHashTable.WordCount, ActionChoice, 1, 1);
+            printf("|------------------------------+---------------+-------------------------|\n");
+
+            //Hamming Distance
+            HashChecker(WordHashTable.HashTable, MaxSize, WordHashTable.WordCount, ActionChoice, 2, 1);
+            printf("|------------------------------+---------------+-------------------------|\n");
+
+            //Sørensen–Dice Coefficient
+            HashChecker(WordHashTable.HashTable, MaxSize, WordHashTable.WordCount, ActionChoice, 3, 1);
+            printf("|------------------------------+---------------+-------------------------|\n");
+
+            //Optimal String Alignment Distance
+            HashChecker(WordHashTable.HashTable, MaxSize, WordHashTable.WordCount, ActionChoice, 4, 1);
+            printf("|------------------------------+---------------+-------------------------|\n");
+
+            //Damerau-Levenshtein Distance
+            HashChecker(WordHashTable.HashTable, MaxSize, WordHashTable.WordCount, ActionChoice, 5, 1);
+            printf("|------------------------------+---------------+-------------------------|\n");
+
+            //Jaro Distance
+            HashChecker(WordHashTable.HashTable, MaxSize, WordHashTable.WordCount, ActionChoice, 6, 1);
+            printf("|------------------------------+---------------+-------------------------|\n");
+
+            //Jaro-Winkler Distance
+            HashChecker(WordHashTable.HashTable, MaxSize, WordHashTable.WordCount, ActionChoice, 7, 1);
+
+            printf("--------------------------------------------------------------------------\n");
+            printf("\n\n");
+
+            //cleanup hash table
+            struct WordNode *tmp, *currentNode;
+            for (int i = 0; i < MaxSize; i++)
+            {
+                if (WordHashTable.HashTable[i].head != NULL && WordHashTable.HashTable[i].tail != NULL)
+                {
+                    currentNode = WordHashTable.HashTable[i].head;
+                    while(currentNode->next != NULL)
+                    {
+                        tmp = currentNode->next;
+                        free(currentNode);
+                        currentNode = tmp;
+                    }
+                    tmp = currentNode;
+                    free(tmp);
+                }
+            }
+            
+
+            //user input (just to confirm that the user can return back to the previous menu)
+            char ActionChoice2[128];
+            printf("Type anything to enter another word: ");
+            scanf("%s", ActionChoice2);
+        }
     }
 
     return 0;
+}
+
+int AlgorithmAssessor(int FileType)
+{
+    //word array for storing all the words
+    char **MispelledWordArray;
+    MispelledWordArray = malloc(50000 * sizeof(char*));
+    int WordCount = 0;
+
+    FILE* fp;
+
+    for (int i = 0; i < 3; i++)
+    {
+        //open the three mispelled word files
+        if (i == 0) fp = fopen("../corpus/Words-Misspelled/aspell.dat.txt","r");
+        if (i == 1) fp = fopen("../corpus/Words-Misspelled/missp.dat.txt","r");
+        if (i == 2) fp = fopen("../corpus/Words-Misspelled/wikipedia.dat.txt","r");
+
+        char nextChar = ' ';
+        char nextString[50];
+
+        //for testing
+        int lineCount = 0;
+        
+        int charCount = 0;
+
+        //read all the words into a large list 
+        while (nextChar != EOF)
+        {
+            nextChar = fgetc(fp);
+
+            if (nextChar != '\n')
+            {
+                nextString[charCount] = nextChar;
+                charCount++;
+            }
+
+            else if (nextChar == '\n')
+            {
+                nextString[charCount] = '\0';
+                //printf("%s\n", nextString);
+
+                MispelledWordArray[WordCount] = malloc(50 * sizeof(char));
+                strcpy(MispelledWordArray[WordCount], nextString);
+                WordCount++;
+                
+                lineCount++;
+                charCount = 0;
+            }
+        }
+    }
+
+    //begin testing loop
+
+    
+
+    //cleanup
+    free(MispelledWordArray);
+    MispelledWordArray = NULL;
+
+    char FinalAction[128];
+    printf("Type anything to enter another word: ");
+    scanf("%s", FinalAction);
+    return 0 ;
 }

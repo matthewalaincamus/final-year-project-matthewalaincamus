@@ -99,15 +99,21 @@ def DataReader(duplicateFlag : bool, sortFlag : bool, testFlag : bool):
                             for split4 in fourthSplit:
                                 #if word longer than 1 length allow it
                                 if len(split4) > 1:
-                                    #duplicate check
-                                    if duplicateFlag == False:
-                                        if split4 not in WordArrayNoDuplicates:
-                                            #if not alread checked, add to list then add to file
-                                            WordArrayNoDuplicates[split4] = 1
+                                    #check it only has valid chars
+                                    wordCheck = 0
+                                    for letter in split4:
+                                        if ord(letter) < 97 or ord > 122:
+                                            wordCheck+=1
+                                    if wordCheck == 0:
+                                        
+                                        #duplicate check
+                                        if duplicateFlag == False:
+                                            if split4 not in WordArrayNoDuplicates:
+                                                WordArrayNoDuplicates[split4] = 1
+                                                WordCount+=1
+                                        else:
+                                            WordArrayDuplicates.append(split4)
                                             WordCount+=1
-                                    else:
-                                        WordArrayDuplicates.append(split4)
-                                        WordCount+=1
                             
 
             #close afterwards

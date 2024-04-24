@@ -28,6 +28,7 @@ corpus:
     -The folder "Texts" contains the entire corpus that the main spell checker files use
     -the combined size of these corpora is around 4.6 GB, so downloading them would take time and space.
     -the texts are divided into 10 sub corpora, which each have varying numbers of word files of varying length as to test the spell checkers with wordcounts of different sizes.
+    -For anyone wanting to use the system, corpora 'D' is the only small folder which should take less than a second to extract. All other corpora options will take a few minutes to compile given their size.
 
 project-writeup:
     -contains all files used for designing and then writing up the findings for the final report

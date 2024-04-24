@@ -1,4 +1,5 @@
 import os
+from os.path import exists
 
 import ListGenerator
 import SpellChecker
@@ -14,7 +15,7 @@ def mainMenu():
         os.system("cls")
 
         #introduce the system
-        print("***Welcome to Matthew Camus's spell checking software***")
+        print("***Welcome to Matthew Camus's spell checking software in Python***")
         print("")
 
         #show user options that they can do
@@ -447,36 +448,85 @@ def AutoTesterMenu():
         while inputCheck == 1:
             #user input
             ActionChoice = input(": ")
-
-            if ActionChoice == "A" or ActionChoice == "a":
                 
-                errorCheck = ListGenerator.DataReader(0, 0, 1)
+            if ActionChoice == "A" or ActionChoice == "a":
 
-                #if -1, an error occured.
-                #if 0, then reload the page again
-                if errorCheck == 0:
-                    #perform the automated spell checking
-                    errorCheck = SpellChecker.AutoSpellChecker(1)
+                #check if the file exists already
+                if os.path.exists("./GeneratedFiles/LWND.txt") == True:
+                    print("A file of this type exists, do you want to use it (y/n)?")
+                    ActionChoice = input(": ")
 
-                    if errorCheck == 0: inputCheck = 2
+                    if ActionChoice == "Y" or ActionChoice == "y":
+                        #perform the automated spell checking
+                        errorCheck = SpellChecker.AutoSpellChecker(1)
+
+                        if errorCheck == 0: inputCheck = 2
+                        elif errorCheck == -1: inputCheck = -1
+                    else:
+                        errorCheck = ListGenerator.DataReader(0, 0, 1)
+                        #if -1, an error occured.
+                        #if 0, then reload the page again
+                        if errorCheck == 0:
+                            #perform the automated spell checking
+                            errorCheck = SpellChecker.AutoSpellChecker(1)
+
+                            if errorCheck == 0: inputCheck = 2
+                            elif errorCheck == -1: inputCheck = -1
+
+                        elif errorCheck == -1: inputCheck = -1
+                else:
+                    errorCheck = ListGenerator.DataReader(0, 0, 1)
+
+                    #if -1, an error occured.
+                    #if 0, then reload the page again
+                    if errorCheck == 0:
+                        #perform the automated spell checking
+                        errorCheck = SpellChecker.AutoSpellChecker(1)
+
+                        if errorCheck == 0: inputCheck = 2
+                        elif errorCheck == -1: inputCheck = -1
+
                     elif errorCheck == -1: inputCheck = -1
-
-                elif errorCheck == -1: inputCheck = -1
 
             if ActionChoice == "B" or ActionChoice == "b":
                 
-                errorCheck = ListGenerator.DataReader(0, 1, 1)
+                #check if the file exists already
+                if os.path.exists("./GeneratedFiles/LWNDS.txt") == True:
+                    print("A file of this type exists, do you want to use it (y/n)?")
+                    ActionChoice = input(": ")
 
-                #if -1, an error occured.
-                #if 0, then reload the page again
-                if errorCheck == 0:
-                    #perform the automated spell checking
-                    errorCheck = SpellChecker.AutoSpellChecker(3)
+                    if ActionChoice == "Y" or ActionChoice == "y":
+                        #perform the automated spell checking
+                        errorCheck = SpellChecker.AutoSpellChecker(3)
 
-                    if errorCheck == 0: inputCheck = 2
+                        if errorCheck == 0: inputCheck = 2
+                        elif errorCheck == -1: inputCheck = -1
+                    else:
+
+                        errorCheck = ListGenerator.DataReader(0, 1, 1)
+                        #if -1, an error occured.
+                        #if 0, then reload the page again
+                        if errorCheck == 0:
+                            #perform the automated spell checking
+                            errorCheck = SpellChecker.AutoSpellChecker(3)
+
+                            if errorCheck == 0: inputCheck = 2
+                            elif errorCheck == -1: inputCheck = -1
+
+                        elif errorCheck == -1: inputCheck = -1
+                else:
+                    errorCheck = ListGenerator.DataReader(0, 1, 1)
+
+                    #if -1, an error occured.
+                    #if 0, then reload the page again
+                    if errorCheck == 0:
+                        #perform the automated spell checking
+                        errorCheck = SpellChecker.AutoSpellChecker(3)
+
+                        if errorCheck == 0: inputCheck = 2
+                        elif errorCheck == -1: inputCheck = -1
+
                     elif errorCheck == -1: inputCheck = -1
-
-                elif errorCheck == -1: inputCheck = -1
 
             elif ActionChoice == "Z" or ActionChoice ==  "z": inputCheck = 0
             

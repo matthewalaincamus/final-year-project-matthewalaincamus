@@ -154,7 +154,7 @@ int DataReader(int duplicateFlag, int sortFlag, int testFlag)
                                             if (nextChar == ' ')
                                             {
                                                 //string variable to hold the next word
-                                                char nextString[25];
+                                                char nextString[50];
 
                                                 while(nextChar != 'h')
                                                 {
@@ -171,12 +171,12 @@ int DataReader(int duplicateFlag, int sortFlag, int testFlag)
                                                 int charCount = 0;
                                                 while(nextChar != '"')
                                                 {
-                                                    if (isdigit(nextChar))
+                                                    if (isdigit(nextChar) || (int)nextChar < 97 ||(int)nextChar > 122)
                                                     {
                                                         breakCheck++;
                                                         break;
                                                     }
-                                                    else if (nextChar == '/' || nextChar == '-')
+                                                    else if (nextChar == '/' || nextChar == '-' || nextChar == '.' || nextChar == '*')
                                                     {
                                                         nextString[charCount] = '\0';
                                                         //word shouldn't have numbers or start on anything other than a letter
@@ -200,7 +200,7 @@ int DataReader(int duplicateFlag, int sortFlag, int testFlag)
 
                                                             if((duplicateCheck == 0 && duplicateFlag == 0) || (duplicateFlag == 1))
                                                             {
-                                                                WordArray[WordCount] = malloc(25 * sizeof(char));
+                                                                WordArray[WordCount] = malloc(50 * sizeof(char));
                                                                 strcpy(WordArray[WordCount], nextString);
                                                                 WordCount++;
 
@@ -244,7 +244,7 @@ int DataReader(int duplicateFlag, int sortFlag, int testFlag)
 
                                                     if((duplicateCheck == 0 && duplicateFlag == 0) || (duplicateFlag == 1))
                                                     {
-                                                        WordArray[WordCount] = malloc(25 * sizeof(char));
+                                                        WordArray[WordCount] = malloc(50 * sizeof(char));
                                                         strcpy(WordArray[WordCount], nextString);
                                                         WordCount++;
 
@@ -305,11 +305,6 @@ int DataReader(int duplicateFlag, int sortFlag, int testFlag)
 
     //cleanup
     fclose(Wfp);
-    for (int i = 0; i < WordCount - 1 ;i++)
-    {
-        free(WordArray[i]);
-        WordArray[i] = NULL;
-    }
     free(WordArray);
     WordArray = NULL;
 
