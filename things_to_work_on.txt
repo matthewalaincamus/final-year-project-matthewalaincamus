@@ -13,9 +13,6 @@ notes:
 *things to discuss at next meeting:
    - should I work on any more methods (e.g tree data structure, python dictionaries, parallel search ect)
    - should I implement a profanity filter / do something to regard ethics in the final report
-   - should some simple form of user testing be done?
-   - should I try to use the misspelled words corpus for testing
-   - is what i've done enough to be graded highly?
    - ask about referencing figures
-   - ask how much I should explain to the assessor (explain linear search?)
-   - is pseudocode better for explaining the algorithms?
+   - ask how much I should explain to the assessor (explain linear search?): don't
+   - is pseudocode better for explaining the algorithms?: yes, but make simpler
