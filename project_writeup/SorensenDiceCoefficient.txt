@@ -1,27 +1,25 @@
-algorithm Sørensen–Dice Coefficient is
-	input: strings a[0 ... length(a)], b[0 ... length(b)]
-	output: distance, float
+Algorithm Sørensen–Dice Coefficient is
+	input: strings A[0 ... length(A)], B[0 ... length(B)]
+	output: distance: float
 
 	//score counter for how many bigram are matching
-	matches = 0
+	let matches := 0
 
 	let i := 0
 	let j := 0
 
 	//loop though both strings, comparing the bigrams for matches
-	while i < length(a) - 1 and j < length(b) - 1 inclusive do
+	while i < length(A) - 1 and j < length(B) - 1 do
 		
-		//get the next bigram from each string
-		let bigram1 = [ a[i], a[i+1] ]
-		let bigram2 = [ b[j], b[j+1] ]
+		let bigram1 = next two characters from string A
+		let bigram2 = next two characters from string B
 
-		//if they are identical update the count
 		if bigram1 = bigram2 then
-			matches = matches + 1
+			increment matches by 1
 
-		i = i + 1
-		j = j + 1
+		increment i by 1
+		increment j by 1
 
 
-	return (2 * matches) / ( (length(a) - 1) + (length(b) - 1 ) )
+	return (2 * matches) / ( (length(A) - 1) + (length(B) - 1 ) )
 

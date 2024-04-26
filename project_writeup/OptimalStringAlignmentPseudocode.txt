@@ -1,0 +1,26 @@
+Algorithm OptimalStringAlignmentDistance is
+	input: strings A[0 ... length(A)], B[0 ... length(B)]
+	output: integer: distance
+
+	let CalculationMatrix be a 2D array of integers, dimensions legnth(A) + 1, length(B) + 1
+
+	//initialise the first values of the matrix
+	for the length of string A do
+		set the first value of each row of the CalculationMatrix to be the value of its index
+	for the length of string B do
+		set the first value of each column of the CalculationMatrix to be the value of its index
+
+	for the length of string A do
+		for the length of string B do
+			if current character of string A = current character of stirng B then
+				let Cost := 0
+			else
+				let Cost := 1
+				
+			set current CalculationMatrix[i][j] value to minimum cost process between insertion, deletion or substitution
+			
+			if a transposition is possible to perform then
+				set current CalculationMatrix[i][j] value to minimum cost between current value or cost of a transposition
+
+	return last value in CalculationMatrix
+

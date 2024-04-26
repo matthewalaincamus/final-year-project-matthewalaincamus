@@ -1,27 +1,23 @@
-algorithm levenshteinDistance is 
-	input: strings a[0 ... length(a)], b[0 ... length(b)]
-	output: distance, integer
+Algorithm LevenshteinDistance is 
+	input: strings: A[0 ... length(a)], B[0 ... length(b)]
+	output: integer: distance
 
-	let CalculationMatrix[0 ... length(a)+1, 0 ... length(b)+1] be a 2-d array of zeros, dimensions length(a)+1, length(b)
+	let CalculationMatrix be a 2-d array of zeros, dimensions length(A)+1, length(B)+1
 
-	//initialise the first row of the matrix	
-	for i := 0 to length(a) inclusive do
-		CalculationMatrix[i][0] := i
-	for j := 0 to length(a) inclusive do
-		CalculationMatrix[0][j] := j
+	//initialise the first values of the matrix
+	for the length of string A do
+		set the first value of each row of the CalculationMatrix to be the value of its index
+	for the length of string B do
+		set the first value of each column of the CalculationMatrix to be the value of its index
 
-	for i := 1 to length(a) inclusive do
-		for j := 1 to length(b) inclusive do
-			if a[i-1] = b[j-1] then
-				#characters match, do nothing
-				CalculationMatrix[i][j] := CalculationMatrix[i-1][j-1]
+	for the length of string A do
+		for the length of string B do
+			if current character of string A = current character of stirng B then
+				set current CalculationMatrix value to the previous CalculationMatrix value
 			else
-				#characters don't match, choose minimum cost from insertion, deletion, substitution
-				CalculationMatrix[i][j] := 1 + min(
-								CalculationMatrix[i][j-1],
-								CalculationMatrix[i-1][j],
-								CalculationMatrix[i-1][j-1])
-	return CalculationMatrix[length(a)][length(b)]
+				set current CalculationMatrix[i][j] value to 1 + minimum cost process between insertion, deletion or substitution
+	
+	return last value in CalculationMatrix
 	
 
 	

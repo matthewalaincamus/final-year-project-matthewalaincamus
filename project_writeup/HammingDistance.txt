@@ -1,19 +1,15 @@
-algorithm HammingDistance is
-	input: strings a[0 ... length(a)], b[0 ... length(b)]
-	output: distance, integer
+Algorithm HammingDistance is
+	input: strings A[0 ... length(A)], B[0 ... length(B)]
+	output: distance: integer
 
-	//both strings need to be the same length
-	if length(a) != length(b) then
-		return -1
+	if length(A) doesn't = length(B) then
+		return error
 
-	//score for the difference between the two strings
-	//the larger the score, the more different the two strings are
 	let score := 0
 
-	//loop through the strings, and update the count when differences are found
-	for i := 0 to length(a) - 1 inclusive do
-		if a[i] != b[i] then
-			score := score + 1
+	for the length(A) do
+		if the next character in A = the equivalent character in B then
+			increment score by 1
 
 	return score
 

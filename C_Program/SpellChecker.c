@@ -3,10 +3,10 @@
 //skeleton functions for use later
 struct WordsListing WordFetcher(int FileType);
 struct ReturnHash initHash(int FileType, int MaxSize);
-struct TimeAndSuggestion linearCheck(char ** WordArray, int WordCount, char wordString[], int AlgorithmCheck, int TestFlag, char TestString);
-struct TimeAndSuggestion binaryCheck(char ** WordArray, int WordCount, char wordString[], int AlgorithmCheck, int TestFlag, char TestString);
+struct TimeAndSuggestion linearCheck(char ** WordArray, int WordCount, char wordString[], int AlgorithmCheck, int TestFlag, char TestString[]);
+struct TimeAndSuggestion binaryCheck(char ** WordArray, int WordCount, char wordString[], int AlgorithmCheck, int TestFlag, char TestString[]);
 int binarySearch(char** WordArray, int leftValue, int rightValue, char wordString[]);
-struct TimeAndSuggestion HashChecker(struct WordHashItem *HashTable, int MaxSize, int WordCount, char wordString[], int AlgorithmCheck, int TestFlag, char TestString);
+struct TimeAndSuggestion HashChecker(struct WordHashItem *HashTable, int MaxSize, int WordCount, char wordString[], int AlgorithmCheck, int TestFlag, char TestString[]);
 int LevenshteinDistance(char string1[], char string2[], int len1, int len2);
 int HammingDistance(char string1[], char string2[], int len1, int len2);
 int SorensenDiceCoefficient(char string1[], char string2[], int len1, int len2);
@@ -391,7 +391,7 @@ struct ReturnHash initHash(int FileType, int MaxSize)
 }
 
 //linear search checker
-struct TimeAndSuggestion linearCheck(char ** WordArray, int WordCount, char wordString[], int AlgorithmCheck, int TestFlag, char TestString)
+struct TimeAndSuggestion linearCheck(char ** WordArray, int WordCount, char wordString[], int AlgorithmCheck, int TestFlag, char TestString[])
 {
     //start timer:
     struct timeb Start;
@@ -500,7 +500,7 @@ struct TimeAndSuggestion linearCheck(char ** WordArray, int WordCount, char word
 }
 
 //binary search checker
-struct TimeAndSuggestion binaryCheck(char ** WordArray, int WordCount, char wordString[], int AlgorithmCheck, int TestFlag, char TestString)
+struct TimeAndSuggestion binaryCheck(char ** WordArray, int WordCount, char wordString[], int AlgorithmCheck, int TestFlag, char TestString[])
 {
     //start timer:
     struct timeb Start;
@@ -598,7 +598,7 @@ struct TimeAndSuggestion binaryCheck(char ** WordArray, int WordCount, char word
 }
 
 //hash table checker
-struct TimeAndSuggestion HashChecker(struct WordHashItem *HashTable, int MaxSize, int WordCount, char wordString[], int AlgorithmCheck, int TestFlag, char TestString)
+struct TimeAndSuggestion HashChecker(struct WordHashItem *HashTable, int MaxSize, int WordCount, char wordString[], int AlgorithmCheck, int TestFlag, char TestString[])
 {
     //start timer:
     struct timeb Start;
@@ -947,56 +947,73 @@ int OptimalStringAlignmentDistance(char string1[], char string2[], int len1, int
 //Damerau-Levenshtein distance calculator
 int DamerauLevenshteinDistance(char string1[], char string2[], int len1, int len2)
 {
-    //make an array of the size of the alphabet for calculations
-    int alphabet[26];
-
-    for (int i = 0; i < 26; i++) alphabet[i] = 0;
-
-    //array to store results of calculations
+    
+    //create the 2D array for storing calculations
     int CalculationArray[len1+2][len2+2];
 
-    //get the maximum distance
-    int maxDist = len1 + len2;
-    CalculationArray[0][0] = maxDist;
-
-    //setup the starting values to the array
-    for (int i = 1; i <= len1; i++)
-    {
-        CalculationArray[i][0] = maxDist;
-        CalculationArray[i][1] = i-1;
-    }
-    for (int j = 1; j <= len2; j++)
-    {
-        CalculationArray[0][j] = maxDist;
-        CalculationArray[1][j] = j-1;
-    }
-
-    //main calculation loop
+    //max distance for transpositions 
+    int MaxDist = len1 + len2;
+    
+    CalculationArray[0][0] = MaxDist;
     for (int i = 0; i <= len1; i++)
     {
-        int db = 0;
-        for (int j = 0; j <= len2; j++)
-        {
-            int k = alphabet[(int)string2[j] % 97];
-            int l = db;
-            int cost;
-
-            if (string1[i] == string2[j])
-            {
-                cost = 0;
-                db = j;
-            }
-            else cost = 1;
-
-            CalculationArray[i+2][j+2] = Min( Min(CalculationArray[i+1][j+1]+cost, //substitution
-                                                    CalculationArray[i+2][j+1]+1 ), //insertion
-                                              Min(CalculationArray[i+1][j+2]+1, //deletion
-                                                    CalculationArray[k][l]+(i-k+1)+1+(j-l+1)) ); //transpostion
-        alphabet[(int)string1[i]%97] = i+2;
-        }
+        CalculationArray[i+1][1] = i;
+        CalculationArray[i+1][0] = MaxDist;
+    }
+    for (int j = 0; j <= len2; j++)
+    {
+        CalculationArray[1][j+1] = j;
+        CalculationArray[0][j+1] = MaxDist;
     }
 
-    return CalculationArray[len1+2][len2+2];
+    //store the row where a given character last appeared in string1
+    int lastRow[256];
+    
+    for (int d = 0; d < 256; d++)
+        lastRow[d] = 0;
+
+    // calculation loop
+    for (int i = 1; i <= len1; i++)
+    {
+        //convert to unsigned so that they can be used as an index to last_row
+        unsigned char string1Char = string1[i-1];
+        
+        // The last column this row where the character in string1 matched the character in string2
+        int lastMatchingCol = 0;
+
+        for (int j = 1; j <= len2; j++)
+        {
+            //convert to unsigned so that they can be used as an index to last_row
+            unsigned char string2Char = string2[j-1];
+            
+            // The last place in string1 where we can find the current character in string2
+            int lastMatchingRow = lastRow[string2Char];
+
+            int cost;
+            if (string1Char == string2Char) cost = 0;
+            else cost = 1;
+
+            CalculationArray[i+1][j+1] = Min( Min(CalculationArray[i][j+1] + 1, //insertion
+                                               CalculationArray[i+1][j] + 1), //deletion
+                                               Min(CalculationArray[i][j] + cost, //substitution
+                                               CalculationArray[lastMatchingRow][lastMatchingCol]
+                                                + (i - lastMatchingRow - 1) + 1
+                                                + (j - lastMatchingCol - 1) ) ); //transposition
+
+
+            // If there was a match, update the last matching column
+            if (cost == 0)
+                lastMatchingCol = j;
+        }
+
+        // Update the entry for this row's character
+        lastRow[string1Char] = i;
+    }
+
+    // Extract the bottom right-most cell -- that's the total distance
+    int result = CalculationArray[len1+1][len2+1];
+
+    return result;
 }
 
 //Jaro Similarity calculator
@@ -1360,20 +1377,19 @@ int AlgorithmAssessor(int FileType)
 {
     //word array for storing all the words
     char **CorrectspelledWordArray;
-    CorrectspelledWordArray = malloc(10000 * sizeof(char*));
-    struct MisspelledWord* MisspelledWordArray = (struct MisspelledWord*) malloc(40000 * sizeof(struct MisspelledWord));
+    CorrectspelledWordArray = malloc(6000 * sizeof(char*));
+    struct MisspelledWord* MisspelledWordArray = (struct MisspelledWord*) malloc(6000 * sizeof(struct MisspelledWord));
     
     int CorrectWordCount = 0;
     int IncorrectWordCount = 0;
 
     FILE* fp;
 
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 2; i++)
     {
         
         //open the three mispelled word files
         if (i == 0) fp = fopen("../corpus/Words-Misspelled/aspell.dat.txt","r");
-        if (i == 1) fp = fopen("../corpus/Words-Misspelled/missp.dat.txt","r");
         if (i == 2) fp = fopen("../corpus/Words-Misspelled/wikipedia.dat.txt","r");
 
         char nextChar = ' ';
@@ -1487,7 +1503,6 @@ int AlgorithmAssessor(int FileType)
     struct TimeAndSuggestion NoAlgorithmLinearData;
     struct TimeAndSuggestion NoAlgorithmBinaryData;
     struct TimeAndSuggestion NoAlgorithmHashData;
-    int NoAlgorithmMissCount = 0;
 
     //levenshtein distance
     struct TimeAndSuggestion LevenshteinDistanceData;
@@ -1518,7 +1533,7 @@ int AlgorithmAssessor(int FileType)
     int OptimalStringAlignmentMissCount = 0;
 
     //damerau-levenshtein distance
-    struct TimeAndSuggestion DamerauLevensheinData;
+    struct TimeAndSuggestion DamerauLevenshteinData;
     struct TimeAndSuggestion DamerauLevenshteinLinearData;
     struct TimeAndSuggestion DamerauLevenshteinBinaryData;
     struct TimeAndSuggestion DamerauLevenshteinHashData;
@@ -1552,20 +1567,23 @@ int AlgorithmAssessor(int FileType)
 
     for (int i = 0; i < IncorrectWordCount; i++)
     {
-        //printf("%s -> %s\n", MisspelledWordArray[i].Word, CorrectspelledWordArray[MisspelledWordArray[i].index]);
+        printf("%s -> %s\n", MisspelledWordArray[i].Word, CorrectspelledWordArray[MisspelledWordArray[i].index]);
+        char MasterWord[50]; 
+        strcpy(MasterWord, CorrectspelledWordArray[MisspelledWordArray[i].index] + 1);
+        //printf("%s\n", MasterWord);
         
         //tmp structure to hold data returned from functions
         struct TimeAndSuggestion returnedValues;
 
         //no algorithm
-        returnedValues = linearCheck(WordArray.WordArray, WordArray.WordCount, MisspelledWordArray[i].Word, 0, 2, CorrectspelledWordArray[MisspelledWordArray[i].index]);
+        returnedValues = linearCheck(WordArray.WordArray, WordArray.WordCount, MisspelledWordArray[i].Word, 0, 2, MasterWord);
         
         NoAlgorithmLinearData.TimeTaken += returnedValues.TimeTaken;
         NoAlgorithmData.TimeTaken += returnedValues.TimeTaken;
 
         //Levenshtein Distance
-        returnedValues = linearCheck(WordArray.WordArray, WordArray.WordCount, MisspelledWordArray[i].Word, 1, 2, CorrectspelledWordArray[MisspelledWordArray[i].index]);
-        if (returnedValues.SuggestionNumber == -1) LevenshteinDistanceMissCount++;
+        returnedValues = linearCheck(WordArray.WordArray, WordArray.WordCount, MisspelledWordArray[i].Word, 1, 2, MasterWord);
+        if (returnedValues.SuggestionNumber == 0) LevenshteinDistanceMissCount++;
         
         LevenshteinDistanceLinearData.SuggestionNumber += returnedValues.SuggestionNumber;
         LevenshteinDistanceLinearData.TimeTaken += returnedValues.TimeTaken;
@@ -1573,16 +1591,16 @@ int AlgorithmAssessor(int FileType)
         LevenshteinDistanceData.TimeTaken += returnedValues.TimeTaken;
 
         //Hamming Distance
-        returnedValues = linearCheck(WordArray.WordArray, WordArray.WordCount, MisspelledWordArray[i].Word, 2, 2, CorrectspelledWordArray[MisspelledWordArray[i].index]);
-        if (returnedValues.SuggestionNumber == -1) HammingDistanceMissCount++;
+        returnedValues = linearCheck(WordArray.WordArray, WordArray.WordCount, MisspelledWordArray[i].Word, 2, 2, MasterWord);
+        if (returnedValues.SuggestionNumber == 0) HammingDistanceMissCount++;
         HammingDistanceLinearData.SuggestionNumber += returnedValues.SuggestionNumber;
         HammingDistanceLinearData.TimeTaken += returnedValues.TimeTaken;
         HammingDistanceData.SuggestionNumber += returnedValues.SuggestionNumber;
         HammingDistanceData.TimeTaken += returnedValues.TimeTaken;
 
         //Sørensen–Dice Coefficient
-        returnedValues = linearCheck(WordArray.WordArray, WordArray.WordCount, MisspelledWordArray[i].Word, 3, 2, CorrectspelledWordArray[MisspelledWordArray[i].index]);
-        if (returnedValues.SuggestionNumber == -1) SorensenDiceMissCount++;
+        returnedValues = linearCheck(WordArray.WordArray, WordArray.WordCount, MisspelledWordArray[i].Word, 3, 2, MasterWord);
+        if (returnedValues.SuggestionNumber == 0) SorensenDiceMissCount++;
         
         SorensenDiceLinearData.SuggestionNumber += returnedValues.SuggestionNumber;
         SorensenDiceLinearData.TimeTaken += returnedValues.TimeTaken;
@@ -1591,8 +1609,8 @@ int AlgorithmAssessor(int FileType)
 
 
         //Optimal String Alignment Distance
-        returnedValues = linearCheck(WordArray.WordArray, WordArray.WordCount, MisspelledWordArray[i].Word, 4, 2, CorrectspelledWordArray[MisspelledWordArray[i].index]);
-        if (returnedValues.SuggestionNumber == -1) OptimalStringAlignmentMissCount++;
+        returnedValues = linearCheck(WordArray.WordArray, WordArray.WordCount, MisspelledWordArray[i].Word, 4, 2, MasterWord);
+        if (returnedValues.SuggestionNumber == 0) OptimalStringAlignmentMissCount++;
 
         OptimalStringAlignmentLinearData.SuggestionNumber += returnedValues.SuggestionNumber;
         OptimalStringAlignmentLinearData.TimeTaken += returnedValues.TimeTaken;
@@ -1600,18 +1618,18 @@ int AlgorithmAssessor(int FileType)
         OptimalStringAlignmentData.TimeTaken += returnedValues.TimeTaken;
 
         //Damerau-Levenshtein Distance
-        returnedValues = linearCheck(WordArray.WordArray, WordArray.WordCount, MisspelledWordArray[i].Word, 5, 2, CorrectspelledWordArray[MisspelledWordArray[i].index]);
-        if (returnedValues.SuggestionNumber == -1) DamerauLevensheinMissCount++;
+        returnedValues = linearCheck(WordArray.WordArray, WordArray.WordCount, MisspelledWordArray[i].Word, 5, 2, MasterWord);
+        if (returnedValues.SuggestionNumber == 0) DamerauLevensheinMissCount++;
 
         DamerauLevenshteinLinearData.SuggestionNumber += returnedValues.SuggestionNumber;
         DamerauLevenshteinLinearData.TimeTaken += returnedValues.TimeTaken;
-        DamerauLevensheinData.SuggestionNumber += returnedValues.SuggestionNumber;
-        DamerauLevensheinData.TimeTaken += returnedValues.TimeTaken;
+        DamerauLevenshteinData.SuggestionNumber += returnedValues.SuggestionNumber;
+        DamerauLevenshteinData.TimeTaken += returnedValues.TimeTaken;
 
 
         //Jaro Distance
-        returnedValues = linearCheck(WordArray.WordArray, WordArray.WordCount, MisspelledWordArray[i].Word, 6, 2, CorrectspelledWordArray[MisspelledWordArray[i].index]);
-        if (returnedValues.SuggestionNumber == -1) JaroDistanceMissCount++;
+        returnedValues = linearCheck(WordArray.WordArray, WordArray.WordCount, MisspelledWordArray[i].Word, 6, 2, MasterWord);
+        if (returnedValues.SuggestionNumber == 0) JaroDistanceMissCount++;
 
         JaroDistanceLinearData.SuggestionNumber += returnedValues.SuggestionNumber;
         JaroDistanceLinearData.TimeTaken += returnedValues.TimeTaken;
@@ -1620,28 +1638,29 @@ int AlgorithmAssessor(int FileType)
 
 
         //Jaro-Winkler Distance
-        returnedValues = linearCheck(WordArray.WordArray, WordArray.WordCount, MisspelledWordArray[i].Word, 7, 2, CorrectspelledWordArray[MisspelledWordArray[i].index]);
-        if (returnedValues.SuggestionNumber == -1) JaroWinklerDistanceMissCount++;
+        returnedValues = linearCheck(WordArray.WordArray, WordArray.WordCount, MisspelledWordArray[i].Word, 7, 2, MasterWord);
+        if (returnedValues.SuggestionNumber == 0) JaroWinklerDistanceMissCount++;
 
         JaroWinklerDistanceLinearData.SuggestionNumber += returnedValues.SuggestionNumber;
         JaroWinklerDistanceLinearData.TimeTaken += returnedValues.TimeTaken;
         JaroWinklerDistanceData.SuggestionNumber += returnedValues.SuggestionNumber;
         JaroWinklerDistanceData.TimeTaken += returnedValues.TimeTaken;
 
+
         //**binary:
         //need a sorted array to use this
         if (FileType == 3)
         {
             //no algorithm
-            returnedValues = binaryCheck(WordArray.WordArray, WordArray.WordCount, MisspelledWordArray[i].Word, 0, 2, CorrectspelledWordArray[MisspelledWordArray[i].index]);
+            returnedValues = binaryCheck(WordArray.WordArray, WordArray.WordCount, MisspelledWordArray[i].Word, 0, 2, MasterWord);
             
             NoAlgorithmBinaryData.TimeTaken += returnedValues.TimeTaken;
             NoAlgorithmData.TimeTaken += returnedValues.TimeTaken;
         
 
             //Levenshtein Distance
-            returnedValues = binaryCheck(WordArray.WordArray, WordArray.WordCount, MisspelledWordArray[i].Word, 1, 2, CorrectspelledWordArray[MisspelledWordArray[i].index]);
-            if (returnedValues.SuggestionNumber == -1) LevenshteinDistanceMissCount++;
+            returnedValues = binaryCheck(WordArray.WordArray, WordArray.WordCount, MisspelledWordArray[i].Word, 1, 2, MasterWord);
+            if (returnedValues.SuggestionNumber == 0) LevenshteinDistanceMissCount++;
             
             LevenshteinDistanceBinaryData.SuggestionNumber += returnedValues.SuggestionNumber;
             LevenshteinDistanceBinaryData.TimeTaken += returnedValues.TimeTaken;
@@ -1650,8 +1669,8 @@ int AlgorithmAssessor(int FileType)
 
 
             //Hamming Distance
-            returnedValues = binaryCheck(WordArray.WordArray, WordArray.WordCount, MisspelledWordArray[i].Word, 2, 2, CorrectspelledWordArray[MisspelledWordArray[i].index]);
-            if (returnedValues.SuggestionNumber == -1) HammingDistanceMissCount++;
+            returnedValues = binaryCheck(WordArray.WordArray, WordArray.WordCount, MisspelledWordArray[i].Word, 2, 2, MasterWord);
+            if (returnedValues.SuggestionNumber == 0) HammingDistanceMissCount++;
 
             HammingDistanceBinaryData.SuggestionNumber += returnedValues.SuggestionNumber;
             HammingDistanceBinaryData.TimeTaken += returnedValues.TimeTaken;
@@ -1660,8 +1679,8 @@ int AlgorithmAssessor(int FileType)
 
 
             //Sørensen–Dice Coefficient
-            returnedValues = binaryCheck(WordArray.WordArray, WordArray.WordCount, MisspelledWordArray[i].Word, 3, 2, CorrectspelledWordArray[MisspelledWordArray[i].index]);
-            if (returnedValues.SuggestionNumber == -1) SorensenDiceMissCount++;
+            returnedValues = binaryCheck(WordArray.WordArray, WordArray.WordCount, MisspelledWordArray[i].Word, 3, 2, MasterWord);
+            if (returnedValues.SuggestionNumber == 0) SorensenDiceMissCount++;
             
             SorensenDiceBinaryData.SuggestionNumber += returnedValues.SuggestionNumber;
             SorensenDiceBinaryData.TimeTaken += returnedValues.TimeTaken;
@@ -1669,8 +1688,8 @@ int AlgorithmAssessor(int FileType)
             SorensenDiceData.TimeTaken += returnedValues.TimeTaken;
 
             //Optimal String Alignment Distance
-            returnedValues = binaryCheck(WordArray.WordArray, WordArray.WordCount, MisspelledWordArray[i].Word, 4, 2, CorrectspelledWordArray[MisspelledWordArray[i].index]);
-            if (returnedValues.SuggestionNumber == -1) OptimalStringAlignmentMissCount++;
+            returnedValues = binaryCheck(WordArray.WordArray, WordArray.WordCount, MisspelledWordArray[i].Word, 4, 2, MasterWord);
+            if (returnedValues.SuggestionNumber == 0) OptimalStringAlignmentMissCount++;
 
             OptimalStringAlignmentBinaryData.SuggestionNumber += returnedValues.SuggestionNumber;
             OptimalStringAlignmentBinaryData.TimeTaken += returnedValues.TimeTaken;
@@ -1679,18 +1698,18 @@ int AlgorithmAssessor(int FileType)
 
 
             //Damerau-Levenshtein Distance
-            returnedValues = binaryCheck(WordArray.WordArray, WordArray.WordCount, MisspelledWordArray[i].Word, 5, 2, CorrectspelledWordArray[MisspelledWordArray[i].index]);
-            if (returnedValues.SuggestionNumber == -1) DamerauLevensheinMissCount++;
+            returnedValues = binaryCheck(WordArray.WordArray, WordArray.WordCount, MisspelledWordArray[i].Word, 5, 2, MasterWord);
+            if (returnedValues.SuggestionNumber == 0) DamerauLevensheinMissCount++;
 
             DamerauLevenshteinBinaryData.SuggestionNumber += returnedValues.SuggestionNumber;
             DamerauLevenshteinBinaryData.TimeTaken += returnedValues.TimeTaken;
-            DamerauLevensheinData.SuggestionNumber += returnedValues.SuggestionNumber;
-            DamerauLevensheinData.TimeTaken += returnedValues.TimeTaken;
+            DamerauLevenshteinData.SuggestionNumber += returnedValues.SuggestionNumber;
+            DamerauLevenshteinData.TimeTaken += returnedValues.TimeTaken;
 
 
             //Jaro Distance
-            returnedValues = binaryCheck(WordArray.WordArray, WordArray.WordCount, MisspelledWordArray[i].Word, 6, 2, CorrectspelledWordArray[MisspelledWordArray[i].index]);
-            if (returnedValues.SuggestionNumber == -1) JaroDistanceMissCount++;
+            returnedValues = binaryCheck(WordArray.WordArray, WordArray.WordCount, MisspelledWordArray[i].Word, 6, 2, MasterWord);
+            if (returnedValues.SuggestionNumber == 0) JaroDistanceMissCount++;
             
             JaroDistanceBinaryData.SuggestionNumber += returnedValues.SuggestionNumber;
             JaroDistanceBinaryData.TimeTaken += returnedValues.TimeTaken;
@@ -1699,75 +1718,69 @@ int AlgorithmAssessor(int FileType)
 
 
             //Jaro-Winkler Distance
-            returnedValues = binaryCheck(WordArray.WordArray, WordArray.WordCount, MisspelledWordArray[i].Word, 7, 2, CorrectspelledWordArray[MisspelledWordArray[i].index]);
-            if (returnedValues.SuggestionNumber == -1) JaroWinklerDistanceMissCount++;
+            returnedValues = binaryCheck(WordArray.WordArray, WordArray.WordCount, MisspelledWordArray[i].Word, 7, 2, MasterWord);
+            if (returnedValues.SuggestionNumber == 0) JaroWinklerDistanceMissCount++;
 
             JaroWinklerDistanceBinaryData.SuggestionNumber += returnedValues.SuggestionNumber;
             JaroWinklerDistanceBinaryData.TimeTaken += returnedValues.TimeTaken;
             JaroWinklerDistanceData.SuggestionNumber += returnedValues.SuggestionNumber;
             JaroWinklerDistanceData.TimeTaken += returnedValues.TimeTaken;
-
-
         }
 
         //no algorithm
-        returnedValues = HashChecker(WordHashTable.HashTable, MaxSize, WordHashTable.WordCount, MisspelledWordArray[i].Word, 0, 2, CorrectspelledWordArray[MisspelledWordArray[i].index]);
+        returnedValues = HashChecker(WordHashTable.HashTable, MaxSize, WordHashTable.WordCount, MisspelledWordArray[i].Word, 0, 2, MasterWord);
 
         NoAlgorithmHashData.TimeTaken += returnedValues.TimeTaken;
         NoAlgorithmData.TimeTaken += returnedValues.TimeTaken;
 
         //Levenshtein Distance
-        returnedValues = HashChecker(WordHashTable.HashTable, MaxSize, WordHashTable.WordCount, MisspelledWordArray[i].Word, 1, 2, CorrectspelledWordArray[MisspelledWordArray[i].index]);
-        if (returnedValues.SuggestionNumber == -1) LevenshteinDistanceMissCount++;
+        returnedValues = HashChecker(WordHashTable.HashTable, MaxSize, WordHashTable.WordCount, MisspelledWordArray[i].Word, 1, 2, MasterWord);
+        if (returnedValues.SuggestionNumber == 0) LevenshteinDistanceMissCount++;
 
         LevenshteinDistanceHashData.SuggestionNumber += returnedValues.SuggestionNumber;
         LevenshteinDistanceHashData.TimeTaken += returnedValues.TimeTaken;
         LevenshteinDistanceData.SuggestionNumber += returnedValues.SuggestionNumber;
         LevenshteinDistanceData.TimeTaken += returnedValues.TimeTaken;
 
-
         //Hamming Distance
-        returnedValues = HashChecker(WordHashTable.HashTable, MaxSize, WordHashTable.WordCount, MisspelledWordArray[i].Word, 2, 2, CorrectspelledWordArray[MisspelledWordArray[i].index]);
-        if (returnedValues.SuggestionNumber == -1) HammingDistanceMissCount++;
+        returnedValues = HashChecker(WordHashTable.HashTable, MaxSize, WordHashTable.WordCount, MisspelledWordArray[i].Word, 2, 2, MasterWord);
+        if (returnedValues.SuggestionNumber == 0) HammingDistanceMissCount++;
 
         HammingDistanceHashData.SuggestionNumber += returnedValues.SuggestionNumber;
         HammingDistanceHashData.TimeTaken += returnedValues.TimeTaken;
         HammingDistanceData.SuggestionNumber += returnedValues.SuggestionNumber;
         HammingDistanceData.TimeTaken += returnedValues.TimeTaken;
 
-
         //Sørensen–Dice Coefficient
-        returnedValues = HashChecker(WordHashTable.HashTable, MaxSize, WordHashTable.WordCount, MisspelledWordArray[i].Word, 3, 2, CorrectspelledWordArray[MisspelledWordArray[i].index]);
-        if (returnedValues.SuggestionNumber == -1) SorensenDiceMissCount++;
+        returnedValues = HashChecker(WordHashTable.HashTable, MaxSize, WordHashTable.WordCount, MisspelledWordArray[i].Word, 3, 2, MasterWord);
+        if (returnedValues.SuggestionNumber == 0) SorensenDiceMissCount++;
 
         SorensenDiceHashData.SuggestionNumber += returnedValues.SuggestionNumber;
         SorensenDiceHashData.TimeTaken += returnedValues.TimeTaken;
         SorensenDiceData.SuggestionNumber += returnedValues.SuggestionNumber;
         SorensenDiceData.TimeTaken += returnedValues.TimeTaken;
 
-
         //Optimal String Alignment Distance
-        returnedValues = HashChecker(WordHashTable.HashTable, MaxSize, WordHashTable.WordCount, MisspelledWordArray[i].Word, 4, 2, CorrectspelledWordArray[MisspelledWordArray[i].index]);
-        if (returnedValues.SuggestionNumber == -1) OptimalStringAlignmentMissCount++;
+        returnedValues = HashChecker(WordHashTable.HashTable, MaxSize, WordHashTable.WordCount, MisspelledWordArray[i].Word, 4, 2, MasterWord);
+        if (returnedValues.SuggestionNumber == 0) OptimalStringAlignmentMissCount++;
 
         OptimalStringAlignmentHashData.SuggestionNumber += returnedValues.SuggestionNumber;
         OptimalStringAlignmentHashData.TimeTaken += returnedValues.TimeTaken;
         OptimalStringAlignmentData.SuggestionNumber += returnedValues.SuggestionNumber;
         OptimalStringAlignmentData.TimeTaken += returnedValues.TimeTaken;
 
-
         //Damerau-Levenshtein Distance
-        returnedValues = HashChecker(WordHashTable.HashTable, MaxSize, WordHashTable.WordCount, MisspelledWordArray[i].Word, 5, 2, CorrectspelledWordArray[MisspelledWordArray[i].index]);
-        if (returnedValues.SuggestionNumber == -1) DamerauLevensheinMissCount++;
+        returnedValues = HashChecker(WordHashTable.HashTable, MaxSize, WordHashTable.WordCount, MisspelledWordArray[i].Word, 5, 2, MasterWord);
+        if (returnedValues.SuggestionNumber == 0) DamerauLevensheinMissCount++;
 
         DamerauLevenshteinHashData.SuggestionNumber += returnedValues.SuggestionNumber;
         DamerauLevenshteinHashData.TimeTaken += returnedValues.TimeTaken;
-        DamerauLevensheinData.SuggestionNumber += returnedValues.SuggestionNumber;
-        DamerauLevensheinData.TimeTaken += returnedValues.TimeTaken;
+        DamerauLevenshteinData.SuggestionNumber += returnedValues.SuggestionNumber;
+        DamerauLevenshteinData.TimeTaken += returnedValues.TimeTaken;
 
         //Jaro Distance
-        returnedValues = HashChecker(WordHashTable.HashTable, MaxSize, WordHashTable.WordCount, MisspelledWordArray[i].Word, 6, 2, CorrectspelledWordArray[MisspelledWordArray[i].index]);
-        if (returnedValues.SuggestionNumber == -1) JaroDistanceMissCount++;
+        returnedValues = HashChecker(WordHashTable.HashTable, MaxSize, WordHashTable.WordCount, MisspelledWordArray[i].Word, 6, 2, MasterWord);
+        if (returnedValues.SuggestionNumber == 0) JaroDistanceMissCount++;
 
         JaroDistanceHashData.SuggestionNumber += returnedValues.SuggestionNumber;
         JaroDistanceHashData.TimeTaken += returnedValues.TimeTaken;
@@ -1776,14 +1789,13 @@ int AlgorithmAssessor(int FileType)
 
 
         //Jaro-Winkler Distance
-        returnedValues = HashChecker(WordHashTable.HashTable, MaxSize, WordHashTable.WordCount, MisspelledWordArray[i].Word, 7, 2, CorrectspelledWordArray[MisspelledWordArray[i].index]);
-        if (returnedValues.SuggestionNumber == -1) JaroWinklerDistanceMissCount++;
+        returnedValues = HashChecker(WordHashTable.HashTable, MaxSize, WordHashTable.WordCount, MisspelledWordArray[i].Word, 7, 2, MasterWord);
+        if (returnedValues.SuggestionNumber == 0) JaroWinklerDistanceMissCount++;
 
         JaroWinklerDistanceHashData.SuggestionNumber += returnedValues.SuggestionNumber;
         JaroWinklerDistanceHashData.TimeTaken += returnedValues.TimeTaken;
         JaroWinklerDistanceData.SuggestionNumber += returnedValues.SuggestionNumber;
         JaroWinklerDistanceData.TimeTaken += returnedValues.TimeTaken;
-
     }
 
     //cleanup word array
@@ -1857,8 +1869,8 @@ int AlgorithmAssessor(int FileType)
     OptimalStringAlignmentHashData.SuggestionNumber = OptimalStringAlignmentHashData.SuggestionNumber / IncorrectWordCount;
 
     //damerau-levenshtein distance
-    DamerauLevensheinData.SuggestionNumber = DamerauLevensheinData.SuggestionNumber / IncorrectWordCount;
-    DamerauLevensheinData.TimeTaken = DamerauLevensheinData.TimeTaken / IncorrectWordCount;
+    DamerauLevenshteinData.SuggestionNumber = DamerauLevenshteinData.SuggestionNumber / IncorrectWordCount;
+    DamerauLevenshteinData.TimeTaken = DamerauLevenshteinData.TimeTaken / IncorrectWordCount;
     DamerauLevenshteinLinearData.SuggestionNumber = DamerauLevenshteinLinearData.SuggestionNumber / IncorrectWordCount;
     DamerauLevenshteinLinearData.TimeTaken = DamerauLevenshteinLinearData.TimeTaken / IncorrectWordCount;
     DamerauLevenshteinBinaryData.SuggestionNumber = DamerauLevenshteinBinaryData.SuggestionNumber / IncorrectWordCount;
@@ -1886,6 +1898,54 @@ int AlgorithmAssessor(int FileType)
     JaroWinklerDistanceHashData.SuggestionNumber = JaroWinklerDistanceHashData.SuggestionNumber / IncorrectWordCount;
     JaroWinklerDistanceHashData.TimeTaken = JaroWinklerDistanceHashData.TimeTaken / IncorrectWordCount;
     
+    printf("Linear Data:\n");
+    printf("Linear: *NoAlgorithm: average-time: %lf\n", NoAlgorithmLinearData.TimeTaken);
+    printf("Linear: *Levenshtein: average-time: %lf, average-suggestion: %ld\n", LevenshteinDistanceLinearData.TimeTaken, LevenshteinDistanceLinearData.SuggestionNumber);
+    printf("Linear: *Hamming: average-time: %lf, average-suggestion: %ld\n", HammingDistanceLinearData.TimeTaken, HammingDistanceLinearData.SuggestionNumber);
+    printf("Linear: *SerensenDice: average-time: %lf, average-suggestion: %ld\n", SorensenDiceLinearData.TimeTaken, SorensenDiceLinearData.SuggestionNumber);
+    printf("Linear: *Optimal: average-time: %lf, average-suggestion: %ld\n", OptimalStringAlignmentLinearData.TimeTaken, OptimalStringAlignmentLinearData.SuggestionNumber);
+    printf("Linear: *Damerau: average-time: %lf, average-suggestion: %ld\n", DamerauLevenshteinLinearData.TimeTaken, DamerauLevenshteinLinearData.SuggestionNumber);
+    printf("Linear: *Jaro: average-time: %lf, average-suggestion: %ld\n", JaroDistanceLinearData.TimeTaken, JaroDistanceLinearData.SuggestionNumber);
+    printf("Linear: *JaroWinkler: average-time: %lf, average-suggestion: %ld\n", JaroWinklerDistanceLinearData.TimeTaken, JaroWinklerDistanceLinearData.SuggestionNumber);
+
+    printf("Binary Data:\n");
+    printf("Binary: *NoAlgorithm: average-time: %lf\n", NoAlgorithmBinaryData.TimeTaken);
+    printf("Binary: *Levenshtein: average-time: %lf, average-suggestion: %ld\n", LevenshteinDistanceBinaryData.TimeTaken, LevenshteinDistanceBinaryData.SuggestionNumber);
+    printf("Binary: *Hamming: average-time: %lf, average-suggestion: %ld\n", HammingDistanceBinaryData.TimeTaken, HammingDistanceBinaryData.SuggestionNumber);
+    printf("Binary: *SerensenDice: average-time: %lf, average-suggestion: %ld\n", SorensenDiceBinaryData.TimeTaken, SorensenDiceBinaryData.SuggestionNumber);
+    printf("Binary: *Optimal: average-time: %lf, average-suggestion: %ld\n", OptimalStringAlignmentBinaryData.TimeTaken, OptimalStringAlignmentBinaryData.SuggestionNumber);
+    printf("Binary: *Damerau: average-time: %lf, average-suggestion: %ld\n", DamerauLevenshteinBinaryData.TimeTaken, DamerauLevenshteinBinaryData.SuggestionNumber);
+    printf("Binary: *Jaro: average-time: %lf, average-suggestion: %ld\n", JaroDistanceBinaryData.TimeTaken, JaroDistanceBinaryData.SuggestionNumber);
+    printf("Binary: *JaroWinkler: average-time: %lf, average-suggestion: %ld\n", JaroWinklerDistanceBinaryData.TimeTaken, JaroWinklerDistanceBinaryData.SuggestionNumber);
+
+    printf("Hash Data:\n");
+    printf("Hash: *NoAlgorithm: average-time: %lf\n", NoAlgorithmHashData.TimeTaken);
+    printf("Hash: *Levenshtein: average-time: %lf, average-suggestion: %ld\n", LevenshteinDistanceHashData.TimeTaken, LevenshteinDistanceHashData.SuggestionNumber);
+    printf("Hash: *Hamming: average-time: %lf, average-suggestion: %ld\n", HammingDistanceHashData.TimeTaken, HammingDistanceHashData.SuggestionNumber);
+    printf("Hash: *SerensenDice: average-time: %lf, average-suggestion: %ld\n", SorensenDiceHashData.TimeTaken, SorensenDiceHashData.SuggestionNumber);
+    printf("Hash: *Optimal: average-time: %lf, average-suggestion: %ld\n", OptimalStringAlignmentHashData.TimeTaken, OptimalStringAlignmentHashData.SuggestionNumber);
+    printf("Hash: *Damerau: average-time: %lf, average-suggestion: %ld\n", DamerauLevenshteinHashData.TimeTaken, DamerauLevenshteinHashData.SuggestionNumber);
+    printf("Hash: *Jaro: average-time: %lf, average-suggestion: %ld\n", JaroDistanceHashData.TimeTaken, JaroDistanceHashData.SuggestionNumber);
+    printf("Hash: *JaroWinkler: average-time: %lf, average-suggestion: %ld\n", JaroWinklerDistanceHashData.TimeTaken, JaroWinklerDistanceHashData.SuggestionNumber);
+
+    printf("Total Data:\n");
+    printf("Total: *NoAlgorithm: average-time: %f\n", NoAlgorithmData.TimeTaken);
+    printf("Total: *Levenshtein: average-time: %f, average-suggestion: %ld\n", LevenshteinDistanceData.TimeTaken, LevenshteinDistanceData.SuggestionNumber);
+    printf("Total: *Hamming: average-time: %f, average-suggestion: %ld\n", HammingDistanceData.TimeTaken, HammingDistanceData.SuggestionNumber);
+    printf("Total: *SerensenDice: average-time: %f, average-suggestion: %ld\n", SorensenDiceData.TimeTaken, SorensenDiceData.SuggestionNumber);
+    printf("Total: *Optimal: average-time: %f, average-suggestion: %ld\n", OptimalStringAlignmentData.TimeTaken, OptimalStringAlignmentData.SuggestionNumber);
+    printf("Total: *Damerau: average-time: %f, average-suggestion: %ld\n", DamerauLevenshteinData.TimeTaken, DamerauLevenshteinData.SuggestionNumber);
+    printf("Total: *Jaro: average-time: %f, average-suggestion: %ld\n", JaroDistanceData.TimeTaken, JaroDistanceData.SuggestionNumber);
+    printf("Total: *JaroWinkler: average-time: %f, average-suggestion: %ld\n", JaroWinklerDistanceData.TimeTaken, JaroWinklerDistanceData.SuggestionNumber);
+
+    printf("Total Miss Counts:\n");
+    printf("Total: *Levenshtein: miss-count: %d\n", LevenshteinDistanceMissCount);
+    printf("Total: *Hamming: miss-count: %d\n", HammingDistanceMissCount);
+    printf("Total: *SerensenDice: miss-count: %d\n", SorensenDiceMissCount);
+    printf("Total: *Optimal: miss-count: %d\n", OptimalStringAlignmentMissCount);
+    printf("Total: *Damerau: miss-count: %d\n", DamerauLevensheinMissCount);
+    printf("Total: *Jaro: miss-count: %d\n", JaroDistanceMissCount);
+    printf("Total: *JaroWinkler: miss-count: %d\n", JaroWinklerDistanceMissCount);
 
     //cleanup
     free(CorrectspelledWordArray);

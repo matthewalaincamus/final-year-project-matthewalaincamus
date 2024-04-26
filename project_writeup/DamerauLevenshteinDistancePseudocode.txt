@@ -1,0 +1,24 @@
+Algorithm DamerauLevenshteinDistance is
+	input: strings A[0 .. length(A)], B[0 ... length(B)]
+	output: integer: distance
+
+	let CalculationMatrix be a 2D array of integers, dimensions length(A) + 2, length(B) + 2	
+
+	//maximum length a transposition can occur
+	let maxDistance = length(A) + length(B)	
+
+	for the length of string A do
+		set first value of each row in CalculationMatrix to be maxDistance
+		set second value of each row in CalculationMatrix to be the value of its index 
+	for the length of string B do
+		set first value of each column in CalculationMatrix to be maxDistance
+		set second value of each column in CalculationMatrix to be the value of its index 
+		
+
+	for the length of string A + 1 do
+		for the length of string B + 1 do
+		
+			set current CalculationMatrix value to minimum cost process between insertion, deletion, substitution or transposition
+			
+	return last value in CalculationMatrix
+

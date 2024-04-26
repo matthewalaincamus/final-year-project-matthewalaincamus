@@ -16,8 +16,8 @@ struct WordsListing
 //for returning values for automated testing
 struct TimeAndSuggestion
 {
-    float TimeTaken;
-    int SuggestionNumber;
+    double TimeTaken;
+    long int SuggestionNumber;
 };
 
 //for processing mispelled words in the auto tester
@@ -56,13 +56,13 @@ struct ReturnHash
 int SpellChecker(int FileType, int CheckType, int AlgorithmCheck);
 
 //linear searcher
-struct TimeAndSuggestion linearCheck(char ** WordArray, int WordCount, char wordString[], int AlgorithmCheck, int TestFlag, char TestString);
+struct TimeAndSuggestion linearCheck(char ** WordArray, int WordCount, char wordString[], int AlgorithmCheck, int TestFlag, char TestString[]);
 
 //binary seacher
-struct TimeAndSuggestion binaryCheck(char ** WordArray, int WordCount, char wordString[], int AlgorithmCheck, int TestFlag, char TestString);
+struct TimeAndSuggestion binaryCheck(char ** WordArray, int WordCount, char wordString[], int AlgorithmCheck, int TestFlag, char TestString[]);
 
 //hash table searcher
-struct TimeAndSuggestion HashChecker(struct WordHashItem *HashTable, int MaxSize, int WordCount, char wordString[], int AlgorithmCheck, int TestFlag, char TestString);
+struct TimeAndSuggestion HashChecker(struct WordHashItem *HashTable, int MaxSize, int WordCount, char wordString[], int AlgorithmCheck, int TestFlag, char TestString[]);
 
 //function to get words from file
 struct WordsListing WordFetcher(int FileType);
