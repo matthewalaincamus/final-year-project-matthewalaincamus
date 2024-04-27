@@ -68,7 +68,7 @@ def DataReader(duplicateFlag : bool, sortFlag : bool, testFlag : bool):
                 print(FinalFilePath)
 
             #open the file to read
-            fp = open(FinalFilePath, "r")
+            fp = open(FinalFilePath, "r", encoding="utf-8")
 
             fileData = fp.read()
 
@@ -102,7 +102,7 @@ def DataReader(duplicateFlag : bool, sortFlag : bool, testFlag : bool):
                                     #check it only has valid chars
                                     wordCheck = 0
                                     for letter in split4:
-                                        if ord(letter) < 97 or ord > 122:
+                                        if ord(letter) < 97 or ord(letter) > 122:
                                             wordCheck+=1
                                     if wordCheck == 0:
                                         

@@ -15,6 +15,10 @@ Python_Program:
     -run with: python Main.py
     -requires the files in the folder "corpus" to function
 
+AutomatedTesingResults
+    -Holds the results of the automated testing that both the Python and C programs
+    -GraphGenerator.py uses matplotlib in order to generate graphs that are used in the writeup
+
 proof-of-concept:
     -holds the working code for a protoype spell checker in C
     -to compile use: gcc -Wall -fopenmp -o <name-of-executable> main.c
