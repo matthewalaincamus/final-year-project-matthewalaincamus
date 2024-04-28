@@ -974,63 +974,59 @@ def AlgorithmAssessor(FileType : int):
     DuplicateCheckArray = []
     IncorrectCount = 0
     CorrectCount = 0
-    for i in range(2):
-        
-        #open the three mispelled word files
-        if i == 0: 
-            fp = open("../corpus/Words-Misspelled/aspell.dat.txt","r")
-            Lines = fp.readlines()
-        if i == 1: 
-            fp = open("../corpus/Words-Misspelled/wikipedia.dat.txt","r")
-            Lines = fp.readlines()
+    
+    #open mispelled word files
 
-        CurrentMasterWord = ""
-        #for checking if a word only has chars from a - z
-        ValidCheck = 0
-        #for checking if a correct word is valid or not (all its subsequent incorrect spellings will be ignored)
-        CorrectWordCheck = 0
+    fp = open("../corpus/Words-Misspelled/aspell.dat.txt","r")
+    Lines = fp.readlines()
 
-        #read all the words into a large dictionary 
-        for line in Lines:
-            #correctly spelt words
-            if line[0] == '$':
-                CorrectWordCheck = 0
-                ValidCheck=0
-                for letter in line[1:-1]:
-                    #check all the characters are valid
-                    if ord(letter) < 97 or ord(letter) > 122:
-                        ValidCheck+=1
-                if ValidCheck == 0:
-                    #check for duplicates, if not then add
-                    if line[1:-1] not in MisspelledWordArray.keys():
-                        #allow its children to be validated
-                        CorrectWordCheck = 0
+    CurrentMasterWord = ""
+    #for checking if a word only has chars from a - z
+    ValidCheck = 0
+    #for checking if a correct word is valid or not (all its subsequent incorrect spellings will be ignored)
+    CorrectWordCheck = 0
 
-                        MisspelledWordArray[line[1:-1]] = []
-                        CurrentMasterWord = line[1:-1]
-                        CorrectCount+=1
+    #read all the words into a large dictionary 
+    for line in Lines:
+        #correctly spelt words
+        if line[0] == '$':
+            CorrectWordCheck = 0
+            ValidCheck=0
+            for letter in line[1:-1]:
+                #check all the characters are valid
+                if ord(letter) < 97 or ord(letter) > 122:
+                    ValidCheck+=1
+            if ValidCheck == 0:
+                #check for duplicates, if not then add
+                if line[1:-1] not in MisspelledWordArray.keys():
+                    #allow its children to be validated
+                    CorrectWordCheck = 0
 
-                    else:
-                        #prevent its children from being validated
-                        CorrectWordCheck = 1
-                else: 
+                    MisspelledWordArray[line[1:-1]] = []
+                    CurrentMasterWord = line[1:-1]
+                    CorrectCount+=1
+
+                else:
                     #prevent its children from being validated
                     CorrectWordCheck = 1
+            else: 
+                #prevent its children from being validated
+                CorrectWordCheck = 1
 
-            #incorrectly spelt words
-            else:
-                for letter in line[:-1]:
-                    #check each letter is valid
-                    if ord(letter) < 97 or ord(letter) > 122:
-                        ValidCheck+=1
-                
-                if ValidCheck == 0 and CorrectWordCheck == 0:
-                    if line[:-1] not in DuplicateCheckArray:
-                        MisspelledWordArray[CurrentMasterWord].append(line[:-1])
-                        DuplicateCheckArray.append((line[:-1]))
-                        IncorrectCount+=1
-        #close the file each time
-        fp.close()
+        #incorrectly spelt words
+        else:
+            for letter in line[:-1]:
+                #check each letter is valid
+                if ord(letter) < 97 or ord(letter) > 122:
+                    ValidCheck+=1
+            
+            if ValidCheck == 0 and CorrectWordCheck == 0:
+                if line[:-1] not in DuplicateCheckArray:
+                    MisspelledWordArray[CurrentMasterWord].append(line[:-1])
+                    DuplicateCheckArray.append((line[:-1]))
+                    IncorrectCount+=1
+    #close the file each time
+    fp.close()
 
     #print(MisspelledWordArray)
     
@@ -1089,57 +1085,49 @@ def AlgorithmAssessor(FileType : int):
             #no algorithm
             returnedValues = linearCheck(WordArray, MisspelledWord, 0, 2, CorrectWord)
             
-            Wfp.write("L/NO: %lf" %(returnedValues["TimeTaken"]))
-            Wfp.write("\n")
+            Wfp.write("L/NO: %lf\n" %(returnedValues["TimeTaken"]))
             
             #Levenshtein Distance
             returnedValues = linearCheck(WordArray,MisspelledWord, 1, 2, CorrectWord)
             if returnedValues["SuggestionNumber"] == 0: LevenshteinDistanceMissCount[0]+=1
             
-            Wfp.write("L/LD: %ld : %lf" % (returnedValues["SuggestionNumber"], returnedValues["TimeTaken"]))
-            Wfp.write("\n")
+            Wfp.write("L/LD: %ld : %lf\n" % (returnedValues["SuggestionNumber"], returnedValues["TimeTaken"]))
 
             #Hamming Distance
             returnedValues = linearCheck(WordArray, MisspelledWord, 2, 2, CorrectWord)
             if returnedValues["SuggestionNumber"] == 0: HammingDistanceMissCount[0]+=1
 
-            Wfp.write("L/HD: %ld : %lf" % (returnedValues["SuggestionNumber"], returnedValues["TimeTaken"]))
-            Wfp.write("\n")
+            Wfp.write("L/HD: %ld : %lf\n" % (returnedValues["SuggestionNumber"], returnedValues["TimeTaken"]))
 
             #Sørensen–Dice Coefficient
             returnedValues = linearCheck(WordArray, MisspelledWord, 3, 2, CorrectWord)
             if returnedValues["SuggestionNumber"] == 0: SorensenDiceMissCount[0]+=1
 
-            Wfp.write("L/SD: %ld : %lf" % (returnedValues["SuggestionNumber"], returnedValues["TimeTaken"]))
-            Wfp.write("\n")
+            Wfp.write("L/SD: %ld : %lf\n" % (returnedValues["SuggestionNumber"], returnedValues["TimeTaken"]))
 
             #Optimal String Alignment Distance
             returnedValues = linearCheck(WordArray, MisspelledWord, 4, 2, CorrectWord)
             if returnedValues["SuggestionNumber"] == 0: OptimalStringAlignmentMissCount[0]+=1
 
-            Wfp.write("L/OD: %ld : %lf" % (returnedValues["SuggestionNumber"], returnedValues["TimeTaken"]))
-            Wfp.write("\n")
+            Wfp.write("L/OS: %ld : %lf\n" % (returnedValues["SuggestionNumber"], returnedValues["TimeTaken"]))
 
             #Damerau-Levenshtein Distance
             returnedValues = linearCheck(WordArray, MisspelledWord, 5, 2, CorrectWord)
             if returnedValues["SuggestionNumber"] == 0: DamerauLevensheinMissCount[0]+=1
 
-            Wfp.write("L/DL: %ld : %lf" % (returnedValues["SuggestionNumber"], returnedValues["TimeTaken"]))
-            Wfp.write("\n")
+            Wfp.write("L/DL: %ld : %lf\n" % (returnedValues["SuggestionNumber"], returnedValues["TimeTaken"]))
 
             #Jaro Distance
             returnedValues = linearCheck(WordArray, MisspelledWord, 6, 2, CorrectWord)
             if returnedValues["SuggestionNumber"] == 0: JaroDistanceMissCount[0]+=1
 
-            Wfp.write("L/JD: %ld : %lf" % (returnedValues["SuggestionNumber"], returnedValues["TimeTaken"]))
-            Wfp.write("\n")
+            Wfp.write("L/JD: %ld : %lf\n" % (returnedValues["SuggestionNumber"], returnedValues["TimeTaken"]))
 
             #Jaro-Winkler Distance
             returnedValues = linearCheck(WordArray, MisspelledWord, 7, 2, CorrectWord)
             if returnedValues["SuggestionNumber"] == 0: JaroWinklerDistanceMissCount[0]+=1
 
-            Wfp.write("L/LW: %ld : %lf" % (returnedValues["SuggestionNumber"], returnedValues["TimeTaken"]))
-            Wfp.write("\n")
+            Wfp.write("L/LW: %ld : %lf\n" % (returnedValues["SuggestionNumber"], returnedValues["TimeTaken"]))
 
             #**binary:
             #need a sorted array to use this
@@ -1147,131 +1135,107 @@ def AlgorithmAssessor(FileType : int):
                 #no algorithm
                 returnedValues = binaryCheck(WordArray, MisspelledWord, 0, 2, CorrectWord)
                 
-                Wfp.write("B/NO: %lf" % (returnedValues["TimeTaken"]))
-                Wfp.write("\n")
+                Wfp.write("B/NO: %lf\n" % (returnedValues["TimeTaken"]))
 
                 #Levenshtein Distance
                 returnedValues = binaryCheck(WordArray, MisspelledWord, 1, 2, CorrectWord)
                 if returnedValues["SuggestionNumber"] == 0: LevenshteinDistanceMissCount[1]+=1
                 
-                Wfp.write("B/LD: %ld : %lf" % (returnedValues["SuggestionNumber"], returnedValues["TimeTaken"]))
-                Wfp.write("\n")
+                Wfp.write("B/LD: %ld : %lf\n" % (returnedValues["SuggestionNumber"], returnedValues["TimeTaken"]))
 
                 #Hamming Distance
                 returnedValues = binaryCheck(WordArray, MisspelledWord, 2, 2, CorrectWord)
                 if returnedValues["SuggestionNumber"] == 0: HammingDistanceMissCount[1]+=1
 
-                Wfp.write("B/HD: %ld : %lf" % (returnedValues["SuggestionNumber"], returnedValues["TimeTaken"]))
-                Wfp.write("\n")
+                Wfp.write("B/HD: %ld : %lf\n" % (returnedValues["SuggestionNumber"], returnedValues["TimeTaken"]))
 
                 #Sørensen–Dice Coefficient
                 returnedValues = binaryCheck(WordArray, MisspelledWord, 3, 2, CorrectWord)
                 if returnedValues["SuggestionNumber"] == 0: SorensenDiceMissCount[1]+=1
                 
-                Wfp.write("B/SD: %ld : %lf" % (returnedValues["SuggestionNumber"], returnedValues["TimeTaken"]))
-                Wfp.write("\n")
+                Wfp.write("B/SD: %ld : %lf\n" % (returnedValues["SuggestionNumber"], returnedValues["TimeTaken"]))
 
                 #Optimal String Alignment Distance
                 returnedValues = binaryCheck(WordArray, MisspelledWord, 4, 2, CorrectWord)
                 if returnedValues["SuggestionNumber"] == 0: OptimalStringAlignmentMissCount[1]+=1
 
-                Wfp.write("B/OS: %ld : %lf" % (returnedValues["SuggestionNumber"], returnedValues["TimeTaken"]))
-                Wfp.write("\n")
+                Wfp.write("B/OS: %ld : %lf\n" % (returnedValues["SuggestionNumber"], returnedValues["TimeTaken"]))
 
                 #Damerau-Levenshtein Distance
                 returnedValues = binaryCheck(WordArray, MisspelledWord, 5, 2, CorrectWord)
                 if returnedValues["SuggestionNumber"] == 0: DamerauLevensheinMissCount[1]+=1
 
-                Wfp.write("B/DL: %ld : %lf" % (returnedValues["SuggestionNumber"], returnedValues["TimeTaken"]))
-                Wfp.write("\n")
+                Wfp.write("B/DL: %ld : %lf\n" % (returnedValues["SuggestionNumber"], returnedValues["TimeTaken"]))
 
                 #Jaro Distance
                 returnedValues = binaryCheck(WordArray, MisspelledWord, 6, 2, CorrectWord)
                 if returnedValues["SuggestionNumber"] == 0: JaroDistanceMissCount[1]+=1
                 
-                Wfp.write("B/JD: %ld : %lf" % (returnedValues["SuggestionNumber"], returnedValues["TimeTaken"]))
-                Wfp.write("\n")
+                Wfp.write("B/JD: %ld : %lf\n" % (returnedValues["SuggestionNumber"], returnedValues["TimeTaken"]))
 
                 #Jaro-Winkler Distance
                 returnedValues = binaryCheck(WordArray, MisspelledWord, 7, 2, CorrectWord)
                 if returnedValues["SuggestionNumber"] == 0: JaroWinklerDistanceMissCount[1]+=1
 
                 Wfp.write("B/JW: %ld : %lf\n" % (returnedValues["SuggestionNumber"], returnedValues["TimeTaken"]))
-                Wfp.write("\n")
 
             #Hashing
             
             #no algorithm
             returnedValues = hashCheck(WordHashTable, MisspelledWord, 0, 2, CorrectWord)
 
-            Wfp.write("H/NO: %lf" % (returnedValues["TimeTaken"]))
-            Wfp.write("\n")
+            Wfp.write("H/NO: %lf\n" % (returnedValues["TimeTaken"]))
 
             #Levenshtein Distance
             returnedValues = hashCheck(WordHashTable, MisspelledWord, 1, 2, CorrectWord)
             if returnedValues["SuggestionNumber"] == 0: LevenshteinDistanceMissCount[2]+=1
 
-            Wfp.write("H/LD: %ld : %lf" % (returnedValues["SuggestionNumber"], returnedValues["TimeTaken"]))
-            Wfp.write("\n")
+            Wfp.write("H/LD: %ld : %lf\n" % (returnedValues["SuggestionNumber"], returnedValues["TimeTaken"]))
 
             #Hamming Distance
             returnedValues = hashCheck(WordHashTable, MisspelledWord, 2, 2, CorrectWord)
             if returnedValues["SuggestionNumber"] == 0: HammingDistanceMissCount[2]+=1
 
-            Wfp.write("H/HD: %ld : %lf" % (returnedValues["SuggestionNumber"], returnedValues["TimeTaken"]))
-            Wfp.write("\n")
+            Wfp.write("H/HD: %ld : %lf\n" % (returnedValues["SuggestionNumber"], returnedValues["TimeTaken"]))
 
             #Sørensen–Dice Coefficient
             returnedValues = hashCheck(WordHashTable, MisspelledWord, 3, 2, CorrectWord)
             if returnedValues["SuggestionNumber"] == 0: SorensenDiceMissCount[2]+=1
 
-            Wfp.write("H/SD: %ld : %lf" % (returnedValues["SuggestionNumber"], returnedValues["TimeTaken"]))
-            Wfp.write("\n")
+            Wfp.write("H/SD: %ld : %lf\n" % (returnedValues["SuggestionNumber"], returnedValues["TimeTaken"]))
 
             #Optimal String Alignment Distance
             returnedValues = hashCheck(WordHashTable, MisspelledWord, 4, 2, CorrectWord)
             if returnedValues["SuggestionNumber"] == 0: OptimalStringAlignmentMissCount[2]+=1
 
-            Wfp.write("H/OS: %ld : %lf" % (returnedValues["SuggestionNumber"], returnedValues["TimeTaken"]))
-            Wfp.write("\n")
+            Wfp.write("H/OS: %ld : %lf\n" % (returnedValues["SuggestionNumber"], returnedValues["TimeTaken"]))
 
             #Damerau-Levenshtein Distance
             returnedValues = hashCheck(WordHashTable, MisspelledWord, 5, 2, CorrectWord)
             if returnedValues["SuggestionNumber"] == 0: DamerauLevensheinMissCount[2]+=1
 
-            Wfp.write("H/DL: %ld : %lf" % (returnedValues["SuggestionNumber"], returnedValues["TimeTaken"]))
-            Wfp.write("\n")
+            Wfp.write("H/DL: %ld : %lf\n" % (returnedValues["SuggestionNumber"], returnedValues["TimeTaken"]))
 
             #Jaro Distance
             returnedValues = hashCheck(WordHashTable, MisspelledWord, 6, 2, CorrectWord)
             if returnedValues["SuggestionNumber"] == 0: JaroDistanceMissCount[2]+=1
 
-            Wfp.write("H/JD: %ld : %lf" % (returnedValues["SuggestionNumber"], returnedValues["TimeTaken"]))
-            Wfp.write("\n")
+            Wfp.write("H/JD: %ld : %lf\n" % (returnedValues["SuggestionNumber"], returnedValues["TimeTaken"]))
 
             #Jaro-Winkler Distance
             returnedValues = hashCheck(WordHashTable, MisspelledWord, 7, 2, CorrectWord)
             if returnedValues["SuggestionNumber"] == 0: JaroWinklerDistanceMissCount[2]+=1
 
-            Wfp.write("H/JW: %ld : %lf" % (returnedValues["SuggestionNumber"], returnedValues["TimeTaken"]))
-            Wfp.write("\n")
+            Wfp.write("H/JW: %ld : %lf\n" % (returnedValues["SuggestionNumber"], returnedValues["TimeTaken"]))
         
-        Wfp.write("Total Miss Counts:")
-        Wfp.write("\n")
-        Wfp.write("LD: L:%d, B:%d, H:%d" % (LevenshteinDistanceMissCount[0], LevenshteinDistanceMissCount[1],LevenshteinDistanceMissCount[2]))
-        Wfp.write("\n")
-        Wfp.write("HD: L:%d, B:%d, H:%d" % (HammingDistanceMissCount[0], HammingDistanceMissCount[1],HammingDistanceMissCount[2]))
-        Wfp.write("\n")
-        Wfp.write("SD: L:%d, B:%d, H:%d" % (SorensenDiceMissCount[0], SorensenDiceMissCount[1],SorensenDiceMissCount[2]))
-        Wfp.write("\n")
-        Wfp.write("OS: L:%d, B:%d, H:%d" % (OptimalStringAlignmentMissCount[0], OptimalStringAlignmentMissCount[1],OptimalStringAlignmentMissCount[2]))
-        Wfp.write("\n")
-        Wfp.write("DL: L:%d, B:%d, H:%d" % (DamerauLevensheinMissCount[0], DamerauLevensheinMissCount[1],DamerauLevensheinMissCount[2]))
-        Wfp.write("\n")
-        Wfp.write("JD: L:%d, B:%d, H:%d" % (JaroDistanceMissCount[0], JaroDistanceMissCount[1],JaroDistanceMissCount[2]))
-        Wfp.write("\n")
-        Wfp.write("JW: L:%d, B:%d, H:%d" % (JaroWinklerDistanceMissCount[0], JaroWinklerDistanceMissCount[1],JaroWinklerDistanceMissCount[2]))
-        Wfp.write("\n")
+    Wfp.write("Total Miss Counts:\n")
+    Wfp.write("LD: L:%d, B:%d, H:%d\n" % (LevenshteinDistanceMissCount[0], LevenshteinDistanceMissCount[1],LevenshteinDistanceMissCount[2]))
+    Wfp.write("HD: L:%d, B:%d, H:%d\n" % (HammingDistanceMissCount[0], HammingDistanceMissCount[1],HammingDistanceMissCount[2]))
+    Wfp.write("SD: L:%d, B:%d, H:%d\n" % (SorensenDiceMissCount[0], SorensenDiceMissCount[1],SorensenDiceMissCount[2]))
+    Wfp.write("OS: L:%d, B:%d, H:%d\n" % (OptimalStringAlignmentMissCount[0], OptimalStringAlignmentMissCount[1],OptimalStringAlignmentMissCount[2]))
+    Wfp.write("DL: L:%d, B:%d, H:%d\n" % (DamerauLevensheinMissCount[0], DamerauLevensheinMissCount[1],DamerauLevensheinMissCount[2]))
+    Wfp.write("JD: L:%d, B:%d, H:%d\n" % (JaroDistanceMissCount[0], JaroDistanceMissCount[1],JaroDistanceMissCount[2]))
+    Wfp.write("JW: L:%d, B:%d, H:%d\n" % (JaroWinklerDistanceMissCount[0], JaroWinklerDistanceMissCount[1],JaroWinklerDistanceMissCount[2]))
 
     Wfp.close()
     

@@ -1385,112 +1385,107 @@ int AlgorithmAssessor(int FileType)
 
     FILE* fp;
 
-    for (int i = 0; i < 2; i++)
+    //open the mispelled word file
+    fp = fopen("../corpus/Words-Misspelled/aspell.dat.txt","r");
+
+    char nextChar = ' ';
+    char nextString[50];
+
+    //for testing
+    int lineCount = 0;
+    
+    int charCount = 0;
+
+    //for checking if a word only has chars from a - z
+    int ValidCheck = 0;
+    //for checking if a correct word is valid or not (all its subsequent incorrect spellings will be ignored)
+    int CorrectWordCheck = 0;
+
+    //read all the words into a large list 
+    while (nextChar != EOF)
     {
-        
-        //open the three mispelled word files
-        if (i == 0) fp = fopen("../corpus/Words-Misspelled/aspell.dat.txt","r");
-        if (i == 1) fp = fopen("../corpus/Words-Misspelled/wikipedia.dat.txt","r");
+        //get next char
+        nextChar = fgetc(fp);
 
-        char nextChar = ' ';
-        char nextString[50];
-
-        //for testing
-        int lineCount = 0;
-        
-        int charCount = 0;
-
-        //for checking if a word only has chars from a - z
-        int ValidCheck = 0;
-        //for checking if a correct word is valid or not (all its subsequent incorrect spellings will be ignored)
-        int CorrectWordCheck = 0;
-
-        //read all the words into a large list 
-        while (nextChar != EOF)
+        if (nextChar != '\n')
         {
-            //get next char
-            nextChar = fgetc(fp);
-
-            if (nextChar != '\n')
+            //if any invalid chars are in the word, update the count
+            if ((int)nextChar < 97 || (int)nextChar > 122) 
             {
-                //if any invalid chars are in the word, update the count
-                if ((int)nextChar < 97 || (int)nextChar > 122) 
-                {
-                    if (nextChar != '$') ValidCheck++;
-                }
-                nextString[charCount] = nextChar;
-                charCount++;
+                if (nextChar != '$') ValidCheck++;
             }
-
-            else if (nextChar == '\n')
-            {
-                //complete word
-                nextString[charCount] = '\0';
-                //printf("%s\n", nextString);
-
-                //if this is a correctly spelled word which is valid
-                if (ValidCheck == 0 && nextString[0] == '$')
-                {
-                    //check if its a duplicate or not
-                    int duplicateCheck = 0;
-                    for (int i = 0; i < CorrectWordCount; i++)
-                    {
-                        if (!strcmp(CorrectspelledWordArray[i], nextString))
-                        {
-                            duplicateCheck++;
-                            break;
-                        }
-                    }
-                    //if not, then add to list and update count
-                    if (duplicateCheck == 0)
-                    {
-                        CorrectspelledWordArray[CorrectWordCount] = malloc(50 * sizeof(char));
-                        strcpy(CorrectspelledWordArray[CorrectWordCount], nextString);
-                        CorrectWordCount++;
-                        CorrectWordCheck = 0;
-                    }
-                    //otherwise, disregard all its mispellings
-                    else
-                    {
-                        CorrectWordCheck = 1;
-                    }
-                }
-                //if a correctly spelled word is invalid, disregard its mispelled children words
-                else if (ValidCheck == 1 && nextString[0] == '$') CorrectWordCheck++;
-                //for valid mispelled words
-                else if (ValidCheck == 0 && nextString[0] != '$' && CorrectWordCheck == 0)
-                {
-                    //check if its a duplicate
-                    int duplicateCheck = 0;
-                    for (int i = 0; i < IncorrectWordCount; i++)
-                    {
-                        if (!strcmp(MisspelledWordArray[i].Word, nextString))
-                        {
-                            duplicateCheck++;
-                            break;
-                        }
-                    }
-                    //if not, add it to the list
-                    if (duplicateCheck == 0)
-                    {
-                        strcpy(MisspelledWordArray[IncorrectWordCount].Word, nextString);
-                        MisspelledWordArray[IncorrectWordCount].index = CorrectWordCount - 1;
-                        IncorrectWordCount++;
-                    }
-
-                }
-                
-                //update values after word is processed
-                lineCount++;
-                charCount = 0;
-                ValidCheck = 0;
-            }
+            nextString[charCount] = nextChar;
+            charCount++;
         }
 
-        //close the file each time
-        fclose(fp);
-    
+        else if (nextChar == '\n')
+        {
+            //complete word
+            nextString[charCount] = '\0';
+            //printf("%s\n", nextString);
+
+            //if this is a correctly spelled word which is valid
+            if (ValidCheck == 0 && nextString[0] == '$')
+            {
+                //check if its a duplicate or not
+                int duplicateCheck = 0;
+                for (int i = 0; i < CorrectWordCount; i++)
+                {
+                    if (!strcmp(CorrectspelledWordArray[i], nextString))
+                    {
+                        duplicateCheck++;
+                        break;
+                    }
+                }
+                //if not, then add to list and update count
+                if (duplicateCheck == 0)
+                {
+                    CorrectspelledWordArray[CorrectWordCount] = malloc(50 * sizeof(char));
+                    strcpy(CorrectspelledWordArray[CorrectWordCount], nextString);
+                    CorrectWordCount++;
+                    CorrectWordCheck = 0;
+                }
+                //otherwise, disregard all its mispellings
+                else
+                {
+                    CorrectWordCheck = 1;
+                }
+            }
+            //if a correctly spelled word is invalid, disregard its mispelled children words
+            else if (ValidCheck == 1 && nextString[0] == '$') CorrectWordCheck++;
+            //for valid mispelled words
+            else if (ValidCheck == 0 && nextString[0] != '$' && CorrectWordCheck == 0)
+            {
+                //check if its a duplicate
+                int duplicateCheck = 0;
+                for (int i = 0; i < IncorrectWordCount; i++)
+                {
+                    if (!strcmp(MisspelledWordArray[i].Word, nextString))
+                    {
+                        duplicateCheck++;
+                        break;
+                    }
+                }
+                //if not, add it to the list
+                if (duplicateCheck == 0)
+                {
+                    strcpy(MisspelledWordArray[IncorrectWordCount].Word, nextString);
+                    MisspelledWordArray[IncorrectWordCount].index = CorrectWordCount - 1;
+                    IncorrectWordCount++;
+                }
+
+            }
+            
+            //update values after word is processed
+            lineCount++;
+            charCount = 0;
+            ValidCheck = 0;
+        }
     }
+
+    //close the file each time
+    fclose(fp);
+
     //begin testing loop
     //printf("Correct Words: %d, Incorrect Words: %d\n", CorrectWordCount, IncorrectWordCount);
     
@@ -1580,7 +1575,7 @@ int AlgorithmAssessor(int FileType)
         returnedValues = linearCheck(WordArray.WordArray, WordArray.WordCount, MisspelledWordArray[i].Word, 4, 2, MasterWord);
         if (returnedValues.SuggestionNumber == 0) OptimalStringAlignmentMissCount[0]++;
 
-        fprintf(WFP, "L/OD: %ld : %lf\n", returnedValues.SuggestionNumber, returnedValues.TimeTaken);
+        fprintf(WFP, "L/OS: %ld : %lf\n", returnedValues.SuggestionNumber, returnedValues.TimeTaken);
 
         //Damerau-Levenshtein Distance
         returnedValues = linearCheck(WordArray.WordArray, WordArray.WordCount, MisspelledWordArray[i].Word, 5, 2, MasterWord);
@@ -1600,7 +1595,7 @@ int AlgorithmAssessor(int FileType)
         returnedValues = linearCheck(WordArray.WordArray, WordArray.WordCount, MisspelledWordArray[i].Word, 7, 2, MasterWord);
         if (returnedValues.SuggestionNumber == 0) JaroWinklerDistanceMissCount[0]++;
 
-        fprintf(WFP, "L/LW: %ld : %lf\n", returnedValues.SuggestionNumber, returnedValues.TimeTaken);
+        fprintf(WFP, "L/JW: %ld : %lf\n", returnedValues.SuggestionNumber, returnedValues.TimeTaken);
 
 
         //Binary:
