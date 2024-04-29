@@ -1127,7 +1127,7 @@ def AlgorithmAssessor(FileType : int):
             returnedValues = linearCheck(WordArray, MisspelledWord, 7, 2, CorrectWord)
             if returnedValues["SuggestionNumber"] == 0: JaroWinklerDistanceMissCount[0]+=1
 
-            Wfp.write("L/LW: %ld : %lf\n" % (returnedValues["SuggestionNumber"], returnedValues["TimeTaken"]))
+            Wfp.write("L/JW: %ld : %lf\n" % (returnedValues["SuggestionNumber"], returnedValues["TimeTaken"]))
 
             #**binary:
             #need a sorted array to use this

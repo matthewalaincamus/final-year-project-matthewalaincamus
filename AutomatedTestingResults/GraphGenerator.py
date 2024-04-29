@@ -648,17 +648,26 @@ def graphingGenerator(FileData : dict):
 
 
 if __name__ == "__main__":
+    '''
     if os.path.exists("./CProgramResultsType0.txt") == True:
+        print("*C Program No Sorting")
         C0Data = fileParser("./CProgramResultsType0.txt", 0)
         graphingGenerator(C0Data)
+    '''
     if os.path.exists("./CProgramResultsType1.txt") == True:
+        print("*C Program Sorted")
         C1Data = fileParser("./CProgramResultsType1.txt", 1)
         graphingGenerator(C1Data)
     '''
     if os.path.exists("./PythonProgramResultsType0.txt") == True:
+        print("*Python Program No Sorting")
         P0Data = fileParser("./PythonProgramResultsType0.txt", 0)
+        graphingGenerator(P0Data)
+
     if os.path.exists("./PythonProgramResultsType1.txt") == True:
+        print("*Python Program Sorted")
         P1Data = fileParser("./PythonProgramResultsType1.txt", 1)
+        graphingGenerator(P1Data)
     '''
         
             

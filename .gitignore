@@ -5,3 +5,4 @@
 /Python_Program/__pycache__
 /Python_Program/GeneratedFiles/*.txt
 /AutomatedTestingResults/.venv
+/AutomatedTestingResults/*.txt

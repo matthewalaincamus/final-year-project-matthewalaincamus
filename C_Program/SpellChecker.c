@@ -883,7 +883,7 @@ int HammingDistance(char string1[], char string2[], int len1, int len2)
     return HammingScore;
 }
 
-//hamming distance calculator
+//Sorensn-Dice Coefficient calculator
 int SorensenDiceCoefficient(char string1[], char string2[], int len1, int len2)
 {
     //number of bigrams that match
