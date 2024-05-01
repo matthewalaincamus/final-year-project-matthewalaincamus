@@ -46,5 +46,5 @@ The system works as follows:
 * The folder "Words-Misspelled" contains 3 files of misspelled words for automated testing, however only the "aspell.dat.txt" file is used given the performance of the Python program (this was got from: https://www.dcs.bbk.ac.uk/~roger/corpora.html)
 
 
-#project-writeup:
+## project-writeup:
 * contains all files used for designing and then writing up the findings for the final report
