@@ -37,7 +37,7 @@ The system works as follows:
 * Could use the GeneratedWordFiles with either system, though they would need to be dragged into their GeneratedFiles folder in order to be used.
 * The GeneratedResultFiles would need to be dragged into the AutomatedTestingResults folder in order to generate their graphs.
 
-##corpus:
+## corpus:
 * The folder "Texts" contains the entire corpus that the main spell checker files use
 * this was got from: https://llds.ling-phil.ox.ac.uk/llds/xmlui/handle/20.500.14106/2554
 * the combined size of these corpora is around 4.6 GB, so downloading them would take time and space.
