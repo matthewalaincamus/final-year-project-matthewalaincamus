@@ -12,5 +12,4 @@ int DataReader(int duplicateFlag, int sortFlag, int testFlag);
 char** sortingAlphabeticallyFunction(char **WordArray, int WordCount);
 void MergeSort(char**WordArray, int LeftValue, int RightValue, int WordCount);
 void Merge(char**WordArray, int LeftValue, int MiddleValue, int RightValue, int WordCount);
-void ParallelSort(char**WordArray);
 int AfterSort(char** WordArray, int WordCount, FILE* Wfp);

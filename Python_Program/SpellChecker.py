@@ -15,6 +15,7 @@ class Node:
         self.AlgorithmDistance = AlgorithmDistance
         self.next = None
 
+#hash table class
 class HashTable:
     def __init__(self, maxSize):
         self.maxSize = maxSize
@@ -536,29 +537,7 @@ def initHash(FileType : int, MaxSize : int):
 #Levenshtein Distance algorithm
 def LevenshteinDistance(string1 : str, string2 : str, len1 : int, len2 : int):
     levenshtein = Levenshtein()
-    return levenshtein.distance(string1, string2)
-    '''
-    #array to store results of calculations
-    CalculationArray = [[0 for x in range(len2 + 1)] for y in range(len1+1)]
-
-    #add starting values to calculation array
-    for i in range(len1+1): CalculationArray[i][0] = i
-    for j in range(len2+1): CalculationArray[0][j] = j
-
-    #fill in the matrix using dynamic programming
-    for i in range(1, len1+1):
-        for j in range(1, len2+1):
-            if string1[i - 1] == string2[j - 1]:
-                #characters match, no operation needed
-                CalculationArray[i][j] = CalculationArray[i-1][j-1]
-            else:
-                #characters don't match, choose minimum cost among insertion, deletion, substitution
-                CalculationArray[i][j] = 1 + min(
-                                        CalculationArray[i][j-1],
-                                        CalculationArray[i-1][j],
-                                        CalculationArray[i-1][j-1])
-    return CalculationArray[len1][len2]
-    '''
+    return levenshtein.distance(string1, string2) 
 
 #Hamming Distance algorithm
 def HammingDistance(string1 : str, string2 : str, len1 : int, len2 : int):
@@ -579,119 +558,16 @@ def HammingDistance(string1 : str, string2 : str, len1 : int, len2 : int):
 def SorensenDiceCoefficient(string1 : str, string2 : str, len1 : int, len2 : int):
     SD = SorensenDice()
     return SD.distance(string1, string2)
-    '''
-    #number of bigrams that match
-    matches = 0.0
-
-    i = 0
-    j = 0
-
-    #loop through, getting the number of bigrams that match and updating the count
-    while i < len1 - 1 and j < len2 - 1:
-        bigram1 = "" + string1[i] + string2[i+1]
-        bigram2 = "" + string2[j] + string2[j+1]
-
-        if bigram1 == bigram2: matches+=1
-
-        i+=1
-        j+=1
-
-    #would usually be a value between 0 and 1, but for uniformity of keeping all algorithm values
-    # int, times the value by 100 and use that instead
-    #also, minus the value from 100, so that similar values are close to 0 than 100 so the 
-    # top 10 results calculator and just look for the smallest values
-    return 100 - (100 * ( (2 * matches) / ( (len1 - 1) + (len2 - 1) ) ) )
-    '''
 
 #Optimal String Alignment Distance algorithm
 def OptimalStringAlignmentDistance(string1 : str, string2 : str, len1 : int, len2 : int):
     OSA = OptimalStringAlignment()
     return OSA.distance(string1, string2)
-    '''
-    #array to store results of calculations
-    CalculationArray = [ [0 for x in range(len2+1)] for y in range (len1+1)]
-
-    #add starting values to calculation array
-    for i in range(len1 + 1): CalculationArray[i][0] = i
-    for j in range(len2 + 1): CalculationArray[0][j] = j
-
-    for i in range(len1):
-        for j in range(len2):
-            cost = 0
-
-            if string1[i] == string2[j]: cost = 0
-            else: cost = 1
-
-            CalculationArray[i+1][j+1] = min(CalculationArray[i][j+1] + 1, #deletion
-                                            CalculationArray[i+1][j] + 1, #insertion
-                                            CalculationArray[i][j] + cost) #substitution
-            
-            if i > 0 and j > 0 and string1[i] == string2[j-1] and string1[i-1] == string2[j]:
-                CalculationArray[i][j] = min(CalculationArray[i][j],
-                                                CalculationArray[i-1][j-1] + 1) #transposition
-
-    return CalculationArray[len1][len2]
-    '''
 
 #Damerau-Levenshtein Distance algorithm
 def DamerauLevenshteinDistance(string1 : str, string2 : str, len1 : int, len2 : int):
     damerau = Damerau()
     return damerau.distance(string1, string2)
-    '''
-    # Used to prevent transpositions for first characters
-    MaxDistance = len1 + len2
-
-    #2D array for storing the results of calculations
-    CalculationMatrix  =  [ [0 for x in range(len2+2)] for y in range (len1+2)]
-
-    CalculationMatrix[0][0] = MaxDistance
-    for i in range(len1+1):
-        CalculationMatrix[i+1][1] = i
-        CalculationMatrix[i+1][0] = MaxDistance
-    for j in range(len2):
-        CalculationMatrix[1][j+1] = j
-        CalculationMatrix[0][j+1] = MaxDistance
-
-    # Holds last row each element was encountered
-    last_row = {}
-
-    #calculation loop
-    for i in range(1, len1 + 1):
-        #current string 1 character
-        string1Char = string1[i-1]
-
-        # Column of last match on this row
-        lastMatchingCol = 0
-
-        for j in range(1, len2 + 1):
-            # Current string 2 character
-            string2Char = string2[j-1]
-
-            # Last row with matching character
-            lastMatchingRow = last_row.get(string2Char, 0)
-
-            # Cost of substitution
-            cost = 0 if string1Char == string2Char else 1
-
-            # Compute smallest distance
-            CalculationMatrix[i+1][j+1] = min(
-                CalculationMatrix[i][j] + cost, # Substitution
-                CalculationMatrix[i+1][j] + 1,  # Addition
-                CalculationMatrix[i][j+1] + 1,  # Deletion
-                CalculationMatrix[lastMatchingRow][lastMatchingCol]
-                    + (i - lastMatchingRow - 1) + 1
-                    + (j - lastMatchingCol - 1)) # Transposition
-
-            # If there was a match, update last_match_col
-            if cost == 0:
-                lastMatchingCol = j
-
-        # Update last row for current character
-        last_row[string1Char] = i
-
-    # Return last element
-    return CalculationMatrix[-1][-1]
-    '''
 
 #Jaro Similarity algorithm
 def JaroSimilarity(string1 : str, string2 : str, len1 : int, len2 : int):
@@ -742,32 +618,8 @@ def JaroSimilarity(string1 : str, string2 : str, len1 : int, len2 : int):
 
 #Jaro-Winkler Similarity algorithm
 def JaroWinklerSimilarity(string1 : str, string2 : str, len1 : int, len2 : int):
-
     jaroWinkler = JaroWinkler()
     return jaroWinkler.distance(string1, string2)
-
-    '''
-    #get the original jaro distance
-    jaroDistance = (100 - JaroSimilarity(string1, string2, len1, len2)) / 100
-
-    #if the similarity is above a threshold
-    if jaroDistance > 0.7:
-        Prefix = 0
-
-        for i in range(0, min(len1, len2)):
-            #if the characters match
-            if string1[i] == string2[i]: Prefix+=1
-            else: break
-
-        #maximum of 4 characters are allowed in prefix
-        Prefix = min(4, Prefix)
-
-        #calculate jaro winkler Similarity
-        jaroDistance += 0.1 * Prefix * (1 - jaroDistance)
-
-    #return jaro distance, making sure values are int and similar values are close to zero
-    return 100 - (100 * jaroDistance)
-    '''
 
 #function to handle full testing and comparison of methods and algorithms
 def AutoSpellChecker(FileType : int):
@@ -1027,11 +879,8 @@ def AlgorithmAssessor(FileType : int):
                     IncorrectCount+=1
     #close the file each time
     fp.close()
-
-    #print(MisspelledWordArray)
     
     #begin testing loop
-    print("Correct Words:" , len(MisspelledWordArray.keys()), ", Incorrect Words:", IncorrectCount)
     
     #make a number of variables for calculating the average time and suggestion number for each algorithm
     #levenshtein distance

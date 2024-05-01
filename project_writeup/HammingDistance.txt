@@ -8,7 +8,7 @@ Algorithm HammingDistance is
 	let score := 0
 
 	for the length(A) do
-		if the next character in A = the equivalent character in B then
+		if the next character in A doesn't = the equivalent character in B then
 			increment score by 1
 
 	return score

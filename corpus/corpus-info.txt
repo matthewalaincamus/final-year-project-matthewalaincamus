@@ -1,2 +1,2 @@
-I got the main corpus from: https://llds.ling-phil.ox.ac.uk/llds/xmlui/handle/20.500.14106/2554, at 13:59 on 29/01/2024
+I got the main corpus from: https://llds.ling-phil.ox.ac.uk/llds/xmlui/handle/20.500.14106/2554, on 29/01/2024
 I got the Words-Mispelled corpus from: https://www.dcs.bbk.ac.uk/~roger/corpora.html, on 24/4/24

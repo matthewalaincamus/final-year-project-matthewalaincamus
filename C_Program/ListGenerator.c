@@ -73,10 +73,10 @@ int DataReader(int duplicateFlag, int sortFlag, int testFlag)
         return -1;
     }
 
+    //used to look through all the files in a directory
     struct dirent *dp;
     char directoryName[50] = "../corpus/Texts/";
     strcat(directoryName, ActionChoice1);
-    //printf("%s\n", directoryName);
 
     DIR *dir = opendir(directoryName);
     if (!dir)
@@ -86,6 +86,7 @@ int DataReader(int duplicateFlag, int sortFlag, int testFlag)
     }
     else
     {
+        //loop through the first folder, collecting all the subsequent folder names
         while ((dp = readdir(dir)) != NULL)
         {
             if (!(!strcmp(dp->d_name,"..") || !strcmp(dp->d_name, ".")))
@@ -105,6 +106,7 @@ int DataReader(int duplicateFlag, int sortFlag, int testFlag)
                 }
                 else
                 {
+                    //loop through the next directory to find all the xml files of the corpus
                     while((innerdp = readdir(innerdir)) != NULL)
                     {
                         if (!(!strcmp(innerdp->d_name,"..") || !strcmp(innerdp->d_name, ".")))
@@ -120,6 +122,7 @@ int DataReader(int duplicateFlag, int sortFlag, int testFlag)
                             FILE* fp;
                             char nextChar = ' ';
 
+                            //open the xml corpus file
                             fp = fopen(FinalDirectoryName, "r");
 
                             if (fp == NULL)
@@ -131,12 +134,6 @@ int DataReader(int duplicateFlag, int sortFlag, int testFlag)
                             {
                                 //line count just used for testing purposes
                                 int lineCount = 1;
-
-                                //for if a word ends with a ': needs work
-                                /*
-                                int apostropheCheck = 0;
-                                char apostropheWord [25] = "";
-                                */
 
                                 while(nextChar != EOF)
                                 {
@@ -171,11 +168,13 @@ int DataReader(int duplicateFlag, int sortFlag, int testFlag)
                                                 int charCount = 0;
                                                 while(nextChar != '"')
                                                 {
+                                                    //check if a letter is valid (a - z)
                                                     if (isdigit(nextChar) || (int)nextChar < 97 ||(int)nextChar > 122)
                                                     {
                                                         breakCheck++;
                                                         break;
                                                     }
+                                                    //split words on non aplha caracters
                                                     else if (nextChar == '/' || nextChar == '-' || nextChar == '.' || nextChar == '*')
                                                     {
                                                         nextString[charCount] = '\0';
@@ -184,6 +183,7 @@ int DataReader(int duplicateFlag, int sortFlag, int testFlag)
                                                         //exclude one letter words
                                                         if (breakCheck == 0 && isalpha(nextString[0]) && charCount > 1)
                                                         {
+                                                            //check if word exists already in list
                                                             int duplicateCheck = 0;
 
                                                             if (duplicateFlag == 0)
@@ -197,26 +197,29 @@ int DataReader(int duplicateFlag, int sortFlag, int testFlag)
                                                                     }
                                                                 }
                                                             }
-
+                                                            
+                                                            //if word is valid, add to word list
                                                             if((duplicateCheck == 0 && duplicateFlag == 0) || (duplicateFlag == 1))
                                                             {
                                                                 WordArray[WordCount] = malloc(50 * sizeof(char));
                                                                 strcpy(WordArray[WordCount], nextString);
                                                                 WordCount++;
 
+                                                                //can add the data immediately if no sorting is needed
                                                                 if (sortFlag == 0)
                                                                 {
                                                                     fprintf(Wfp, "%s\n", nextString);
                                                                 }
                                                             }
                                                         }
-
+                                                        //reset data for next string
                                                         charCount = 0;
                                                         breakCheck = 0;
                                                         nextChar = fgetc(fp);
                                                     }
                                                     else
                                                     {
+                                                        //update data for string
                                                         nextString[charCount] = nextChar;
                                                         nextChar = fgetc(fp);
                                                         charCount++;
@@ -228,6 +231,7 @@ int DataReader(int duplicateFlag, int sortFlag, int testFlag)
                                                 //exclude 1 letter words
                                                 if (breakCheck == 0 && isalpha(nextString[0]) && charCount > 1)
                                                 {
+                                                    //check if word exists in list
                                                     int duplicateCheck = 0;
 
                                                     if (duplicateFlag == 0)
@@ -241,13 +245,15 @@ int DataReader(int duplicateFlag, int sortFlag, int testFlag)
                                                             }
                                                         }
                                                     }
-
+                                                    
+                                                    //if word is valid add to list
                                                     if((duplicateCheck == 0 && duplicateFlag == 0) || (duplicateFlag == 1))
                                                     {
                                                         WordArray[WordCount] = malloc(50 * sizeof(char));
                                                         strcpy(WordArray[WordCount], nextString);
                                                         WordCount++;
 
+                                                        //if no sorting is needed, add immidiately to list
                                                         if (sortFlag == 0)
                                                         {
                                                             fprintf(Wfp, "%s\n", nextString);
@@ -263,24 +269,17 @@ int DataReader(int duplicateFlag, int sortFlag, int testFlag)
                             fclose(fp);
                         }
                     }
+                    //cleanup
                     closedir(innerdir);
                 }
             }
         }
+        //cleanup
         closedir(dir);
     }
 
-    
     printf("**Loading Complete\n");
     printf("WordCount: %d\n", WordCount);
-
-    //for testing
-    /*
-    for (int i = 0; i < WordCount; i++)
-    {
-        printf("%s\n", WordArray[i]);
-    }
-    */
 
     //sorting if necessary
     if (sortFlag == 1)
@@ -290,6 +289,7 @@ int DataReader(int duplicateFlag, int sortFlag, int testFlag)
         //merge sort
         char **SortedWordArray = sortingAlphabeticallyFunction(WordArray, WordCount);
 
+        //add the data to word file after sorting is complete
         int sortingCheck = AfterSort(SortedWordArray, WordCount, Wfp);
 
         if (sortingCheck == -1)
@@ -311,6 +311,7 @@ int DataReader(int duplicateFlag, int sortFlag, int testFlag)
     //confirm that the file was generated successfully
     printf("***File generated sucessfully***\n");
 
+    //return the time of completion
     clock_t TimeDif = clock() - Start;
     double TimeTaken = (double)TimeDif / CLOCKS_PER_SEC;
 
@@ -325,16 +326,16 @@ int DataReader(int duplicateFlag, int sortFlag, int testFlag)
 }
 
 //function used to sort a list of words in aplphabetical order
-//using a shell sort
+//using a merge sort
 char** sortingAlphabeticallyFunction(char **WordArray, int WordCount)
 {
-    //printf("%d: words to sort\n", WordCount);
-
+    //perform merge sort
     MergeSort(WordArray, 0, WordCount - 1, WordCount);
 
     return WordArray;
 }
 
+//merge sort function
 void MergeSort(char**WordArray, int LeftValue, int RightValue, int WordCount)
 {
     if (LeftValue < RightValue)
@@ -347,6 +348,7 @@ void MergeSort(char**WordArray, int LeftValue, int RightValue, int WordCount)
     }
 }
 
+//for merge recursion
 void Merge(char**WordArray, int LeftValue, int MiddleValue, int RightValue, int WordCount)
 {
     int LeftArrayRange = MiddleValue - LeftValue + 1;
@@ -398,6 +400,7 @@ void Merge(char**WordArray, int LeftValue, int MiddleValue, int RightValue, int 
     }
 }
 
+//add results of sorting to word file
 int AfterSort(char** WordArray, int WordCount, FILE* Wfp)
 {
     //loop to add sorted list to final file

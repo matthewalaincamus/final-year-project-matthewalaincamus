@@ -137,12 +137,10 @@ def DataReader(duplicateFlag : bool, sortFlag : bool, testFlag : bool):
     #then write them to the file
     if duplicateFlag == True:
         for word in WordArrayDuplicates:
-            #print(word)
             Wfp.write(word)
             Wfp.write("\n")
     else:
         for word in WordArrayNoDuplicates.keys():
-            #print(word)
             Wfp.write(word)
             Wfp.write("\n")
 

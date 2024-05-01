@@ -127,34 +127,6 @@ int SpellChecker(int FileType, int CheckType, int AlgorithmCheck)
             struct ReturnHash WordHashTable = initHash(FileType, MaxSize);
             if (WordHashTable.WordCount == -1) return -1;
 
-            /*
-            struct WordNode *TestNode;
-            for (int i = 0; i < MaxSize; i++)
-            {
-                if (WordHashTable.HashTable[i].head != NULL && i < 6000 && i >5000)
-                {
-                    printf("(%d)Head: ", i);
-                    TestNode = WordHashTable.HashTable[i].head;
-                    if (TestNode->next == NULL) printf("(%d : %s) :Tail",TestNode->key,TestNode->Word);
-                    else
-                    {
-                        while(1)
-                        {   
-                            if (TestNode->next == NULL)
-                            {
-                                printf(" :Tail");
-                                break;
-                            }
-
-                            printf("(%d : %s) -> ", TestNode->key,TestNode->Word);
-                            TestNode = TestNode->next;
-                        }
-                    }
-                    printf("\n");
-                }
-            }
-            */
-
             //perform hash checking
             HashChecker(WordHashTable.HashTable, MaxSize, WordHashTable.WordCount, ActionChoice, AlgorithmCheck, 0, "");
 
@@ -249,7 +221,6 @@ struct WordsListing WordFetcher(int FileType)
         else if (nextChar == '\n')
         {
             nextString[charCount] = '\0';
-            //printf("%s\n", nextString);
 
             WordArray[WordCount] = malloc(50 * sizeof(char));
             strcpy(WordArray[WordCount], nextString);
@@ -268,6 +239,7 @@ struct WordsListing WordFetcher(int FileType)
     return returnStruct;
 }
 
+//convert word file into a hash table
 struct ReturnHash initHash(int FileType, int MaxSize)
 {
     FILE* fp;
@@ -344,9 +316,6 @@ struct ReturnHash initHash(int FileType, int MaxSize)
         {
             //end off the string
             nextString[charCount] = '\0';
-
-            //testing
-            //if (!strcmp(nextString, "apple")) printf("%s : %d\n", nextString, stringHashCode);
             
             //insert the string into the hash table
             struct WordNode *nodeList = (struct WordNode*) returnHashTable[stringHashCode].head;
@@ -758,28 +727,6 @@ struct TimeAndSuggestion HashChecker(struct WordHashItem *HashTable, int MaxSize
                     }
                 }
 
-                /*
-                if (i == 0)
-                {
-                    struct WordNode *TestNode;
-                    for (int k = 0; k < MaxSize; k++)
-                    {
-                        if (HashTable[k].head != NULL && HashTable[k].tail != NULL && k < 8000)
-                        {
-                            printf("%d| ", k);
-                            TestNode = HashTable[k].head;
-                            if (TestNode->next == NULL) printf("%d:%d: %s",TestNode->key, TestNode->AlgorithmDistance, TestNode->Word);
-                            while(TestNode->next != NULL)
-                            {   
-                                printf("%d:%d: %s ->", TestNode->key, TestNode->AlgorithmDistance, TestNode->Word);
-                                TestNode = TestNode->next;
-                            }
-                            printf("\n");
-                        }
-                    }
-                }
-                */
-
                 //update the min key to be large and out of the way
                 struct WordNode *updateNode = HashTable[CurrentMinIndex].head;
                 for (int k = 0; k < CurrentMinLinkedListIndex; k++) 
@@ -1129,6 +1076,7 @@ int Min3(int a, int b, int c)
     else return c;
 }
 
+//automated tests function
 int AutoSpellChecker(int FileType)
 {
     //check to see if the user wants to return to the main menu
@@ -1373,6 +1321,7 @@ int AutoSpellChecker(int FileType)
     return 0;
 }
 
+//Misspelled words automated tester
 int AlgorithmAssessor(int FileType)
 {
     //word array for storing all the words
@@ -1422,7 +1371,6 @@ int AlgorithmAssessor(int FileType)
         {
             //complete word
             nextString[charCount] = '\0';
-            //printf("%s\n", nextString);
 
             //if this is a correctly spelled word which is valid
             if (ValidCheck == 0 && nextString[0] == '$')
@@ -1487,7 +1435,6 @@ int AlgorithmAssessor(int FileType)
     fclose(fp);
 
     //begin testing loop
-    //printf("Correct Words: %d, Incorrect Words: %d\n", CorrectWordCount, IncorrectWordCount);
     
     //make a number of variables for calculating the average time and suggestion number for each algorithm
     //levenshtein distance
@@ -1541,7 +1488,6 @@ int AlgorithmAssessor(int FileType)
         printf("%s -> %s\n", MisspelledWordArray[i].Word, CorrectspelledWordArray[MisspelledWordArray[i].index]);
         char MasterWord[50]; 
         strcpy(MasterWord, CorrectspelledWordArray[MisspelledWordArray[i].index] + 1);
-        //printf("%s\n", MasterWord);
         
         //tmp structure to hold data returned from functions
         struct TimeAndSuggestion returnedValues;

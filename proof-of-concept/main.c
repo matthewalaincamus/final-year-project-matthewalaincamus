@@ -38,7 +38,6 @@ int main(){
             int i = 0;
 
             while(nextChar != '\n' && nextChar != EOF){
-                //printf("[%i]:[%i]\n", index, i);
                 testString[i] = nextChar;
                 i++;
                 nextChar = fgetc(fptr);
@@ -51,14 +50,11 @@ int main(){
 
             testString[i] = '\0';
 
-            //printf("%s\n", testString);
             WordArray[index] = malloc(128 * sizeof(char));
             strcpy(WordArray[index], testString);
             index++;
         }
     }
-    //printf("%s\n", WordArray[0]);
-    //printf("%s\n", WordArray[370098]);
 
     //user input
     char userWord[128];
