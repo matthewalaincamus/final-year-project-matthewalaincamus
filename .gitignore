@@ -1,8 +1,6 @@
 *.exe
 /.vscode
-/C_Program/GeneratedFiles/*.txt
 /Python_Program/.venv
 /Python_Program/__pycache__
-/Python_Program/GeneratedFiles/*.txt
 /AutomatedTestingResults/.venv
 /AutomatedTestingResults/*.txt
